@@ -1,11 +1,11 @@
 steps:
   # 1. Cloner le Backend
   - name: 'gcr.io/cloud-builders/git'
-    args: ['clone', 'https://github.com/axelVISSOH/reloke-back.git', 'backend']
+    args: ['clone', 'https://github.com/reloke/reloke-back.git', 'backend']
 
   # 2. Cloner le Frontend
   - name: 'gcr.io/cloud-builders/git'
-    args: ['clone', 'https://github.com/Houken23/reloke-front.git', 'frontend']
+    args: ['clone', 'https://github.com/reloke/reloke-front.git', 'frontend']
 
   # 3. Builder l'image Docker unique
   - name: 'gcr.io/cloud-builders/docker'
