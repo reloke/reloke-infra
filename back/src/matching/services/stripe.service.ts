@@ -31,6 +31,8 @@ export class StripeService {
     this.webhookSecretRefund =
       this.configService.get<string>('STRIPE_WEBHOOK_SECRET_REFUND') || '';
 
+    const STRIPE_API_VERSION = this.configService.get<string>('STRIPE_API_VERSION') || '2026-01-28.clover';
+
     // Check if Stripe is properly configured
     this.isConfigured = !!(
       secretKey &&

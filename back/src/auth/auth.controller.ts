@@ -143,7 +143,7 @@ export class AuthController {
   @Get('provider/:email')
   async getAuthProvider(@Req() req: Request) {
     const email = req.params.email;
-    const user = await this.userService.findByMail(email);
+    const user = await this.userService.findByMail(email as string);
 
     if (!user) {
       return { provider: 'PASSWORD', exists: false };
