@@ -31,7 +31,9 @@ export class StripeService {
     this.webhookSecretRefund =
       this.configService.get<string>('STRIPE_WEBHOOK_SECRET_REFUND') || '';
 
-    const STRIPE_API_VERSION = this.configService.get<string>('STRIPE_API_VERSION') || '2026-01-28.clover';
+    const isProd = process.env.NODE_ENV === 'production';
+    // Utilisation de || pour la valeur par défaut et "as any" pour calmer le compilateur
+    const STRIPE_API_VERSION = (this.configService.get<string>('STRIPE_API_VERSION') || (isProd ? '2026-01-28.clover' : '2025-11-17.clover')) as any;
 
     // Check if Stripe is properly configured
     this.isConfigured = !!(
@@ -43,7 +45,8 @@ export class StripeService {
 
     if (this.isConfigured) {
       this.stripe = new Stripe(secretKey, {
-        apiVersion: '2025-11-17.clover',
+        // @ts-ignore
+        apiVersion: STRIPE_API_VERSION,
         typescript: true,
       });
       this.logger.log('Stripe SDK initialized successfully');
