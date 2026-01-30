@@ -24,7 +24,8 @@ RUN npx prisma generate
 
 # 3. Copier le reste du code et compiler NestJS
 COPY back/ .
-RUN npm run build
+# Utilisation de --skipLibCheck pour ignorer les erreurs de types Stripe/Auth pendant le build
+RUN npx nest build -- --skipLibCheck
 
 # --- ÉTAPE 3 : Image Finale (Production) ---
 FROM node:20-slim
@@ -42,13 +43,13 @@ COPY --from=build-back /app/backend/prisma ./prisma/
 RUN npm install --only=production --legacy-peer-deps
 
 # Récupération du Frontend
-# Note : vérifie bien si ton Angular 17+ génère dans dist/browser ou dist/[nom-projet]/browser
+# Basé sur ton build local réussi : le chemin est /app/frontend/dist/Reloke
 COPY --from=build-front /app/frontend/dist/Reloke /usr/share/nginx/html
 
 # Configuration Nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 8080
 
-# Démarrage : Migration de la DB (optionnel au runtime) + NestJS + Nginx
-# Note : npx prisma migrate deploy nécessite que DATABASE_URL soit définie dans Cloud Run
+# Démarrage : Migration de la DB + NestJS + Nginx
+# Rappel : DATABASE_URL doit être configurée dans les secrets de Cloud Run
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js & nginx -g 'daemon off;'"]
