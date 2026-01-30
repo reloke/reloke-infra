@@ -41,4 +41,4 @@ COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 8080
 
 # Script de démarrage pour forcer les logs NestJS au premier plan
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js & nginx -g 'daemon off;'"]
+CMD ["sh", "-c", "npx prisma migrate deploy && (node dist/main.js & nginx -g 'daemon off;')"]
