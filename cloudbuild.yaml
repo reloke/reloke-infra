@@ -1,24 +1,23 @@
 steps:
-  # 1. Builder l'image Docker (Google a déjà récupéré tout le code)
+  # 1. Builder l'image Docker
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/reloke-monolith', '.']
+    args: ['build', '-t', 'europe-west9-docker.pkg.dev/$PROJECT_ID/reloke-repo/reloke-monolith', '.']
 
-  # 2. Pousser l'image vers le registre
+  # 2. Pousser l'image vers Artifact Registry (le nouveau garage)
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/reloke-monolith']
+    args: ['push', 'europe-west9-docker.pkg.dev/$PROJECT_ID/reloke-repo/reloke-monolith']
 
-  # 3. Déployer sur Cloud Run à Paris
+  # 3. Déployer sur Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
       [
         'run', 'deploy', 'reloke-api',
-        '--image', 'gcr.io/$PROJECT_ID/reloke-monolith',
+        '--image', 'europe-west9-docker.pkg.dev/$PROJECT_ID/reloke-repo/reloke-monolith',
         '--region', 'europe-west9',
         '--platform', 'managed',
         '--allow-unauthenticated'
       ]
 
-# Forcer l'affichage des logs
 options:
   logging: CLOUD_LOGGING_ONLY
