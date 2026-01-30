@@ -1,0 +1,104 @@
+
+// --- AJOUTS PROPOSÉS (Migration RGPD) ---
+
+// 1. Gestion des liens DossierFacile
+model DossierFacileLink {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  uuid          String   @unique
+  status        String   @default("UNKNOWN") // OK | KO | UNKNOWN
+  lastCheckedAt DateTime?
+  
+  lastHttpCode  Int?
+  lastError     String? // Pour debug technique uniquement, pas de PII
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+}
+
+// 2. Gestion des cas légaux (Litiges/Fraude) pour "Legal Hold"
+model LegalCase {
+  id           Int      @id @default(autoincrement())
+  type         String   // FRAUD | HARASSMENT | CHARGEBACK | DISPUTE | OTHER
+  status       String   @default("OPEN") // OPEN | CLOSED
+  
+  openedAt     DateTime @default(now())
+  closedAt     DateTime?
+  
+  // Date jusqu'à laquelle les données sont gelées (ex: closedAt + 5 ans)
+  holdUntil    DateTime?  
+
+  internalNotes String?   @db.Text // Notes admin internes
+
+  // Utilisateur principal concerné (l'accusé ou le demandeur selon contexte)
+  userId       Int?
+  user         User?    @relation(fields: [userId], references: [id]) 
+  // Note: On ne met pas onDelete: Cascade car le but est justement de garder le cas même si user "supprimé"
+
+  // Liens optionnels vers les objets du litige
+  reportId     Int?
+  report       Report?  @relation(fields: [reportId], references: [id])
+  
+  paymentId    Int?
+  payment      Payment? @relation(fields: [paymentId], references: [id])
+  
+  chatId       Int?
+  chat         Chat?    @relation(fields: [chatId], references: [id])
+  
+  matchGroupId String?    // Lien souple vers un groupe de match
+
+  // Snapshots de données (JSON) pour archivage figé si les originaux sont purgés
+  evidenceSnapshot Json?
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([status])
+  @@index([holdUntil])
+  @@index([userId])
+}
+
+// --- MODIFICATIONS SUR MODÈLES EXISTANTS ---
+
+/* 
+   User : Ajout champs cycle de vie 
+*/
+// model User {
+//   ... existant ...
+//   lastActivityAt      DateTime  @default(now()) // Pour calcul inactivité 2 ans
+//   anonymizedAt        DateTime? // Date d'anonymisation effective
+//   deletionRequestedAt DateTime? // Date demande utilisateur
+//   deletionScheduledAt DateTime? // Date prévue purge (J+90)
+//   deletedReason       String?   // USER_REQUEST | INACTIVITY | LEGAL_FORCE
+//   isDeletionFinalized Boolean   @default(false)
+//   ...
+// }
+
+/* 
+   Message : Soft delete et Redaction 
+*/
+// model Message {
+//   ... existant ...
+//   deletedAt       DateTime?
+//   isDeleted       Boolean   @default(false)
+//   redactedAt      DateTime?
+//   redactionReason String?   // USER_DELETE | MODERATION | LEGAL_HOLD
+//   // contentRedacted String? // Optionnel si on veut garder une trace du fait qu'il y avait du texte
+//   ...
+// }
+
+/* 
+   Report : Suivi clôture pour délai prescription 
+*/
+// model Report {
+//   ... existant ...
+//   resolvedAt     DateTime?
+//   closedAt       DateTime? // Point de départ des 5 ans d'archivage
+//   handledByAdminId Int?
+//   resolutionNote String?   @db.Text
+//   ...
+// }

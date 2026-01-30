@@ -1,0 +1,1136 @@
+<div class="min-h-screen bg-bg-main p-4 sm:p-6 font-body">
+  <div class="max-w-6xl mx-auto">
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !isLoading" class="bg-bg-card rounded-3xl shadow-card border border-border p-10 text-center">
+      <div class="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-4">
+        <i class="pi pi-exclamation-triangle text-2xl"></i>
+      </div>
+      <h3 class="text-xl font-heading font-bold text-main mb-2">Erreur</h3>
+      <p class="text-secondary mb-6">{{ error }}</p>
+      <button (click)="goBack()"
+        class="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-hover transition-colors">
+        Retour
+      </button>
+    </div>
+
+    <!-- Content -->
+    <ng-container *ngIf="context && !isLoading && !error">
+
+      <!-- Header -->
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <div class="flex items-center gap-3">
+          <button (click)="goBack()"
+            class="w-11 h-11 rounded-xl border border-border text-main flex items-center justify-center hover:border-primary hover:text-primary transition-colors">
+            <i class="pi pi-arrow-left text-lg"></i>
+          </button>
+          <div>
+            <p class="text-xs uppercase tracking-[0.08em] text-secondary font-semibold">Profil utilisateur</p>
+            <h1 class="text-2xl font-heading font-bold text-main">
+              {{ context.user.firstName }} {{ context.user.lastName }}
+            </h1>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span *ngIf="context.user.isBanned" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+            Banni
+          </span>
+          <span *ngIf="context.user.isKycVerified" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+            Valide
+          </span>
+          <span *ngIf="!context.user.isKycVerified" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+            Non valide
+          </span>
+        </div>
+      </div>
+
+      <!-- User Info Card -->
+      <div class="bg-bg-card rounded-2xl shadow-sm border border-border overflow-hidden mb-6">
+        <div class="p-5 bg-gradient-to-r from-primary/5 to-primary/10 border-b border-border">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold">
+              {{ context.user.firstName.charAt(0) || 'U' }}{{ context.user.lastName.charAt(0) || '' }}
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-main">{{ context.user.firstName }} {{ context.user.lastName }}</h2>
+              <p class="text-secondary text-sm">{{ context.user.mail }}</p>
+              <p class="text-xs text-gray-400 mt-1">Inscrit le {{ formatDate(context.user.createdAt) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-border">
+          <div class="p-4 text-center">
+            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Role</p>
+            <p class="text-main font-semibold">{{ context.user.role }}</p>
+          </div>
+          <div class="p-4 text-center">
+            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">KYC</p>
+            <p class="text-main font-semibold">{{ context.user.kycStatus }}</p>
+          </div>
+          <div class="p-4 text-center">
+            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">ID</p>
+            <p class="text-main font-semibold">#{{ context.user.id }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-6">
+
+        <!-- LEFT COLUMN -->
+        <div class="space-y-6">
+
+          <!-- Home Section -->
+          <div class="bg-bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+            <div class="p-5 border-b border-border flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <i class="pi pi-home text-lg"></i>
+                </div>
+                <h3 class="text-lg font-heading font-bold text-main">Logement sortant</h3>
+              </div>
+              <span *ngIf="context.home.hasHome" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                Actif
+              </span>
+              <span *ngIf="!context.home.hasHome" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                Non configure
+              </span>
+            </div>
+
+            <ng-container *ngIf="context.home.hasHome && context.home.home">
+              <!-- Image Gallery -->
+              <div *ngIf="context.home.home.imageUrls?.length" class="relative aspect-[4/3] bg-gray-100">
+                <img [src]="context.home.home.imageUrls[currentImageIndex]" alt="Photo du logement"
+                  class="w-full h-full object-cover cursor-pointer" (click)="openGallery(currentImageIndex)">
+
+                <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div>
+
+                <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 text-white text-xs font-semibold">
+                  {{ currentImageIndex + 1 }} / {{ context.home.home.imageUrls.length }}
+                </div>
+
+                <button *ngIf="context.home.home.imageUrls.length > 1" (click)="previousImage(); $event.stopPropagation()"
+                  class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 text-main shadow-lg hover:bg-white flex items-center justify-center">
+                  <i class="pi pi-chevron-left text-sm"></i>
+                </button>
+                <button *ngIf="context.home.home.imageUrls.length > 1" (click)="nextImage(); $event.stopPropagation()"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 text-main shadow-lg hover:bg-white flex items-center justify-center">
+                  <i class="pi pi-chevron-right text-sm"></i>
+                </button>
+
+                <button (click)="openGallery(currentImageIndex); $event.stopPropagation()"
+                  class="absolute bottom-3 left-3 bg-white/90 hover:bg-white px-3 py-1.5 rounded-lg shadow-card text-xs font-semibold flex items-center gap-2">
+                  <i class="pi pi-images text-primary text-xs"></i>
+                  Voir les {{ context.home.home.imageUrls.length }} photos
+                </button>
+              </div>
+
+              <!-- Thumbnails -->
+              <div *ngIf="context.home.home.imageUrls && context.home.home.imageUrls.length > 1" class="flex gap-2 p-3 overflow-x-auto">
+                <button *ngFor="let img of context.home.home.imageUrls; let i = index" (click)="goToImage(i)"
+                  [class.ring-2]="currentImageIndex === i" [class.ring-primary]="currentImageIndex === i"
+                  class="flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden bg-gray-100">
+                  <img [src]="img" alt="Miniature" class="w-full h-full object-cover">
+                </button>
+              </div>
+
+              <!-- Home Details -->
+              <div class="p-5">
+                <div class="flex items-start justify-between mb-4">
+                  <div>
+                    <h4 class="text-2xl font-bold text-main">{{ context.home.home.rent }} EUR<span class="text-base font-normal text-secondary">/mois</span></h4>
+                    <p class="text-sm text-secondary">loyer mensuel</p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-3 divide-x divide-border border-y border-border -mx-5 px-5 py-3 mb-4">
+                  <div class="text-center px-2">
+                    <div class="flex items-center justify-center gap-1 mb-1">
+                      <i class="pi pi-th-large text-primary text-sm"></i>
+                      <span class="text-lg font-semibold text-main">{{ context.home.home.nbRooms }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">pièce{{ context.home.home.nbRooms > 1 ? 's' : '' }}</span>
+                  </div>
+                  <div class="text-center px-2">
+                    <div class="flex items-center justify-center gap-1 mb-1">
+                      <i class="pi pi-arrows-alt text-primary text-sm"></i>
+                      <span class="text-lg font-semibold text-main">{{ context.home.home.surface }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">m2</span>
+                  </div>
+                  <div class="text-center px-2">
+                    <div class="flex items-center justify-center gap-1 mb-1">
+                      <i class="pi pi-home text-primary text-sm"></i>
+                    </div>
+                    <span class="text-xs text-gray-500">{{ getHomeTypeLabel(context.home.home.homeType) }}</span>
+                  </div>
+                </div>
+
+                <div class="space-y-3">
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <i class="pi pi-map-marker text-primary text-sm"></i>
+                    </div>
+                    <div>
+                      <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Adresse</span>
+                      <p class="text-main text-sm font-medium">{{ context.home.home.addressFormatted }}</p>
+                    </div>
+                  </div>
+
+
+                  <div *ngIf="context.home.home.description" class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <i class="pi pi-align-left text-blue-500 text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                      <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Description</span>
+                      <p class="text-secondary text-sm leading-relaxed mt-1">{{ context.home.home.description }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- No Home State -->
+            <div *ngIf="!context.home.hasHome" class="p-8 text-center">
+              <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
+                <i class="pi pi-home text-3xl text-gray-300"></i>
+              </div>
+              <p class="text-secondary text-sm">Aucun logement sortant configure</p>
+            </div>
+          </div>
+
+          <!-- Search Section -->
+          <div class="bg-bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+            <div class="p-5 border-b border-border flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
+                  <i class="pi pi-search text-lg"></i>
+                </div>
+                <h3 class="text-lg font-heading font-bold text-main">Recherche</h3>
+              </div>
+              <span *ngIf="context.search.hasSearch" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                Active
+              </span>
+              <span *ngIf="!context.search.hasSearch" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                Non configuree
+              </span>
+            </div>
+
+            <ng-container *ngIf="context.search.hasSearch && context.search.search">
+              <!-- Summary Header -->
+              <div class="p-4 bg-gradient-to-r from-accent/5 to-accent/10 border-b border-border">
+                <p class="text-sm text-gray-600">
+                  Budget max <strong class="text-accent">{{ context.search.search.maxRent || '?' }} EUR</strong>
+                  <span *ngIf="context.search.search.searchStartDate">,
+                    a partir du <strong class="text-accent">{{ formatDate(context.search.search.searchStartDate) }}</strong>
+                  </span>
+                </p>
+              </div>
+
+              <div class="p-5 space-y-4">
+                <!-- Zones -->
+                <div *ngIf="context.search.search.zones?.length" class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="pi pi-map-marker text-primary text-sm"></i>
+                  </div>
+                  <div class="flex-1">
+                    <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Zones de recherche</span>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                      <span *ngFor="let zone of context.search.search.zones"
+                        class="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                        <i class="pi pi-map-marker text-primary text-[10px]"></i>
+                        {{ zone.label }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Criteria Grid -->
+                <div class="grid grid-cols-3 divide-x divide-border border border-border rounded-xl overflow-hidden">
+                  <div class="p-3 text-center">
+                    <div class="flex items-center justify-center gap-1 mb-1">
+                      <i class="pi pi-euro text-primary text-sm"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-main block">
+                      {{ context.search.search.minRent || 0 }} - {{ context.search.search.maxRent || '?' }} EUR
+                    </span>
+                    <span class="text-xs text-gray-500">Budget</span>
+                  </div>
+                  <div class="p-3 text-center">
+                    <div class="flex items-center justify-center gap-1 mb-1">
+                      <i class="pi pi-arrows-alt text-primary text-sm"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-main block">
+                      {{ context.search.search.minRoomSurface || 0 }} - {{ context.search.search.maxRoomSurface || '?' }} m2
+                    </span>
+                    <span class="text-xs text-gray-500">Surface</span>
+                  </div>
+                  <div class="p-3 text-center">
+                    <div class="flex items-center justify-center gap-1 mb-1">
+                      <i class="pi pi-th-large text-primary text-sm"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-main block">
+                      {{ context.search.search.minRoomNb || 1 }} - {{ context.search.search.maxRoomNb || '?' }}
+                    </span>
+                    <span class="text-xs text-gray-500">Pieces</span>
+                  </div>
+                </div>
+
+                <!-- Home Types -->
+                <div *ngIf="context.search.search.homeType?.length" class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="pi pi-home text-blue-500 text-sm"></i>
+                  </div>
+                  <div>
+                    <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Types de logement</span>
+                    <p class="text-main text-sm font-medium mt-1">
+                      {{ getHomeTypesLabels(context.search.search.homeType) }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Period -->
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="pi pi-calendar text-orange-500 text-sm"></i>
+                  </div>
+                  <div>
+                    <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Periode</span>
+                    <p class="text-main text-sm font-medium mt-1">
+                      Du {{ formatDate(context.search.search.searchStartDate) }}
+                      <span *ngIf="context.search.search.searchEndDate">
+                        au {{ formatDate(context.search.search.searchEndDate) }}
+                      </span>
+                      <span *ngIf="!context.search.search.searchEndDate">
+                        (sans date de fin)
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- No Search State -->
+            <div *ngIf="!context.search.hasSearch" class="p-8 text-center">
+              <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
+                <i class="pi pi-search text-3xl text-gray-300"></i>
+              </div>
+              <p class="text-secondary text-sm">Aucune recherche configuree</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="space-y-6">
+
+          <!-- Credits Section -->
+          <div class="bg-bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+            <div class="p-5 border-b border-border flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <i class="pi pi-bolt text-lg"></i>
+                </div>
+                <h3 class="text-lg font-heading font-bold text-main">Credits</h3>
+              </div>
+              <span *ngIf="context.credits.isInFlow" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                Dans le flux
+              </span>
+              <span *ngIf="!context.credits.isInFlow" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                Hors flux
+              </span>
+            </div>
+
+            <div class="p-5">
+              <!-- Progress Bar -->
+              <div class="mb-5">
+                <div class="flex justify-between items-end mb-2">
+                  <span class="text-sm font-medium text-gray-500">Consommation</span>
+                  <div class="text-right">
+                    <span class="text-2xl font-bold text-primary">{{ context.credits.totalMatchesRemaining }}</span>
+                    <span class="text-sm text-gray-400 font-medium ml-1">restants</span>
+                  </div>
+                </div>
+
+                <div class="relative h-3 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-primary to-indigo-500 rounded-full transition-all duration-500"
+                    [style.width.%]="progressPercent">
+                  </div>
+                </div>
+                <p class="text-xs text-secondary mt-1 text-right">
+                  {{ context.credits.totalMatchesUsed }} utilises sur {{ context.credits.totalMatchesPurchased }}
+                </p>
+              </div>
+
+              <!-- Stats Cards -->
+              <div class="grid grid-cols-2 gap-3">
+                <div class="p-3 rounded-xl bg-green-50 border border-green-100 text-center">
+                  <span class="text-xs font-semibold text-green-500 uppercase tracking-wider">Dispo</span>
+                  <span class="text-xl font-bold text-green-600 block">{{ context.credits.totalMatchesRemaining }}</span>
+                </div>
+                <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 text-center">
+                  <span class="text-xs font-semibold text-orange-400 uppercase tracking-wider">Utilises</span>
+                  <span class="text-xl font-bold text-orange-600 block">{{ context.credits.totalMatchesUsed }}</span>
+                </div>
+              </div>
+
+              <!-- Cooldown Alert -->
+              <div *ngIf="context.credits.refundCooldownUntil"
+                class="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-200">
+                <div class="flex items-start gap-2">
+                  <i class="pi pi-clock text-amber-600 mt-0.5"></i>
+                  <div>
+                    <p class="text-xs text-amber-600 font-semibold uppercase">Cooldown actif</p>
+                    <p class="text-sm text-amber-800">
+                      Jusqu'au {{ formatDate(context.credits.refundCooldownUntil) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Matches with Pagination -->
+          <div class="bg-bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+            <div class="p-5 border-b border-border flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
+                  <i class="pi pi-heart text-lg"></i>
+                </div>
+                <h3 class="text-lg font-heading font-bold text-main">Matchs</h3>
+              </div>
+              <span class="text-sm text-gray-400">{{ matchesTotal }} au total</span>
+            </div>
+
+            <!-- Loading -->
+            <div *ngIf="matchesLoading && matches.length === 0" class="p-8 text-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent mx-auto"></div>
+            </div>
+
+            <!-- Matches List -->
+            <div *ngIf="matches.length > 0" class="divide-y divide-border">
+              <div *ngFor="let match of matches"
+                   (click)="openMatchDetail(match)"
+                   class="p-4 hover:bg-gray-50 transition-colors cursor-pointer">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                         [ngClass]="match.type === 'TRIANGLE' ? 'bg-purple-100' : 'bg-blue-100'">
+                      <i class="pi" [ngClass]="match.type === 'TRIANGLE' ? 'pi-share-alt text-purple-500' : 'pi-sync text-blue-500'"></i>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-main">{{ getHomeTypeLabel(match.targetHome.homeType) }}</p>
+                      <p class="text-xs text-gray-500">{{ match.targetHome.addressFormatted }}</p>
+                      <div class="flex items-center gap-2 mt-1">
+                        <span class="text-xs text-gray-400">{{ formatDate(match.createdAt) }}</span>
+                        <span [class]="getMatchTypeInfo(match.type).class"
+                          class="px-1.5 py-0.5 rounded text-[10px] font-medium">
+                          {{ getMatchTypeInfo(match.type).label }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-right flex-shrink-0">
+                    <p class="text-sm font-bold text-main">{{ match.targetHome.rent }} EUR</p>
+                    <span [class]="getMatchStatusInfo(match.status).class"
+                      class="px-2 py-0.5 rounded-full text-xs font-medium inline-block mt-1">
+                      {{ getMatchStatusInfo(match.status).label }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loading More (mobile) -->
+            <div *ngIf="matchesLoading && matches.length > 0 && isMobile" class="p-4 text-center">
+              <div class="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent mx-auto"></div>
+            </div>
+
+            <!-- Load More Button (mobile) -->
+            <div *ngIf="isMobile && matchesHasMore && !matchesLoading" class="p-4 text-center border-t border-border">
+              <button (click)="loadMoreMatches()"
+                      class="px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                Charger plus
+              </button>
+            </div>
+
+            <!-- Desktop Pagination -->
+            <div *ngIf="!isMobile && matchesTotalPages > 1" class="p-4 border-t border-border flex items-center justify-between">
+              <p class="text-xs text-gray-500">
+                Page {{ matchesPage }} sur {{ matchesTotalPages }}
+              </p>
+              <div class="flex items-center gap-1">
+                <button (click)="goToMatchesPage(1)"
+                        [disabled]="matchesPage === 1"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="pi pi-angle-double-left text-sm"></i>
+                </button>
+                <button (click)="goToMatchesPage(matchesPage - 1)"
+                        [disabled]="matchesPage === 1"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="pi pi-angle-left text-sm"></i>
+                </button>
+
+                <button *ngFor="let p of matchesPagesArray"
+                        (click)="goToMatchesPage(p)"
+                        [class.bg-primary]="p === matchesPage"
+                        [class.text-white]="p === matchesPage"
+                        [class.text-gray-600]="p !== matchesPage"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium hover:bg-gray-100">
+                  {{ p }}
+                </button>
+
+                <button (click)="goToMatchesPage(matchesPage + 1)"
+                        [disabled]="matchesPage === matchesTotalPages"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="pi pi-angle-right text-sm"></i>
+                </button>
+                <button (click)="goToMatchesPage(matchesTotalPages)"
+                        [disabled]="matchesPage === matchesTotalPages"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="pi pi-angle-double-right text-sm"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="matches.length === 0 && !matchesLoading" class="p-8 text-center">
+              <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-50 flex items-center justify-center">
+                <i class="pi pi-heart text-2xl text-gray-300"></i>
+              </div>
+              <p class="text-secondary text-sm">Aucun match</p>
+            </div>
+          </div>
+
+          <!-- Transactions with Pagination -->
+          <div class="bg-bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+            <div class="p-5 border-b border-border flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600">
+                  <i class="pi pi-credit-card text-lg"></i>
+                </div>
+                <h3 class="text-lg font-heading font-bold text-main">Transactions</h3>
+              </div>
+              <span class="text-sm text-gray-400">{{ transactionsTotal }} au total</span>
+            </div>
+
+            <!-- Loading -->
+            <div *ngIf="transactionsLoading && transactions.length === 0" class="p-8 text-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent mx-auto"></div>
+            </div>
+
+            <!-- Transactions List -->
+            <div *ngIf="transactions.length > 0" class="divide-y divide-border">
+              <div *ngFor="let tx of transactions"
+                   (click)="openTransactionDetail(tx)"
+                   class="p-4 hover:bg-gray-50 transition-colors cursor-pointer">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      <i class="pi {{ getTransactionTypeInfo(tx.type).icon }} {{ getTransactionTypeInfo(tx.type).iconClass }}"></i>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-main">{{ getTransactionTypeInfo(tx.type).label }}</p>
+                      <p class="text-xs text-gray-500">{{ formatDateTime(tx.occurredAt) }}</p>
+                      <p *ngIf="tx.payment" class="text-xs text-primary mt-0.5">
+                        {{ getPlanTypeLabel(tx.payment.planType) }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="text-right flex-shrink-0">
+                    <p class="text-sm font-bold text-main">{{ formatAmountEuros(tx.amountTotal, tx.currency) }}</p>
+                    <span [class]="getTransactionStatusInfo(tx.status).class"
+                      class="px-2 py-0.5 rounded-full text-xs font-medium inline-block mt-1">
+                      {{ getTransactionStatusInfo(tx.status).label }}
+                    </span>
+                    <p *ngIf="hasStripeError(tx.metadata)" class="text-xs text-red-500 mt-1">
+                      Erreur Stripe
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Infinite Scroll Sentinel -->
+            <div #transactionsSentinel class="h-2"></div>
+
+            <!-- Loading More (mobile) -->
+            <div *ngIf="transactionsLoading && transactions.length > 0 && isMobile" class="p-4 text-center">
+              <div class="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent mx-auto"></div>
+            </div>
+
+            <!-- Desktop Pagination -->
+            <div *ngIf="!isMobile && transactionsTotalPages > 1" class="p-4 border-t border-border flex items-center justify-between">
+              <p class="text-xs text-gray-500">
+                Page {{ transactionsPage }} sur {{ transactionsTotalPages }}
+              </p>
+              <div class="flex items-center gap-1">
+                <button (click)="goToTransactionsPage(1)"
+                        [disabled]="transactionsPage === 1"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="pi pi-angle-double-left text-sm"></i>
+                </button>
+                <button (click)="goToTransactionsPage(transactionsPage - 1)"
+                        [disabled]="transactionsPage === 1"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="pi pi-angle-left text-sm"></i>
+                </button>
+
+                <button *ngFor="let p of transactionsPagesArray"
+                        (click)="goToTransactionsPage(p)"
+                        [class.bg-primary]="p === transactionsPage"
+                        [class.text-white]="p === transactionsPage"
+                        [class.text-gray-600]="p !== transactionsPage"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium hover:bg-gray-100">
+                  {{ p }}
+                </button>
+
+                <button (click)="goToTransactionsPage(transactionsPage + 1)"
+                        [disabled]="transactionsPage === transactionsTotalPages"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="pi pi-angle-right text-sm"></i>
+                </button>
+                <button (click)="goToTransactionsPage(transactionsTotalPages)"
+                        [disabled]="transactionsPage === transactionsTotalPages"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="pi pi-angle-double-right text-sm"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="transactions.length === 0 && !transactionsLoading" class="p-8 text-center">
+              <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-50 flex items-center justify-center">
+                <i class="pi pi-credit-card text-2xl text-gray-300"></i>
+              </div>
+              <p class="text-secondary text-sm">Aucune transaction</p>
+            </div>
+          </div>
+
+          <!-- Recent Help Requests -->
+          <div class="bg-bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+            <div class="p-5 border-b border-border flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600">
+                  <i class="pi pi-question-circle text-lg"></i>
+                </div>
+                <h3 class="text-lg font-heading font-bold text-main">Demandes d'aide</h3>
+              </div>
+              <span class="text-sm text-gray-400">{{ context.recentHelpRequests.length }} affichee(s)</span>
+            </div>
+
+            <div *ngIf="context.recentHelpRequests.length > 0" class="divide-y divide-border">
+              <div *ngFor="let help of context.recentHelpRequests" class="p-4 hover:bg-gray-50 transition-colors">
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <p class="text-sm font-medium text-main">{{ getHelpTopicLabel(help.topic) }}</p>
+                    <p class="text-xs text-gray-500">{{ formatDate(help.createdAt) }}</p>
+                  </div>
+                  <span [class]="getHelpStatusInfo(help.status).class"
+                    class="px-2 py-0.5 rounded-full text-xs font-medium">
+                    {{ getHelpStatusInfo(help.status).label }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="context.recentHelpRequests.length === 0" class="p-8 text-center">
+              <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-50 flex items-center justify-center">
+                <i class="pi pi-question-circle text-2xl text-gray-300"></i>
+              </div>
+              <p class="text-secondary text-sm">Aucune demande d'aide</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+</div>
+
+<!-- Fullscreen Gallery -->
+<ng-container *ngIf="isGalleryOpen && context?.home?.home?.imageUrls as galleryImages">
+  <div class="fixed inset-0 bg-black/90 z-50 flex flex-col">
+    <div class="flex items-center justify-between p-4">
+      <button (click)="closeGallery()"
+        class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+        <i class="pi pi-times text-white text-xl"></i>
+      </button>
+      <span class="text-white font-semibold">{{ galleryImageIndex + 1 }} / {{ galleryImages.length }}</span>
+      <div class="w-10"></div>
+    </div>
+
+    <div class="flex-1 flex items-center justify-center relative px-6">
+      <button *ngIf="galleryImages.length > 1" (click)="previousGalleryImage()"
+        class="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+        <i class="pi pi-chevron-left text-2xl text-white"></i>
+      </button>
+
+      <img [src]="galleryImages[galleryImageIndex]" alt="Photo en plein ecran"
+        class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl">
+
+      <button *ngIf="galleryImages.length > 1" (click)="nextGalleryImage()"
+        class="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+        <i class="pi pi-chevron-right text-2xl text-white"></i>
+      </button>
+    </div>
+
+    <div *ngIf="galleryImages.length > 1" class="p-4 bg-black/80">
+      <div class="flex gap-2 overflow-x-auto justify-center">
+        <button *ngFor="let img of galleryImages; let i = index" (click)="goToGalleryImage(i)"
+          [class.ring-2]="galleryImageIndex === i" [class.ring-white]="galleryImageIndex === i"
+          [class.opacity-70]="galleryImageIndex !== i"
+          class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all">
+          <img [src]="img" alt="Miniature" class="w-full h-full object-cover">
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Transaction Detail Modal -->
+<div *ngIf="showTransactionModal && selectedTransaction"
+     class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+     (click)="closeTransactionModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
+       (click)="$event.stopPropagation()">
+
+    <!-- Modal Header -->
+    <div class="p-5 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-indigo-50 to-purple-50">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
+          <i class="pi {{ getTransactionTypeInfo(selectedTransaction.type).icon }} {{ getTransactionTypeInfo(selectedTransaction.type).iconClass }} text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-gray-900">Detail de la transaction</h3>
+          <p class="text-sm text-gray-500">{{ getTransactionTypeInfo(selectedTransaction.type).label }}</p>
+        </div>
+      </div>
+      <button (click)="closeTransactionModal()"
+              class="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
+        <i class="pi pi-times text-gray-500"></i>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="p-5 overflow-y-auto max-h-[calc(90vh-180px)]">
+
+      <!-- Loading -->
+      <div *ngIf="loadingTransactionDetail" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+      </div>
+
+      <ng-container *ngIf="!loadingTransactionDetail">
+        <!-- Transaction Info -->
+        <div class="mb-6">
+          <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Informations transaction</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-50 rounded-xl p-4">
+              <span class="text-xs text-gray-500 block mb-1">Status</span>
+              <span [class]="getTransactionStatusInfo(selectedTransaction.status).class"
+                    class="px-3 py-1 rounded-full text-sm font-medium">
+                {{ getTransactionStatusInfo(selectedTransaction.status).label }}
+              </span>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-4">
+              <span class="text-xs text-gray-500 block mb-1">Montant total</span>
+              <span class="text-xl font-bold text-gray-900">{{ formatAmountEuros(selectedTransaction.amountTotal, selectedTransaction.currency) }}</span>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-4">
+              <span class="text-xs text-gray-500 block mb-1">Montant de base</span>
+              <span class="text-lg font-semibold text-gray-700">{{ formatAmountEuros(selectedTransaction.amountBase, selectedTransaction.currency) }}</span>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-4">
+              <span class="text-xs text-gray-500 block mb-1">Frais Stripe</span>
+              <span class="text-lg font-semibold text-gray-700">{{ formatAmountEuros(selectedTransaction.amountFees, selectedTransaction.currency) }}</span>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-4">
+              <span class="text-xs text-gray-500 block mb-1">Date</span>
+              <span class="text-sm font-medium text-gray-700">{{ formatDateTime(selectedTransaction.occurredAt) }}</span>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-4">
+              <span class="text-xs text-gray-500 block mb-1">ID Transaction</span>
+              <span class="text-sm font-mono text-gray-700">#{{ selectedTransaction.id }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stripe IDs -->
+        <div class="mb-6">
+          <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Identifiants Stripe</h4>
+          <div class="space-y-2">
+            <div *ngIf="selectedTransaction.stripeEventId" class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+              <span class="text-xs text-gray-500 w-24">Event ID:</span>
+              <code class="text-xs font-mono text-gray-700 break-all">{{ selectedTransaction.stripeEventId }}</code>
+            </div>
+            <div *ngIf="selectedTransaction.stripeObjectId" class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+              <span class="text-xs text-gray-500 w-24">Object ID:</span>
+              <code class="text-xs font-mono text-gray-700 break-all">{{ selectedTransaction.stripeObjectId }}</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Details -->
+        <div *ngIf="selectedTransaction.payment" class="mb-6">
+          <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Details du paiement</h4>
+          <div class="border border-gray-200 rounded-xl overflow-hidden">
+            <div class="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-sm font-bold text-gray-900">{{ getPlanTypeLabel(selectedTransaction.payment.planType) }}</span>
+                  <span [class]="getPaymentStatusInfo(selectedTransaction.payment.status).class"
+                        class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium">
+                    {{ getPaymentStatusInfo(selectedTransaction.payment.status).label }}
+                  </span>
+                </div>
+                <span class="text-lg font-bold text-green-600">{{ formatAmountEuros(selectedTransaction.payment.amountTotal, 'EUR') }}</span>
+              </div>
+            </div>
+
+            <div class="p-4 grid grid-cols-3 gap-4 text-center border-b border-gray-100">
+              <div>
+                <span class="text-2xl font-bold text-gray-900">{{ selectedTransaction.payment.matchesInitial }}</span>
+                <p class="text-xs text-gray-500 mt-1">Credits achetes</p>
+              </div>
+              <div>
+                <span class="text-2xl font-bold text-orange-600">{{ selectedTransaction.payment.matchesUsed }}</span>
+                <p class="text-xs text-gray-500 mt-1">Credits utilises</p>
+              </div>
+              <div>
+                <span class="text-2xl font-bold text-purple-600">{{ selectedTransaction.payment.matchesRefunded }}</span>
+                <p class="text-xs text-gray-500 mt-1">Credits rembourses</p>
+              </div>
+            </div>
+
+            <div class="p-4 space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-500">Checkout Session:</span>
+                <code class="font-mono text-xs text-gray-700">{{ selectedTransaction.payment.stripeCheckoutSessionId | slice:0:30 }}...</code>
+              </div>
+              <div *ngIf="selectedTransaction.payment.stripePaymentIntentId" class="flex justify-between">
+                <span class="text-gray-500">Payment Intent:</span>
+                <code class="font-mono text-xs text-gray-700">{{ selectedTransaction.payment.stripePaymentIntentId | slice:0:30 }}...</code>
+              </div>
+              <div *ngIf="selectedTransaction.payment.stripeChargeId" class="flex justify-between">
+                <span class="text-gray-500">Charge ID:</span>
+                <code class="font-mono text-xs text-gray-700">{{ selectedTransaction.payment.stripeChargeId | slice:0:30 }}...</code>
+              </div>
+              <div *ngIf="selectedTransaction.payment.stripeRefundId" class="flex justify-between">
+                <span class="text-gray-500">Refund ID:</span>
+                <code class="font-mono text-xs text-gray-700">{{ selectedTransaction.payment.stripeRefundId | slice:0:30 }}...</code>
+              </div>
+              <div class="flex justify-between pt-2 border-t border-gray-100">
+                <span class="text-gray-500">Cree le:</span>
+                <span class="text-gray-700">{{ formatDateTime(selectedTransaction.payment.createdAt) }}</span>
+              </div>
+              <div *ngIf="selectedTransaction.payment.succeededAt" class="flex justify-between">
+                <span class="text-gray-500">Reussi le:</span>
+                <span class="text-green-600">{{ formatDateTime(selectedTransaction.payment.succeededAt) }}</span>
+              </div>
+              <div *ngIf="selectedTransaction.payment.refundedAt" class="flex justify-between">
+                <span class="text-gray-500">Rembourse le:</span>
+                <span class="text-purple-600">{{ formatDateTime(selectedTransaction.payment.refundedAt) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stripe Error -->
+        <div *ngIf="hasStripeError(selectedTransaction.metadata)" class="mb-6">
+          <h4 class="text-xs font-semibold text-red-400 uppercase tracking-wider mb-3">Erreur Stripe</h4>
+          <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <i class="pi pi-exclamation-triangle text-red-500"></i>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-red-700 mb-1">{{ getStripeError(selectedTransaction.metadata) }}</p>
+                <p class="text-xs text-red-600">Consultez le dashboard Stripe pour plus de details</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metadata -->
+        <div *ngIf="selectedTransaction.metadata">
+          <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Metadata</h4>
+          <div class="bg-gray-900 rounded-xl p-4 overflow-x-auto">
+            <pre class="text-xs text-green-400 font-mono whitespace-pre-wrap">{{ formatMetadata(selectedTransaction.metadata) }}</pre>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="p-4 border-t border-gray-200 flex justify-end gap-3">
+      <button (click)="closeTransactionModal()"
+              class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Match Detail Modal -->
+<div *ngIf="showMatchModal"
+     class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+     (click)="closeMatchModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden"
+       (click)="$event.stopPropagation()">
+
+    <!-- Modal Header -->
+    <div class="p-5 border-b border-gray-200 flex items-center justify-between"
+         [ngClass]="selectedMatch?.type === 'TRIANGLE' ? 'bg-gradient-to-r from-purple-50 to-indigo-50' : 'bg-gradient-to-r from-blue-50 to-cyan-50'">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center"
+             [ngClass]="selectedMatch?.type === 'TRIANGLE' ? 'bg-purple-100' : 'bg-blue-100'">
+          <i class="pi text-xl" [ngClass]="selectedMatch?.type === 'TRIANGLE' ? 'pi-share-alt text-purple-600' : 'pi-sync text-blue-600'"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-gray-900">Detail du match</h3>
+          <p class="text-sm text-gray-500" *ngIf="selectedMatch">
+            {{ selectedMatch.type === 'TRIANGLE' ? 'Match triangle' : 'Echange direct' }}
+          </p>
+        </div>
+      </div>
+      <button (click)="closeMatchModal()"
+              class="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
+        <i class="pi pi-times text-gray-500"></i>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="p-5 overflow-y-auto max-h-[calc(90vh-180px)]">
+
+      <!-- Loading -->
+      <div *ngIf="loadingMatchDetail" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+      </div>
+
+      <ng-container *ngIf="!loadingMatchDetail && selectedMatch">
+
+        <!-- Match Status & Type -->
+        <div class="mb-6 flex items-center gap-3">
+          <span [class]="getMatchStatusInfo(selectedMatch.status).class"
+                class="px-3 py-1 rounded-full text-sm font-medium">
+            {{ getMatchStatusInfo(selectedMatch.status).label }}
+          </span>
+          <span [class]="getMatchTypeInfo(selectedMatch.type).class"
+                class="px-3 py-1 rounded-full text-sm font-medium">
+            {{ getMatchTypeInfo(selectedMatch.type).label }}
+          </span>
+          <span class="text-sm text-gray-500">
+            Cree le {{ formatDateTime(selectedMatch.createdAt) }}
+          </span>
+        </div>
+
+        <!-- Target Home Image Gallery -->
+        <div *ngIf="selectedMatch.targetHome.imageUrls?.length" class="mb-6">
+          <div class="relative aspect-[16/9] rounded-xl overflow-hidden bg-gray-100">
+            <img [src]="selectedMatch.targetHome.imageUrls[matchGalleryImageIndex]" alt="Photo du logement"
+                 class="w-full h-full object-cover cursor-pointer"
+                 (click)="openMatchGallery(matchGalleryImageIndex)">
+
+            <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 text-white text-xs font-semibold">
+              {{ matchGalleryImageIndex + 1 }} / {{ selectedMatch.targetHome.imageUrls.length }}
+            </div>
+
+            <button *ngIf="selectedMatch.targetHome.imageUrls.length > 1"
+                    (click)="previousMatchGalleryImage(); $event.stopPropagation()"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 text-main shadow-lg hover:bg-white flex items-center justify-center">
+              <i class="pi pi-chevron-left text-sm"></i>
+            </button>
+            <button *ngIf="selectedMatch.targetHome.imageUrls.length > 1"
+                    (click)="nextMatchGalleryImage(); $event.stopPropagation()"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 text-main shadow-lg hover:bg-white flex items-center justify-center">
+              <i class="pi pi-chevron-right text-sm"></i>
+            </button>
+          </div>
+
+          <!-- Thumbnails -->
+          <div *ngIf="selectedMatch.targetHome.imageUrls.length > 1" class="flex gap-2 mt-3 overflow-x-auto">
+            <button *ngFor="let img of selectedMatch.targetHome.imageUrls; let i = index"
+                    (click)="goToMatchGalleryImage(i)"
+                    [class.ring-2]="matchGalleryImageIndex === i"
+                    [class.ring-primary]="matchGalleryImageIndex === i"
+                    class="flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden bg-gray-100">
+              <img [src]="img" alt="Miniature" class="w-full h-full object-cover">
+            </button>
+          </div>
+        </div>
+
+        <!-- Target Home Details -->
+        <div class="mb-6">
+          <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Logement cible</h4>
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <h5 class="text-lg font-bold text-gray-900">
+                  {{ getHomeTypeLabel(selectedMatch.targetHome.homeType) }} - {{ selectedMatch.targetHome.surface }} m2
+                </h5>
+                <p class="text-sm text-gray-600">{{ selectedMatch.targetHome.addressFormatted }}</p>
+              </div>
+              <div class="text-right">
+                <span class="text-2xl font-bold text-primary">{{ selectedMatch.targetHome.rent }} EUR</span>
+                <span class="text-sm text-gray-500">/mois</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mb-3">
+              <div class="text-center p-2 bg-white rounded-lg">
+                <i class="pi pi-th-large text-primary text-sm"></i>
+                <span class="block text-sm font-semibold text-gray-800">{{ selectedMatch.targetHome.nbRooms }}</span>
+                <span class="text-xs text-gray-500">piece(s)</span>
+              </div>
+              <div class="text-center p-2 bg-white rounded-lg">
+                <i class="pi pi-arrows-alt text-primary text-sm"></i>
+                <span class="block text-sm font-semibold text-gray-800">{{ selectedMatch.targetHome.surface }}</span>
+                <span class="text-xs text-gray-500">m2</span>
+              </div>
+              <div class="text-center p-2 bg-white rounded-lg">
+                <i class="pi pi-home text-primary text-sm"></i>
+                <span class="block text-sm font-semibold text-gray-800">{{ getHomeTypeLabel(selectedMatch.targetHome.homeType) }}</span>
+                <span class="text-xs text-gray-500">type</span>
+              </div>
+            </div>
+
+
+
+            <p *ngIf="selectedMatch.targetHome.description" class="text-sm text-gray-600 mt-3">
+              {{ selectedMatch.targetHome.description }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Participants -->
+        <div class="mb-6">
+          <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Participants</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Seeker (Current User) -->
+            <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">
+                  {{ selectedMatch.seekerUser.firstName.charAt(0) }}{{ selectedMatch.seekerUser.lastName.charAt(0) }}
+                </div>
+                <div>
+                  <p class="text-xs text-blue-600 font-semibold uppercase">Chercheur</p>
+                  <p class="text-sm font-medium text-gray-900">{{ selectedMatch.seekerUser.firstName }} {{ selectedMatch.seekerUser.lastName }}</p>
+                </div>
+              </div>
+              <p class="text-xs text-gray-600">{{ selectedMatch.seekerUser.mail }}</p>
+              <div *ngIf="selectedMatch.seekerHome" class="mt-2 pt-2 border-t border-blue-100">
+                <p class="text-xs text-gray-500">Son logement:</p>
+                <p class="text-xs text-gray-700">{{ getHomeTypeLabel(selectedMatch.seekerHome.homeType) }} - {{ selectedMatch.seekerHome.rent }} EUR</p>
+              </div>
+            </div>
+
+            <!-- Target User -->
+            <div class="bg-green-50 rounded-xl p-4 border border-green-100">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
+                  {{ selectedMatch.targetUser.firstName.charAt(0) }}{{ selectedMatch.targetUser.lastName.charAt(0) }}
+                </div>
+                <div>
+                  <p class="text-xs text-green-600 font-semibold uppercase">Cible</p>
+                  <p class="text-sm font-medium text-gray-900">{{ selectedMatch.targetUser.firstName }} {{ selectedMatch.targetUser.lastName }}</p>
+                </div>
+              </div>
+              <p class="text-xs text-gray-600">{{ selectedMatch.targetUser.mail }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Triangle Match Info -->
+        <div *ngIf="selectedMatch.type === 'TRIANGLE'" class="mb-6">
+          <h4 class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-3">Match triangle</h4>
+          <div class="bg-purple-50 rounded-xl p-4 border border-purple-100">
+            <p class="text-sm text-purple-700 text-center">
+              Ce match fait partie d'un echange triangulaire (A → B → C → A)
+            </p>
+            <p *ngIf="selectedMatch.groupId" class="text-xs text-purple-500 text-center mt-2">
+              Group ID: <code class="font-mono">{{ selectedMatch.groupId }}</code>
+            </p>
+          </div>
+        </div>
+
+        <!-- Match Metadata -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="bg-gray-50 rounded-xl p-4">
+            <span class="text-xs text-gray-500 block mb-1">Match UID</span>
+            <code class="text-xs font-mono text-gray-700">{{ selectedMatch.uid }}</code>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-4">
+            <span class="text-xs text-gray-500 block mb-1">Group ID</span>
+            <code class="text-xs font-mono text-gray-700">{{ selectedMatch.groupId || '-' }}</code>
+          </div>
+        </div>
+
+        <!-- Snapshot (collapsible) -->
+        <details *ngIf="selectedMatch.snapshot" class="mb-4">
+          <summary class="text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600">
+            Snapshot technique
+          </summary>
+          <div class="mt-2 bg-gray-900 rounded-xl p-4 overflow-x-auto">
+            <pre class="text-xs text-green-400 font-mono whitespace-pre-wrap">{{ formatMetadata(selectedMatch.snapshot) }}</pre>
+          </div>
+        </details>
+
+      </ng-container>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="p-4 border-t border-gray-200 flex justify-end gap-3">
+      <button (click)="closeMatchModal()"
+              class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Match Fullscreen Gallery -->
+<ng-container *ngIf="isMatchGalleryOpen && selectedMatch?.targetHome?.imageUrls as galleryImages">
+  <div class="fixed inset-0 bg-black/90 z-[60] flex flex-col">
+    <div class="flex items-center justify-between p-4">
+      <button (click)="closeMatchGallery()"
+        class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+        <i class="pi pi-times text-white text-xl"></i>
+      </button>
+      <span class="text-white font-semibold">{{ matchGalleryImageIndex + 1 }} / {{ galleryImages.length }}</span>
+      <div class="w-10"></div>
+    </div>
+
+    <div class="flex-1 flex items-center justify-center relative px-6">
+      <button *ngIf="galleryImages.length > 1" (click)="previousMatchGalleryImage()"
+        class="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+        <i class="pi pi-chevron-left text-2xl text-white"></i>
+      </button>
+
+      <img [src]="galleryImages[matchGalleryImageIndex]" alt="Photo en plein ecran"
+        class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl">
+
+      <button *ngIf="galleryImages.length > 1" (click)="nextMatchGalleryImage()"
+        class="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+        <i class="pi pi-chevron-right text-2xl text-white"></i>
+      </button>
+    </div>
+
+    <div *ngIf="galleryImages.length > 1" class="p-4 bg-black/80">
+      <div class="flex gap-2 overflow-x-auto justify-center">
+        <button *ngFor="let img of galleryImages; let i = index" (click)="goToMatchGalleryImage(i)"
+          [class.ring-2]="matchGalleryImageIndex === i" [class.ring-white]="matchGalleryImageIndex === i"
+          [class.opacity-70]="matchGalleryImageIndex !== i"
+          class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all">
+          <img [src]="img" alt="Miniature" class="w-full h-full object-cover">
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-container>

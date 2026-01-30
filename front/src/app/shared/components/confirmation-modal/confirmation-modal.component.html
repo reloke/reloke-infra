@@ -1,0 +1,55 @@
+<div *ngIf="isOpen"
+    class="fixed inset-0 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none"
+    style="z-index: 100;">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" (click)="onCancel()"></div>
+
+    <!-- Modal Content -->
+    <div class="relative w-full max-w-md mx-auto my-6 z-50">
+        <div
+            class="relative flex flex-col w-full bg-white border-0 rounded-2xl shadow-2xl outline-none focus:outline-none overflow-hidden animate-fade-in-up">
+
+            <!-- Header -->
+            <div class="flex items-start justify-between p-5 border-b border-solid border-gray-100 rounded-t">
+                <h3 class="text-xl font-heading font-bold text-main">
+                    {{ title }}
+                </h3>
+                <button
+                    class="p-1 ml-auto bg-transparent border-0 text-gray-400 hover:text-gray-600 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                    (click)="onCancel()">
+                    <span class="bg-transparent h-6 w-6 text-2xl block outline-none focus:outline-none">
+                        ×
+                    </span>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="relative p-6 flex-auto">
+                <p class="my-4 text-secondary text-lg leading-relaxed">
+                    {{ message }}
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-end p-6 border-t border-solid border-gray-100 rounded-b gap-3">
+                <button
+                    class="btn btn-outline text-sm font-bold uppercase px-6 py-3 rounded-xl shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button" (click)="onCancel()">
+                    {{ cancelText }}
+                </button>
+                <button
+                    class="btn text-sm font-bold uppercase px-6 py-3 rounded-xl shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 text-white flex items-center gap-2"
+                    [ngClass]="{
+                        'bg-primary hover:bg-primary-hover': type === 'primary',
+                        'bg-red-600 hover:bg-red-700': type === 'danger',
+                        'bg-blue-600 hover:bg-blue-700': type === 'info',
+                        'bg-yellow-500 hover:bg-yellow-600': type === 'warning',
+                        'opacity-70 cursor-not-allowed': isLoading
+                    }" type="button" (click)="onConfirm()" [disabled]="isLoading">
+                    <app-loading *ngIf="isLoading" size="sm"></app-loading>
+                    {{ confirmText }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

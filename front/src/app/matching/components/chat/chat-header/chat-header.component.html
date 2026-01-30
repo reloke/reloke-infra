@@ -1,0 +1,158 @@
+<div class="h-16 px-4 border-b border-gray-200 flex items-center justify-between bg-white shadow-sm chat-header sticky top-0 z-40"
+    *ngIf="activeConversation">
+    <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+        (click)="toggleMatchInfo.emit()">
+        <!-- Back Button Mobile -->
+        <button (click)="back.emit()" class="p-2 text-gray-400 hover:text-primary md:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <!-- Standard Avatar -->
+        <div *ngIf="activeConversation.type !== 'TRIANGLE'"
+            class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold border-2 border-white shadow-sm overflow-hidden">
+            <img *ngIf="getOtherParticipants(activeConversation)[0]?.user?.profilePicture"
+                [src]="getOtherParticipants(activeConversation)[0].user.profilePicture"
+                class="h-full w-full object-cover">
+            <span *ngIf="!getOtherParticipants(activeConversation)[0]?.user?.profilePicture">{{
+                getInitials(activeConversation) }}</span>
+        </div>
+
+        <!-- Double Circle Avatar (Triangle) -->
+        <div *ngIf="activeConversation.type === 'TRIANGLE'" class="relative w-10 h-10 flex items-center justify-center">
+            <div *ngFor="let other of getOtherParticipants(activeConversation); let i = index"
+                class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[9px] font-bold border-2 border-white shadow-sm absolute overflow-hidden"
+                [ngStyle]="{'left': i === 0 ? '0' : 'auto', 'right': i === 1 ? '0' : 'auto', 'top': i === 0 ? '0' : 'auto', 'bottom': i === 1 ? '0' : 'auto', 'z-index': i === 0 ? 2 : 1}">
+                <img *ngIf="other.user?.profilePicture" [src]="other.user.profilePicture"
+                    class="h-full w-full object-cover">
+                <span *ngIf="!other.user?.profilePicture">{{ other.user.firstName[0] }}{{ other.user.lastName[0]
+                    }}</span>
+            </div>
+        </div>
+        <div>
+            <h3 class="font-bold text-secondary leading-tight">{{ getConversationName(activeConversation) }}
+            </h3>
+            <p class="text-[10px] text-secondary">
+                {{ activeConversation.type === 'TRIANGLE' ? 'Discussion de groupe' : 'Discussion directe' }}
+            </p>
+        </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+        <!-- Dossier Facile Reminder -->
+        <a *ngIf="!isDossierValid" routerLink="/profile/account"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-[#E8F0FE] text-[#1A73E8] rounded-full hover:bg-[#D2E3FC] transition-all group relative cursor-pointer border border-[#BDC1C6]/30 shadow-sm">
+            <span class="flex h-2 w-2 relative">
+                <span
+                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Dossier Facile ?</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+
+            <!-- Custom Tooltip -->
+            <div
+                class="absolute top-full right-0 mt-3 w-64 p-3 bg-gray-900 text-white text-[11px] rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[110] pointer-events-none border border-white/10 backdrop-blur-md">
+                <p class="font-bold text-blue-300 mb-1">Dossier Facile manquant</p>
+                <p class="leading-relaxed opacity-90">Renseignez votre dossier pour rassurer les garants et accélérer
+                    votre recherche. Cliquez pour accéder à votre profil.</p>
+                <!-- arrow -->
+                <div
+                    class="absolute bottom-full right-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900 border-l border-t border-white/10">
+                </div>
+            </div>
+        </a>
+
+
+        <div class="relative">
+            <button (click)="toggleMenu(); $event.stopPropagation()"
+                class="p-2 text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                </svg>
+            </button>
+
+
+
+            <!-- Dropdown Menu -->
+            <div *ngIf="showActionMenu" (click)="$event.stopPropagation()"
+                class="absolute right-0 mt-4 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-[100] overflow-hidden animate-fade-in">
+                <div class="p-2 border-b border-gray-50 bg-gray-50/50">
+                    <p class="text-[10px] font-bold text-secondary uppercase tracking-widest px-2">Actions
+                    </p>
+                </div>
+                <button (click)="toggleMatchInfo.emit(); closeMenu()"
+                    class="w-full text-left px-4 py-3 text-sm text-secondary hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Résumé du Match
+                </button>
+                <button (click)="toggleCriteria.emit(); closeMenu()"
+                    class="w-full text-left px-4 py-3 text-sm text-secondary hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                    Critères du match
+                </button>
+                <button (click)="viewMatchDetails.emit(); closeMenu()"
+                    class="w-full text-left px-4 py-3 text-sm text-secondary hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Informations du Match
+                </button>
+                <button (click)="toggleFiles.emit(); closeMenu()"
+                    class="w-full text-left px-4 py-3 text-sm text-secondary hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Fichiers envoyés
+                </button>
+                <button (click)="toggleSelection.emit(); closeMenu()"
+                    class="w-full text-left px-4 py-3 text-sm text-secondary hover:bg-gray-50 flex items-center gap-3 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                    Sélectionner des messages
+                </button>
+                <button (click)="startExitFlow.emit(); closeMenu()"
+                    class="w-full text-left px-4 py-3 text-sm text-orange-600 hover:bg-orange-50 flex items-center gap-3 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Sortir du flux
+                </button>
+                <div class="h-px bg-gray-100 my-1"></div>
+                <button (click)="toggleReport.emit(); closeMenu()"
+                    class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Signaler
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

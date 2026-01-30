@@ -1,0 +1,400 @@
+<div class="min-h-screen flex bg-bg-main font-body">
+    <!-- Left Side: Image/Branding (Hidden on mobile) -->
+    <div class="hidden lg:flex lg:w-1/2 bg-primary relative items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary to-primary-hover opacity-90 z-10"></div>
+        <img src="assets/images/design_ref_1.png" alt="Interior"
+            class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-50">
+
+        <!-- Animated Circles -->
+        <div class="absolute top-1/3 right-1/4 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/3 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse delay-1000">
+        </div>
+
+        <div class="relative z-20 text-center p-12 text-white max-w-lg">
+            <div
+                class="mb-4 inline-block p-6 rounded-2xl group cursor-pointer transition-transform hover:scale-105 duration-300">
+                <img src="assets/images/logo/golden-reloke-logo.svg" alt="Reloke Key"
+                    class="h-32 w-auto  drop-shadow-lg transition-transform duration-700 ease-in-out group-hover:rotate-[360deg]">
+            </div>
+            <div class="flex flex-col items-center justify-center gap-4 mb-6">
+                <h1 class="text-5xl font-heading font-bold">{{ lang.auth.register.heroTitle }}</h1>
+            </div>
+            <p class="text-xl text-white/90 leading-relaxed">
+                {{ lang.auth.register.heroSubtitle }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Right Side: Form -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-10 bg-white relative overflow-y-auto">
+        <a routerLink="/"
+            class="absolute top-4 right-6 text-secondary hover:text-primary transition-colors flex items-center gap-2 group z-50">
+            <span class="text-sm font-medium">{{ lang.common.backToHome }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+        </a>
+
+        <div class="max-w-md w-full animate-fade-in-up">
+
+            <!-- Progress Indicator -->
+            <div class="flex items-center justify-center my-6">
+                <!-- Step 1 -->
+                <div class="flex items-center relative">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 z-10 border-2"
+                        [ngClass]="{'bg-primary border-primary text-white shadow-lg shadow-primary/30': currentStep >= 1, 'bg-white border-gray-200 text-gray-400': currentStep < 1}">
+                        1</div>
+                    <div class="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-bold uppercase tracking-wider whitespace-nowrap"
+                        [ngClass]="{'text-primary': currentStep >= 1, 'text-gray-400': currentStep < 1}">{{
+                        lang.auth.register.step1Label }}</div>
+                </div>
+
+                <div class="w-20 h-0.5 bg-gray-200 mx-1 relative">
+                    <div class="absolute inset-y-0 left-0 bg-primary transition-all duration-500"
+                        [style.width.%]="currentStep >= 2 ? 100 : 0"></div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex items-center relative">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 z-10 border-2"
+                        [ngClass]="{'bg-primary border-primary text-white shadow-lg shadow-primary/30': currentStep >= 2, 'bg-white border-gray-200 text-gray-400': currentStep < 2}">
+                        2</div>
+                    <div class="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-bold uppercase tracking-wider whitespace-nowrap"
+                        [ngClass]="{'text-primary': currentStep >= 2, 'text-gray-400': currentStep < 2}">{{
+                        lang.auth.register.step2Label }}</div>
+                </div>
+
+                <div class="w-20 h-0.5 bg-gray-200 mx-1 relative">
+                    <div class="absolute inset-y-0 left-0 bg-primary transition-all duration-500"
+                        [style.width.%]="currentStep >= 3 ? 100 : 0"></div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex items-center relative">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 z-10 border-2"
+                        [ngClass]="{'bg-primary border-primary text-white shadow-lg shadow-primary/30': currentStep >= 3, 'bg-white border-gray-200 text-gray-400': currentStep < 3}">
+                        3</div>
+                    <div class="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-bold uppercase tracking-wider whitespace-nowrap"
+                        [ngClass]="{'text-primary': currentStep >= 3, 'text-gray-400': currentStep < 3}">{{
+                        lang.auth.register.step3Label }}</div>
+                </div>
+            </div>
+
+            <div class="text-center lg:text-left py-6">
+                <h2 class="text-2xl font-heading font-bold text-main mb-2">{{ lang.auth.register.formTitle }}</h2>
+                <p class="text-secondary text-sm">{{ lang.auth.register.stepIndicator.replace('{{current}}',
+                    currentStep.toString()).replace('{{total}}', '3') }}</p>
+            </div>
+
+            <!-- Influencer Welcome Box -->
+
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
+
+                <!-- STEP 1: EMAIL -->
+                <div *ngIf="currentStep === 1" class="space-y-4 animate-fade-in">
+                    <div class="space-y-2">
+                        <label for="email" class="text-xs font-semibold uppercase tracking-wider text-gray-500 pl-1">{{
+                            lang.auth.register.emailLabel }}</label>
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <input type="email" id="email" formControlName="email" class="form-control pl-11"
+                                [placeholder]="lang.auth.register.emailPlaceholder">
+                        </div>
+                        <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+                            class="text-red-500 text-xs pl-1">
+                            <div *ngIf="registerForm.get('email')?.errors?.['required']">{{
+                                lang.auth.register.errors.emailRequired }}</div>
+                            <div *ngIf="registerForm.get('email')?.errors?.['email']">Format email invalide</div>
+                            <div *ngIf="registerForm.get('email')?.errors?.['maxlength']">L'email ne peut pas dépasser
+                                150 caractères</div>
+                        </div>
+                    </div>
+
+                    <!-- Error Message Step 1 -->
+                    <app-alert *ngIf="errorMessage && currentStep === 1" type="error" [message]="errorMessage"
+                        [dismissible]="true" (closed)="errorMessage = ''"></app-alert>
+
+                    <button type="button" (click)="submitEmail()"
+                        [disabled]="registerForm.get('email')?.invalid || isLoading"
+                        class="w-full btn btn-primary py-4 rounded-xl text-lg font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 flex justify-center items-center transition-all duration-300"
+                        [ngClass]="{'bg-green-600 hover:bg-green-700': isCaptchaSuccess}">
+
+                        <span *ngIf="!isLoading && !isCaptchaSuccess">{{ lang.common.next }}</span>
+
+                        <span *ngIf="isLoading && !isCaptchaSuccess" class="flex items-center">
+                            <app-loading size="sm" [white]="true" class="mr-3"></app-loading>
+                            <span *ngIf="isCaptchaLoading">Verification...</span>
+                            <span *ngIf="!isCaptchaLoading">{{ lang.auth.register.verifyButton }}</span>
+                        </span>
+
+                        <span *ngIf="isCaptchaSuccess" class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                            Secured
+                        </span>
+                    </button>
+
+                    <!-- Divider -->
+                    <div class="relative my-4">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-200"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-4 bg-white text-gray-500">ou</span>
+                        </div>
+                    </div>
+
+                    <!-- Google Sign-Up Button -->
+                    <button type="button" (click)="signInWithGoogle()"
+                        class="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-xl bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow group">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-5 h-5">
+                            <path fill="#FFC107"
+                                d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
+                            <path fill="#FF3D00"
+                                d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
+                            <path fill="#4CAF50"
+                                d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
+                            <path fill="#1976D2"
+                                d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
+                        </svg>
+                        <span class="font-medium text-gray-700 group-hover:text-gray-900">Continuer avec Google</span>
+                    </button>
+                </div>
+
+
+
+                <!-- STEP 2: CODE VERIFICATION -->
+                <div *ngIf="currentStep === 2" class="space-y-4 animate-fade-in">
+                    <div class="space-y-4">
+                        <!-- Email feedback box -->
+                        <div
+                            class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex items-center gap-4 group transition-all hover:bg-gray-100/50">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-0.5">Code
+                                    envoyé à</p>
+                                <p class="text-sm font-semibold text-gray-800 truncate">{{ recipientEmail }}</p>
+                            </div>
+                            <button type="button" (click)="prevStep()"
+                                class="text-xs font-bold text-primary hover:text-primary-hover transition-colors px-2 py-1">
+                                Modifier
+                            </button>
+                        </div>
+
+                        <app-alert *ngIf="infoMessage && currentStep === 2" type="info" [message]="infoMessage"
+                            [duration]="10000" (closed)="infoMessage = ''"></app-alert>
+
+                        <label for="code" class="text-xs font-semibold uppercase tracking-wider text-gray-500 pl-1">
+                            {{ lang.auth.register.codeLabel }}
+                        </label>
+
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <input type="text" id="code" formControlName="code" class="form-control pl-11"
+                                [placeholder]="lang.auth.register.codePlaceholder" maxlength="6">
+                        </div>
+                        <div *ngIf="registerForm.get('code')?.invalid && registerForm.get('code')?.touched"
+                            class="text-red-500 text-xs pl-1">
+                            Code à 6 chiffres requis
+                        </div>
+                    </div>
+
+                    <!-- Error Message Step 2 -->
+                    <app-alert *ngIf="errorMessage && currentStep === 2" type="error" [message]="errorMessage"
+                        [dismissible]="false" class="space-y-2"></app-alert>
+
+                    <button type="button" (click)="submitCode()"
+                        [disabled]="registerForm.get('code')?.invalid || isLoading"
+                        class="w-full btn btn-primary py-3 rounded-xl text-lg font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 flex justify-center items-center">
+                        <span *ngIf="!isLoading">{{ lang.common.next }}</span>
+                        <span *ngIf="isLoading">
+                            <app-loading size="sm" [white]="true" class="mr-2"></app-loading>
+                        </span>
+                    </button>
+
+                    <div class="pt-2 w-full flex flex-col-reverse gap-4 sm:flex-row sm:justify-between sm:items-center">
+                        <div>
+                            <button type="button" (click)="prevStep()"
+                                class="text-sm text-gray-500 hover:text-gray-700">
+                                {{ lang.common.back }}
+                            </button>
+                        </div>
+
+                        <button type="button" (click)="resendCode()" [disabled]="isLoading"
+                            class="text-sm text-primary hover:underline">
+                            {{ lang.auth.register.resendCode }}
+                        </button>
+
+                    </div>
+                </div>
+
+                <!-- STEP 3: FINALIZATION -->
+                <div *ngIf="currentStep === 3" class="space-y-4 animate-fade-in">
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="lastName"
+                                class="text-xs font-semibold uppercase tracking-wider text-gray-500 pl-1">{{
+                                lang.auth.register.lastNameLabel }}</label>
+                            <input type="text" id="lastName" formControlName="lastName" class="form-control"
+                                [placeholder]="lang.auth.register.lastNamePlaceholder">
+                            <div *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched"
+                                class="text-red-500 text-xs pl-1 mt-1">
+                                <span *ngIf="registerForm.get('lastName')?.errors?.['required']">Requis</span>
+                                <span *ngIf="registerForm.get('lastName')?.errors?.['maxlength']">Max 50
+                                    caractères</span>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="firstName"
+                                class="text-xs font-semibold uppercase tracking-wider text-gray-500 pl-1">{{
+                                lang.auth.register.firstNameLabel }}</label>
+                            <input type="text" id="firstName" formControlName="firstName" class="form-control"
+                                [placeholder]="lang.auth.register.firstNamePlaceholder">
+                            <div *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched"
+                                class="text-red-500 text-xs pl-1 mt-1">
+                                <span *ngIf="registerForm.get('firstName')?.errors?.['required']">Requis</span>
+                                <span *ngIf="registerForm.get('firstName')?.errors?.['maxlength']">Max 50
+                                    caractères</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <app-password-strength-field [parentForm]="registerForm" controlName="password"
+                        [label]="lang.auth.register.passwordLabel"
+                        [placeholder]="lang.auth.register.passwordPlaceholder">
+                    </app-password-strength-field>
+
+                    <!-- [DEACTIVATED] Legacy Promo Code Handling -->
+                    <!-- 
+                    <div class="pt-4 border-t border-gray-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 pl-1">
+                                Code promo ou parrainage (Optionnel)
+                            </label>
+                            <div class="group relative inline-block">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 cursor-help"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div
+                                    class="opacity-0 group-hover:opacity-100 transition-opacity absolute bottom-full right-0 mb-2 w-48 p-2 bg-gray-900 text-white text-[10px] rounded shadow-lg pointer-events-none z-50">
+                                    Bénéficiez de réductions exclusives en saisissant un code valide.
+                                </div>
+                            </div>
+                        </div>
+                        <app-promo-code-input (promoVerified)="onPromoVerified($event)"
+                            (promoRemoved)="onPromoRemoved()">
+                        </app-promo-code-input>
+                    </div>
+                    -->
+
+                    <!-- Error Message -->
+                    <div *ngIf="errorMessage"
+                        class="p-4 rounded-xl bg-red-50 text-red-600 text-sm flex items-center gap-3 border border-red-100 font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {{ errorMessage }}
+                    </div>
+
+
+                    <div class="flex gap-4 pt-2">
+                        <button type="button" (click)="prevStep()"
+                            class="w-1/3 btn btn-secondary py-4 rounded-xl text-lg font-bold transition-all hover:bg-gray-100">
+                            {{ lang.common.back }}
+                        </button>
+                        <button type="submit"
+                            [disabled]="registerForm.get('firstName')?.invalid || registerForm.get('lastName')?.invalid || registerForm.get('password')?.invalid || isLoading"
+                            class="w-2/3 btn btn-primary py-4 rounded-xl text-lg font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 flex items-center justify-center transition-all">
+                            <span *ngIf="isLoading" class="mr-3">
+                                <app-loading size="sm" [white]="true"></app-loading>
+                            </span>
+                            {{ isLoading ? lang.auth.register.submitButtonLoading : lang.auth.register.submitButton }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Permanent CGU Block -->
+                <div class="mt-6 p-4 bg-gray-50 rounded-xl border transition-all duration-300" [ngClass]="{
+                        'bg-primary/5 border-primary/20': hasAcceptedCgu && !cguError,
+                        'border-red-500 bg-red-50 animate-shake shadow-lg shadow-red-200/50': cguError,
+                        'border-gray-100': !hasAcceptedCgu && !cguError
+                    }">
+                    <div class="flex items-start gap-3 cursor-pointer" (click)="toggleCgu()">
+                        <div class="flex-shrink-0 pt-0.5">
+                            <div class="w-5 h-5 rounded border-2 transition-all flex items-center justify-center"
+                                [ngClass]="{
+                                    'bg-primary border-primary': hasAcceptedCgu,
+                                    'bg-white border-gray-300': !hasAcceptedCgu,
+                                    'border-red-400': cguError && !hasAcceptedCgu
+                                }">
+                                <svg *ngIf="hasAcceptedCgu" xmlns="http://www.w3.org/2000/svg"
+                                    class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 leading-relaxed select-none">
+                            J'accepte les
+                            <a routerLink="/legal/terms-and-conditions" target="_blank"
+                                (click)="$event.stopPropagation(); onCguLinkClicked()"
+                                class="text-primary font-bold hover:underline">Conditions Générales
+                                d'Utilisation</a> et la
+                            <a routerLink="/legal/privacy-policy" target="_blank" (click)="$event.stopPropagation()"
+                                class="text-primary font-bold hover:underline">Politique de Confidentialité</a>,
+                            et je certifie que mes informations sont exactes.
+                        </p>
+                    </div>
+                    <!-- Help Text -->
+                    <p *ngIf="showCguHelpText"
+                        class="text-[10px] text-red-500 mt-2 font-bold animate-fade-in text-center">
+                        <!-- Vous devez cliquer sur les liens et accepter les conditions pour continuer -->
+                        Vous devez cochez pour accepter nos conditions générales d'utilisation et notre politique de
+                        confidentialité
+                    </p>
+                </div>
+
+                <div class="text-center mt-8 pt-8 border-t border-gray-100">
+                    <p class="text-secondary text-sm">
+                        {{ lang.auth.register.alreadyAccount }}
+                        <a routerLink="/auth/login"
+                            class="text-primary font-bold hover:text-primary-hover transition-colors">{{
+                            lang.auth.register.loginLink }}</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

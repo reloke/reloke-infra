@@ -1,0 +1,302 @@
+<div class="bg-main p-4 md:p-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Welcome Alert -->
+    <app-alert *ngIf="showWelcomeAlert" type="success"
+      message="Bienvenue sur la plateforme ! Votre compte a été créé avec succès." [duration]="25000"
+      [dismissible]="true" (closed)="showWelcomeAlert = false" class="mb-6 block animate-fade-in">
+    </app-alert>
+
+    <!-- Deletion Pending Banner -->
+    <div *ngIf="isPendingDeletion" class="mb-8 block animate-in slide-in-from-top duration-500">
+      <div class="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl p-6 shadow-lg text-white">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <i class="pi pi-exclamation-triangle text-2xl"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold mb-1">Suppression de compte programmée</h2>
+              <p class="text-white/90">
+                Votre compte sera définitivement anonymisé le <span class="font-bold">{{
+                  formatDateDisplay(deletionDate?.toISOString() || null) }}</span>.
+                Passé ce délai, vos données ne pourront plus être récupérées.
+              </p>
+            </div>
+          </div>
+          <button (click)="openRestoreModal()"
+            class="px-6 py-3 bg-white text-red-600 rounded-xl font-bold hover:bg-white/90 transition-all flex-shrink-0 shadow-sm active:scale-95">
+            Annuler la suppression
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <header id="onboarding-dashboard-header" class="flex justify-between items-center mb-12">
+      <div>
+        <h1 class="text-3xl font-heading font-bold text-primary mb-2">Tableau de bord</h1>
+        <p class="text-secondary">Bienvenue, {{ userName }}</p>
+      </div>
+    </header>
+
+    <app-onboarding-timeline *ngIf="!isSearchStopped"></app-onboarding-timeline>
+
+    <!-- Search stopped banner -->
+    <div *ngIf="isSearchStopped" class="mb-10">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-pause-circle text-xl text-gray-600"></i>
+          </div>
+          <div class="flex-1">
+            <h2 class="text-lg font-bold text-main mb-1">Recherche stoppée</h2>
+            <p class="text-secondary">
+              Vous avez stoppé la recherche de profils compatibles à votre projet de mobilité
+              <span *ngIf="searchStoppedAgo">il y a {{ searchStoppedAgo }}</span>.
+            </p>
+            <p class="text-secondary mt-2">
+              Si vous souhaitez relancer cette recherche, cliquez sur le bouton ci-dessous.
+            </p>
+            <div class="mt-4 flex justify-center">
+              <button (click)="restartSearch()"
+                class="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-hover transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                [disabled]="isStoppingSearch">
+                {{ isStoppingSearch ? 'En cours...' : 'Je veux relancer la recherche' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Main Options Grid -->
+    <div *ngIf="!isSearchStopped" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Option 1: Proposer un logement / Voir mon logement -->
+      <div id="onboarding-dashboard-home"
+        class="card p-8 hover:transform hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative"
+        (click)="
+          hasExistingHome ? viewMyHome() : navigateTo('/profile/outgoing')
+        ">
+        <div class="flex justify-between">
+          <div
+            class="h-12 w-12 rounded-xl flex items-center justify-center mb-6 transition-colors bg-primary/10 group-hover:bg-primary">
+            <!-- Icon for new home -->
+            <svg *ngIf="!hasExistingHome" xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-primary group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <!-- Icon for existing home (pi-eye) -->
+            <i *ngIf="hasExistingHome" class="pi pi-eye text-xl text-primary group-hover:text-white"></i>
+          </div>
+          <!-- Badge if home exists -->
+          <div *ngIf="hasExistingHome"
+            class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium h-fit">
+            <i class="pi pi-check mr-1"></i>Validé
+          </div>
+        </div>
+        <h3 class="text-xl font-bold text-main mb-3">Mon logement sortant</h3>
+        <p class="text-secondary mb-6">
+          {{
+          hasExistingHome
+          ? "Consultez et modifiez les informations de votre logement sortant."
+          : "Renseignez les informations de votre logement et votre disponibilité pour entrer dans le matching."
+          }}
+        </p>
+        <span class="font-bold text-primary flex items-center group-hover:translate-x-2 transition-transform">
+          {{ hasExistingHome ? "Visualiser" : "Commencer" }}
+          <span class="ml-2">→</span>
+        </span>
+      </div>
+
+      <!-- Option 2: Rechercher un logement / Ma recherche -->
+      <div id="onboarding-dashboard-search"
+        class="card p-8 hover:transform hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative"
+        (click)="
+          hasExistingSearch ? viewMySearch() : navigateTo('/profile/searcher')
+        ">
+        <div class="flex justify-between">
+          <div
+            class="h-12 w-12 bg-accent/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-accent transition-colors">
+            <!-- Icon for new search -->
+            <svg *ngIf="!hasExistingSearch" xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-accent group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <!-- Icon for existing search (pi-eye) -->
+            <i *ngIf="hasExistingSearch" class="pi pi-eye text-xl text-accent group-hover:text-white"></i>
+          </div>
+          <!-- Badge if search exists -->
+          <div *ngIf="hasExistingSearch"
+            class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium h-fit">
+            <i class="pi pi-check mr-1"></i>Validé
+          </div>
+        </div>
+
+        <h3 class="text-xl font-bold text-main mb-3">
+          Mes critères de mobilité
+        </h3>
+        <p class="text-secondary mb-6">
+          {{
+          hasExistingSearch
+          ? "Consultez et ajustez vos critères pour affiner vos matchs."
+          : "Définissez vos critères (zone, budget, dates) pour recevoir des matchs compatibles."
+          }}
+        </p>
+        <span class="text-accent font-bold flex items-center group-hover:translate-x-2 transition-transform">
+          {{ hasExistingSearch ? "Visualiser" : "Configurer" }}
+          <span class="ml-2">→</span>
+        </span>
+      </div>
+
+      <!-- Option 3: Lancer une recherche (Matching) -->
+      <div id="onboarding-dashboard-matching"
+        class="card p-8 hover:transform hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative overflow-hidden"
+        (click)="navigateTo('/matching/payment')">
+        <div class="absolute top-0 right-0 bg-gradient-to-l from-primary/10 to-transparent w-1/2 h-full"></div>
+        <div
+          class="h-12 w-12 bg-green-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-green-500 group-hover:text-white transition-colors relative z-10">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 group-hover:text-white" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-main mb-3 relative z-10">
+          Lancer le Matching
+        </h3>
+        <p class="text-secondary mb-6 relative z-10">
+          Accédez à vos matchs et découvrez les profils compatibles.
+        </p>
+        <span
+          class="text-green-600 font-bold flex items-center group-hover:translate-x-2 transition-transform relative z-10">
+          Explorer <span class="ml-2">→</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Match Status Section -->
+    <div *ngIf="hasExistingSearch && hasExistingHome && !isSearchStopped" class="mt-24">
+      <app-match-status></app-match-status>
+    </div>
+
+    <!-- Restore Confirmation Modal -->
+    <app-confirmation-modal [isOpen]="showRestoreConfirm" title="Restaurer votre compte ?"
+      message="Voulez-vous annuler la procédure de suppression et retrouver un accès complet à la plateforme ?"
+      confirmText="Confirmer la restauration" cancelText="Garder programmé" [isLoading]="isRestoring"
+      (confirm)="confirmRestore()" (cancel)="closeRestoreModal()">
+    </app-confirmation-modal>
+
+
+    <!-- Match List Section -->
+    <div *ngIf="hasExistingSearch && hasExistingHome && !isSearchStopped" class="mt-12">
+      <app-match-list></app-match-list>
+    </div>
+  </div>
+
+  <app-confirmation-modal [isOpen]="isLogoutModalOpen" title="Se déconnecter ?"
+    message="Êtes-vous sûr de vouloir vous déconnecter ?" confirmText="Déconnexion" cancelText="Annuler"
+    (confirm)="confirmLogout()" (cancel)="closeLogoutModal()">
+  </app-confirmation-modal>
+
+  <!-- Search Period Expired Modal -->
+  <div *ngIf="showPeriodExpiredModal" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50" (click)="closePeriodExpiredModal()"></div>
+    <div class="relative bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl">
+      <!-- Icon -->
+      <div class="flex justify-center mb-4">
+        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
+          <i class="pi pi-calendar-times text-3xl text-orange-500"></i>
+        </div>
+      </div>
+
+      <h4 class="text-xl font-bold text-main mb-3 text-center">
+        Periode de recherche terminee
+      </h4>
+      <p class="text-secondary text-center mb-4">
+        Votre periode de recherche (jusqu'au
+        <strong>{{
+          formatDateDisplay(searchData?.searchEndDate || null)
+          }}</strong>) est maintenant depassee.
+      </p>
+      <p class="text-sm text-secondary text-center mb-6">
+        Mettez a jour vos dates si vous cherchez encore un logement.
+      </p>
+
+      <!-- Date Form -->
+      <div class="space-y-4 mb-6">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+            Nouvelle date de debut
+          </label>
+          <input type="date" [(ngModel)]="newSearchStartDate" [min]="minDate"
+            class="w-full px-4 py-3 bg-white border border-border-light rounded-xl text-main focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+            Nouvelle date de fin
+          </label>
+          <input type="date" [(ngModel)]="newSearchEndDate" [min]="newSearchStartDate || minDate"
+            class="w-full px-4 py-3 bg-white border border-border-light rounded-xl text-main focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex flex-col gap-3">
+        <button (click)="updateSearchPeriod()"
+          class="w-full py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-hover transition-colors flex items-center justify-center"
+          [disabled]="isUpdatingPeriod">
+          <app-loading *ngIf="isUpdatingPeriod" size="sm" class="mr-2"></app-loading>
+          {{ isUpdatingPeriod ? "Mise a jour..." : "Mettre a jour ma periode" }}
+        </button>
+        <button (click)="openStopSearchFromModal()"
+          class="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+          [disabled]="isUpdatingPeriod">
+          Je ne cherche plus
+        </button>
+        <button (click)="closePeriodExpiredModal()"
+          class="w-full py-2 text-gray-500 text-sm hover:text-gray-700 transition-colors" [disabled]="isUpdatingPeriod">
+          Rappeler plus tard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stop Search Confirmation Modal -->
+  <div *ngIf="showStopSearchConfirm" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50" (click)="closeStopSearchConfirm()"></div>
+    <div class="relative bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl">
+      <!-- Icon -->
+      <div class="flex justify-center mb-4">
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+          <i class="pi pi-times-circle text-3xl text-red-500"></i>
+        </div>
+      </div>
+
+      <h4 class="text-xl font-bold text-main mb-3 text-center">
+        Arreter la recherche ?
+      </h4>
+      <p class="text-secondary text-center mb-6">
+        Vous ne recevrez plus de rappels par email concernant votre recherche de
+        logement. Vous pourrez relancer votre recherche a tout moment en mettant
+        a jour vos dates.
+      </p>
+
+      <!-- Actions -->
+      <div class="flex gap-3">
+        <button (click)="closeStopSearchConfirm()"
+          class="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+          [disabled]="isStoppingSearch">
+          Annuler
+        </button>
+        <button (click)="confirmStopSearch()"
+          class="flex-1 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 transition-colors flex items-center justify-center"
+          [disabled]="isStoppingSearch">
+          <app-loading *ngIf="isStoppingSearch" size="sm" class="mr-2"></app-loading>
+          {{ isStoppingSearch ? "En cours..." : "Confirmer" }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

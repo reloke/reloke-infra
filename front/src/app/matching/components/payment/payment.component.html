@@ -1,0 +1,279 @@
+<div class="min-h-screen bg-main p-4 md:p-8">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <header class="mb-12">
+            <button (click)="goBack()"
+                class="flex items-center text-secondary hover:text-primary mb-6 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Retour au tableau de bord
+            </button>
+            <h1 class="text-3xl font-heading font-bold text-primary mb-2">Acheter des matchs</h1>
+            <p class="text-secondary">Choisissez le pack de matchs qui vous convient pour être mis en relation avec des locataires sortants compatibles.</p>
+        </header>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoadingPacks" class="flex justify-center items-center py-20">
+            <app-loading size="lg"></app-loading>
+        </div>
+
+        <!-- Packs Grid -->
+        <div *ngIf="!isLoadingPacks" class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center px-4 md:px-8 py-8">
+            <div *ngFor="let pack of packs"
+                class="relative transition-all duration-300 ease-out cursor-pointer group rounded-3xl p-8 flex flex-col h-full"
+                [class.bg-white]="true" [class.shadow-sm]="!pack.isPopular" [class.hover:shadow-xl]="!pack.isPopular"
+                [class.hover:-translate-y-2]="!pack.isPopular" [class.shadow-2xl]="pack.isPopular"
+                [class.scale-105]="pack.isPopular" [class.z-10]="pack.isPopular"
+                [class.bg-gradient-to-b]="pack.isPopular" [class.from-white]="pack.isPopular"
+                [class.to-indigo-50]="pack.isPopular && pack.planType === 'PACK_STANDARD'"
+                [class.opacity-50]="isLoading && selectedPack?.planType !== pack.planType"
+                [class.pointer-events-none]="isLoading && selectedPack?.planType !== pack.planType"
+                (click)="selectPack(pack)">
+
+                <!-- Popular Badge (Floating Pill) -->
+                <div *ngIf="pack.isPopular"
+                    class="absolute -top-4 left-1/2 transform -translate-x-1/2 text-center bg-primary text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-lg">
+                    Le plus populaire
+                </div>
+
+                <!-- Abstract Icon Header -->
+                <div class="flex justify-center mb-8">
+                    <div class="h-16 w-16 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300"
+                        [ngClass]="{
+                            'bg-blue-50 text-blue-500': pack.planType === 'PACK_DISCOVERY',
+                            'bg-indigo-50 text-indigo-500': pack.planType === 'PACK_STANDARD',
+                            'bg-purple-50 text-purple-600': pack.planType === 'PACK_PRO'
+                        }">
+
+                        <!-- Simple Geometric Icons -->
+                        <!-- Discovery: Circle/Simple Shape -->
+                        <svg *ngIf="pack.planType === 'PACK_DISCOVERY'" xmlns="http://www.w3.org/2000/svg"
+                            class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="12" cy="12" r="8" class="opacity-20" />
+                            <path d="M12 8v8m-4-4h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+
+                        <!-- Standard: Star/Spark -->
+                        <svg *ngIf="pack.planType === 'PACK_STANDARD'" xmlns="http://www.w3.org/2000/svg"
+                            class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                                class="opacity-20" />
+                            <path d="M12 6l1.5 3h3l-2.2 1.8.8 3.2-2.6-1.8-2.6 1.8.8-3.2-2.2-1.8h3L12 6z"
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                                fill="none" />
+                        </svg>
+
+                        <!-- Pro: Diamond/Crown -->
+                        <svg *ngIf="pack.planType === 'PACK_PRO'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8"
+                            viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="7" y="7" width="10" height="10" transform="rotate(45 12 12)" class="opacity-20" />
+                            <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                stroke="currentColor" stroke-width="1.5" fill="none" class="hidden" />
+                            <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" fill="none" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Content Body -->
+                <div class="text-center space-y-2 mb-8">
+                    <!-- Pack Name -->
+                    <h3 class="text-lg font-medium text-gray-500">{{ pack.name }}</h3>
+
+                    <!-- Price - The Hero -->
+                    <div class="flex items-baseline justify-center text-gray-900">
+                        <span class="text-5xl font-extrabold tracking-tight">{{ formatPrice(pack.amountTotal) }}</span>
+                        <span class="text-2xl font-bold ml-1">€</span>
+                    </div>
+
+                    <!-- Price per match - Prominent display -->
+                    <div class="text-sm text-gray-500">
+                        soit <span class="font-semibold text-gray-700">{{ formatPrice(pack.pricePerMatch) }} €</span>
+                        par match
+                    </div>
+
+                    <!-- Matches Included - Clean Badge look -->
+                    <div class="pt-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold" [ngClass]="{
+                                'bg-blue-50 text-blue-700': pack.planType === 'PACK_DISCOVERY',
+                                'bg-indigo-50 text-indigo-700': pack.planType === 'PACK_STANDARD',
+                                'bg-purple-50 text-purple-700': pack.planType === 'PACK_PRO'
+                            }">
+                            {{ pack.matchesIncluded }} matchs
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Refund Guarantee Badge -->
+                <div class="flex items-center justify-center mb-6">
+                    <div
+                        class="inline-flex items-center px-3 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        Remboursable au prorata
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="w-full border-t border-gray-100 mb-6"></div>
+
+                <!-- Details (Secondary Info) - Sans les frais -->
+                <div class="space-y-3 mb-8 flex-grow">
+                    <div class="flex justify-between items-center text-sm text-gray-500">
+                        <span>Nombre de matchs</span>
+                        <span class="font-medium text-gray-700">{{ pack.matchesIncluded }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-gray-500">
+                        <span>Coût par match</span>
+                        <span class="font-medium text-gray-700">{{ formatPrice(pack.pricePerMatch) }} €</span>
+                    </div>
+                </div>
+
+                <!-- CTA Button -->
+                <button
+                    class="w-full py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 transform active:scale-[0.98]"
+                    [ngClass]="{
+                        'bg-primary text-white shadow-md hover:bg-primary-hover hover:shadow-lg': pack.isPopular,
+                        'bg-gray-100 text-gray-600 hover:bg-gray-200': !pack.isPopular
+                    }" [disabled]="isLoading">
+
+                    <span *ngIf="!isLoading || selectedPack?.planType !== pack.planType">
+                        Choisir {{ pack.name }}
+                    </span>
+
+                    <span *ngIf="isLoading && selectedPack?.planType === pack.planType"
+                        class="flex items-center justify-center">
+                        <app-loading size="sm" class="mr-2"></app-loading>
+                        Chargement...
+                    </span>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- Trust badges -->
+        <div *ngIf="!isLoadingPacks" class="mt-20 flex flex-wrap justify-center gap-6 text-secondary text-sm">
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-600" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                Paiement sécurisé
+            </div>
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-600" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Remboursement possible
+            </div>
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-600" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Activation immédiate
+            </div>
+        </div>
+
+        <!-- Info Section - Clearer wording -->
+        <div *ngIf="!isLoadingPacks" class="mt-12 card p-6">
+            <h4 class="font-bold text-main mb-6 flex items-center text-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-primary" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Comment ça marche ?
+            </h4>
+            <ul class="space-y-4 text-secondary">
+                <li class="flex items-start">
+                    <span
+                        class="h-7 w-7 rounded-full bg-primary text-white text-sm font-semibold flex items-center justify-center mr-4 mt-0.5 flex-shrink-0">1</span>
+                    <div>
+                        <p class="font-medium text-main">Choisissez votre pack</p>
+                        <p class="text-sm mt-1">Sélectionnez le nombre de matchs qui correspond à vos besoins de
+                            recherche.</p>
+                    </div>
+                </li>
+                <li class="flex items-start">
+                    <span
+                        class="h-7 w-7 rounded-full bg-primary text-white text-sm font-semibold flex items-center justify-center mr-4 mt-0.5 flex-shrink-0">2</span>
+                    <div>
+                        <p class="font-medium text-main">Payez en toute sécurité</p>
+                        <p class="text-sm mt-1">Le paiement est géré par Stripe, leader mondial du paiement en ligne.
+                            Vos données bancaires sont protégées.</p>
+                    </div>
+                </li>
+                <li class="flex items-start">
+                    <span
+                        class="h-7 w-7 rounded-full bg-primary text-white text-sm font-semibold flex items-center justify-center mr-4 mt-0.5 flex-shrink-0">3</span>
+                    <div>
+                        <p class="font-medium text-main">Recevez des propositions de logements</p>
+                        <p class="text-sm mt-1">Vos matchs sont immédiatement disponibles. Ils seront utilisés pour vous
+                            mettre en relation avec des personnes qui correspondent à vos critères de recherche.</p>
+                    </div>
+                </li>
+                <li class="flex items-start">
+                    <span
+                        class="h-7 w-7 rounded-full bg-primary text-white text-sm font-semibold flex items-center justify-center mr-4 mt-0.5 flex-shrink-0">4</span>
+                    <div>
+                        <p class="font-medium text-main">Remboursement garanti</p>
+                        <p class="text-sm mt-1">Si vous trouvez votre logement avant d'avoir utilisé tous vos matchs,
+                            nous vous remboursons les matchs restants.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+
+    </div>
+
+    <!-- KYC Verification Modal -->
+    <div *ngIf="showKycModal" class="fixed inset-0 z-50 flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/50" (click)="closeKycModal()"></div>
+        <div class="relative bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl">
+            <!-- Icon -->
+            <div class="flex justify-center mb-4">
+                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                </div>
+            </div>
+
+            <h4 class="text-xl font-bold text-main mb-3 text-center">Verification requise</h4>
+            <p class="text-secondary text-center mb-6">
+                Pour effectuer un achat, vous devez d'abord verifier votre identité. Cette étape est nécessaire pour
+                garantir la securite de votre compte et de vos transactions.
+            </p>
+
+            <!-- Actions -->
+            <div class="flex gap-3">
+                <button (click)="closeKycModal()"
+                    class="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+                    [disabled]="isStartingKyc">
+                    Annuler
+                </button>
+                <button (click)="startKyc()"
+                    class="flex-1 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-hover transition-colors flex items-center justify-center"
+                    [disabled]="isStartingKyc">
+                    <app-loading *ngIf="isStartingKyc" size="sm" class="mr-2"></app-loading>
+                    {{ isStartingKyc ? 'Chargement...' : 'Verifier mon compte' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,503 @@
+<div class="min-h-screen bg-bg-main p-4 sm:p-6 font-body">
+    <div class="max-w-6xl mx-auto">
+        <div class="bg-bg-card rounded-3xl shadow-card border border-border overflow-hidden relative">
+
+            <!-- Loading Overlay -->
+            <div *ngIf="isLoading" class="absolute inset-0 bg-white/80 flex items-center justify-center z-30">
+                <div class="flex flex-col items-center gap-3">
+                    <i class="pi pi-spin pi-spinner text-3xl text-primary"></i>
+                    <span class="text-secondary text-sm">Chargement...</span>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <ng-container *ngIf="error && !isLoading">
+                <div class="p-10 sm:p-12 text-center space-y-4">
+                    <div class="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto">
+                        <i class="pi pi-exclamation-triangle text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-heading font-bold text-main">Impossible d'afficher le match</h3>
+                    <p class="text-secondary max-w-md mx-auto">{{ error }}</p>
+                    <button routerLink="/dashboard"
+                        class="inline-flex items-center justify-center px-5 py-3 bg-primary text-white rounded-xl font-semibold shadow-card hover:bg-primary-hover transition-colors">
+                        Retour aux matchs
+                    </button>
+                </div>
+            </ng-container>
+
+            <!-- Content -->
+            <ng-container *ngIf="match && !isLoading && !error">
+                <div class="p-4 sm:p-6 lg:p-8 space-y-6">
+
+                    <!-- Header -->
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <button (click)="goBack()"
+                                class="w-11 h-11 rounded-xl border border-border text-main flex items-center justify-center hover:border-primary hover:text-primary transition-colors">
+                                <i class="pi pi-arrow-left text-lg"></i>
+                            </button>
+                            <div>
+                                <p class="text-xs uppercase tracking-[0.08em] text-secondary font-semibold">Détails du
+                                    match</p>
+                                <p class="text-sm text-secondary">Trouvé le {{ formatDate(match.createdAt) }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="px-3 py-1.5 rounded-full text-xs font-semibold"
+                                [ngClass]="getStatusClass(match.status)">
+                                {{ getStatusLabel(match.status) }}
+                            </span>
+                            <div class="relative">
+                                <button (click)="onActionsMenuToggle($event)"
+                                    class="w-11 h-11 rounded-xl border border-border text-main flex items-center justify-center hover:border-primary hover:text-primary transition-colors">
+                                    <i class="pi pi-ellipsis-v text-lg"></i>
+                                </button>
+                                <div *ngIf="isActionsMenuOpen"
+                                    class="absolute right-0 mt-2 w-56 bg-white border border-border rounded-2xl shadow-card overflow-hidden z-20">
+                                    <button (click)="openSnapshot(); isActionsMenuOpen = false"
+                                        class="w-full flex items-center justify-between px-4 py-3 text-sm text-main hover:bg-gray-50 transition-colors">
+                                        Voir les critères du match
+                                        <i class="pi pi-sliders-h text-primary text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Match Type Explanation Section - TRIANGLE -->
+                    <div *ngIf="match.type === MatchType.TRIANGLE && triangleVm"
+                        class="p-5 rounded-2xl border-2 border-purple-200 bg-purple-50/50">
+                        <div class="space-y-5">
+                            <!-- Header -->
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-purple-500 text-white flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 2L2 18h16L10 2z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-heading font-bold text-purple-900">
+                                        Match Triangle
+                                    </h3>
+                                    <p class="text-purple-700 text-sm">
+                                        Échange à trois participants
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Visual Chain Diagram -->
+                            <div class="flex items-center justify-center py-4">
+                                <div class="flex items-center gap-2 sm:gap-4">
+                                    <!-- YOU node -->
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold shadow-lg ring-4 ring-primary/20">
+                                            {{ triangleVm.you.initials }}
+                                        </div>
+                                        <span class="text-xs font-semibold text-primary mt-1">{{ triangleVm.you.name }}</span>
+                                    </div>
+
+                                    <!-- Arrow YOU -> TARGET -->
+                                    <div class="flex flex-col items-center">
+                                        <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                        </svg>
+                                        <span class="text-[10px] text-purple-500">dossier</span>
+                                    </div>
+
+                                    <!-- TARGET node -->
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-14 h-14 rounded-full bg-purple-500 text-white flex items-center justify-center text-xl font-bold shadow-lg">
+                                            {{ triangleVm.target.initials }}
+                                        </div>
+                                        <span class="text-xs font-semibold text-purple-600 mt-1">{{ triangleVm.target.name }}</span>
+                                    </div>
+
+                                    <!-- Arrow TARGET -> THIRD -->
+                                    <div class="flex flex-col items-center">
+                                        <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                        </svg>
+                                        <span class="text-[10px] text-purple-500">dossier</span>
+                                    </div>
+
+                                    <!-- THIRD node -->
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-14 h-14 rounded-full bg-purple-400 text-white flex items-center justify-center text-xl font-bold shadow-lg">
+                                            {{ triangleVm.third.initials }}
+                                        </div>
+                                        <span class="text-xs font-semibold text-purple-500 mt-1">{{ triangleVm.third.name }}</span>
+                                    </div>
+
+                                    <!-- Arrow THIRD -> YOU (curves back) -->
+                                    <div class="flex flex-col items-center">
+                                         <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                        </svg>
+                                        <span class="text-[10px] text-purple-500">vers vous</span>
+                                    </div>
+
+                                     <!-- YOU node -->
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold shadow-lg ring-4 ring-primary/20">
+                                            {{ triangleVm.you.initials }}
+                                        </div>
+                                        <span class="text-xs font-semibold text-primary mt-1">{{ triangleVm.you.name }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step-by-step instructions (concrete, personalized) -->
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3 p-3 bg-white rounded-xl border border-purple-100">
+                                    <span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
+                                    <div class="flex-1">
+                                        <p class="text-main text-sm">{{ triangleVm.instructions.step1 }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-3 p-3 bg-white rounded-xl border border-purple-100">
+                                    <span class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
+                                    <div class="flex-1">
+                                        <p class="text-main text-sm">{{ triangleVm.instructions.step2 }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-3 p-3 bg-white rounded-xl border border-purple-100">
+                                    <span class="w-8 h-8 rounded-full bg-purple-400 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
+                                    <div class="flex-1">
+                                        <p class="text-main text-sm">{{ triangleVm.instructions.step3 }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Info box -->
+                            <div class="p-3 bg-purple-100 rounded-xl">
+                                <p class="text-purple-800 text-xs">
+                                    <i class="pi pi-info-circle mr-1"></i>
+                                    Pour que l'échange aboutisse, chaque dossier doit être accepté par le participant suivant dans la chaîne.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Standard Match Explanation (compact, dynamic) -->
+                    <div *ngIf="match.type !== MatchType.TRIANGLE"
+                        class="p-4 rounded-2xl border border-border bg-blue-50/30">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+                                <i class="pi pi-sync"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-semibold text-main">Échange direct</h4>
+                                <p class="text-secondary text-xs">
+                                    Vous échangez avec <span class="font-semibold text-blue-600">{{ match.targetUserFirstName || 'le propriétaire' }}</span>.
+                                    Envoyez votre dossier au bailleur de son logement. Il fera de même avec le votre.
+                                </p>
+                            </div>
+                            <!-- Visual exchange icons -->
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">V</div>
+                                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                </svg>
+                                <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">
+                                    {{ (match.targetUserFirstName || 'P').charAt(0).toUpperCase() }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Title & Price -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-heading font-bold text-main">
+                                {{ getHomeTypeLabel(match.targetHome.homeType) }} • {{ match.targetHome.surface }} m²
+                            </h1>
+                            <p class="text-secondary text-sm sm:text-base">
+                                {{ match.targetHome.nbRooms }} pièce{{ match.targetHome.nbRooms > 1 ? 's' : '' }} •
+                                {{ match.targetHome.addressFormatted }}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl sm:text-4xl font-heading font-bold text-main leading-none">
+                                {{ match.targetHome.rent }} €
+                                <span class="text-base text-secondary font-medium">/mois</span>
+                            </div>
+                            <p class="text-xs text-secondary mt-1">Aucun frais caché</p>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="flex items-center gap-3 p-4 rounded-2xl border border-border bg-white">
+                            <div
+                                class="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                                <i class="pi pi-th-large"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-secondary uppercase tracking-wide">Pièces</p>
+                                <p class="text-main font-semibold text-lg">
+                                    {{ match.targetHome.nbRooms }} pièce{{ match.targetHome.nbRooms > 1 ? 's' : '' }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-4 rounded-2xl border border-border bg-white">
+                            <div class="w-11 h-11 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
+                                <i class="pi pi-arrows-alt"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-secondary uppercase tracking-wide">Surface</p>
+                                <p class="text-main font-semibold text-lg">{{ match.targetHome.surface }} m²</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-4 rounded-2xl border border-border bg-white">
+                            <div
+                                class="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                <i class="pi pi-home"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-secondary uppercase tracking-wide">Type</p>
+                                <p class="text-main font-semibold text-lg">{{
+                                    getHomeTypeLabel(match.targetHome.homeType)
+                                    }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid lg:grid-cols-5 gap-6">
+                        <!-- Gallery -->
+                        <div class="lg:col-span-3 space-y-4">
+                            <div class="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100">
+                                <ng-container *ngIf="images.length; else emptyGallery">
+                                    <img [src]="images[currentImageIndex]" alt="Photo du logement"
+                                        class="w-full h-full object-cover" (click)="openGallery(currentImageIndex)">
+
+                                    <div
+                                        class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/50 to-transparent pointer-events-none">
+                                    </div>
+
+                                    <div
+                                        class="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/60 text-white text-sm font-semibold">
+                                        {{ currentImageIndex + 1 }} / {{ images.length }}
+                                    </div>
+
+                                    <button *ngIf="images.length > 1"
+                                        (click)="previousImage(); $event.stopPropagation()"
+                                        class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 text-main shadow-lg hover:bg-white transition-all flex items-center justify-center">
+                                        <i class="pi pi-chevron-left text-sm"></i>
+                                    </button>
+                                    <button *ngIf="images.length > 1" (click)="nextImage(); $event.stopPropagation()"
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 text-main shadow-lg hover:bg-white transition-all flex items-center justify-center">
+                                        <i class="pi pi-chevron-right text-sm"></i>
+                                    </button>
+
+                                    <button (click)="openGallery(currentImageIndex); $event.stopPropagation()"
+                                        class="absolute bottom-4 left-4 bg-white/90 hover:bg-white px-4 py-2 rounded-lg shadow-card text-sm font-semibold flex items-center gap-2 transition-all">
+                                        <i class="pi pi-images text-primary"></i>
+                                        Afficher les {{ images.length }} photos
+                                    </button>
+                                </ng-container>
+
+                                <ng-template #emptyGallery>
+                                    <div
+                                        class="w-full h-full flex flex-col items-center justify-center text-secondary gap-3">
+                                        <div
+                                            class="w-16 h-16 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center">
+                                            <i class="pi pi-image text-2xl"></i>
+                                        </div>
+                                        <p class="font-medium text-main">Aucune photo disponible</p>
+                                        <p class="text-sm text-secondary max-w-xs text-center">Le propriétaire n'a pas
+                                            encore ajouté d'images pour ce logement.</p>
+                                    </div>
+                                </ng-template>
+                            </div>
+
+                            <div *ngIf="images.length > 1" class="flex gap-2 overflow-x-auto py-1">
+                                <button *ngFor="let img of images; let i = index" (click)="goToImage(i)"
+                                    [ngClass]="currentImageIndex === i ? 'ring-2 ring-primary ring-offset-2' : 'border border-border'"
+                                    class="relative flex-shrink-0 w-20 h-16 rounded-xl overflow-hidden bg-gray-100 hover:opacity-90 transition-all">
+                                    <img [src]="img" alt="Miniature" class="w-full h-full object-cover">
+                                    <span *ngIf="currentImageIndex === i"
+                                        class="absolute bottom-1 right-1 text-[10px] px-2 py-0.5 rounded-full bg-primary text-white font-semibold">
+                                        Vue
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Info / Actions -->
+                        <div class="lg:col-span-2 space-y-4">
+                            <div class="p-5 rounded-2xl border border-border bg-white shadow-sm space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs text-secondary uppercase tracking-wide">Loyer</p>
+                                        <p class="text-2xl font-heading font-bold text-main">
+                                            {{ match.targetHome.rent }} €
+                                            <span class="text-sm text-secondary font-medium">/mois</span>
+                                        </p>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                                        [ngClass]="getStatusClass(match.status)">
+                                        {{ getStatusLabel(match.status) }}
+                                    </span>
+                                </div>
+
+                                <div class="flex flex-col gap-2">
+                                    <!-- Chat button - always visible unless NOT_INTERESTED -->
+                                    <button *ngIf="match.status !== MatchStatus.NOT_INTERESTED && match.status !== MatchStatus.ARCHIVED"
+                                        (click)="launchChat()" [disabled]="isActionLoading"
+                                        class="w-full py-3 rounded-xl bg-primary text-white font-semibold shadow-card hover:bg-primary-hover transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                                        <i class="pi pi-comments"></i>
+                                        Lancer le chat
+                                    </button>
+
+                                    <!-- "Pas intéressé" button - hidden when already NOT_INTERESTED -->
+                                    <button *ngIf="match.status !== MatchStatus.NOT_INTERESTED && match.status !== MatchStatus.ARCHIVED"
+                                        (click)="notInterested()" [disabled]="isActionLoading"
+                                        class="w-full py-3 rounded-xl bg-gray-50 text-main font-semibold hover:bg-gray-100 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
+                                        <i class="pi pi-times-circle"></i>
+                                        Pas intéressé
+                                    </button>
+
+                                    <!-- "Remettre en liste" button - only visible when NOT_INTERESTED -->
+                                    <button *ngIf="match.status === MatchStatus.NOT_INTERESTED"
+                                        (click)="restoreToList()" [disabled]="isActionLoading"
+                                        class="w-full py-3 rounded-xl bg-primary text-white font-semibold shadow-card hover:bg-primary-hover transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                                        <i class="pi pi-refresh"></i>
+                                        Remettre en liste
+                                    </button>
+
+                                    <!-- Info message when NOT_INTERESTED -->
+                                    <p *ngIf="match.status === MatchStatus.NOT_INTERESTED"
+                                        class="text-xs text-secondary text-center mt-1">
+                                        Ce match est archivé. Cliquez ci-dessus pour le remettre dans votre liste.
+                                    </p>
+                                    <p *ngIf="match.status === MatchStatus.ARCHIVED"
+                                        class="text-xs text-secondary text-center mt-1">
+                                        Ce match est archiv? automatiquement car le chat est inactif.
+                                    </p>
+                                </div>
+
+                                <div class="flex items-start gap-3 p-4 rounded-xl bg-gray-50">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                                        <i class="pi pi-map-marker"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-secondary uppercase tracking-wide">Adresse</p>
+                                        <p class="text-main font-semibold">{{ match.targetHome.addressFormatted || 'Non
+                                            renseignée' }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between text-sm text-secondary">
+                                    <span>Ajouté le {{ formatDate(match.createdAt) }}</span>
+                                    <button class="text-primary font-semibold flex items-center gap-1"
+                                        (click)="openSnapshot()">
+                                        <i class="pi pi-sliders-h text-xs"></i>
+                                        Voir les critères
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-5 rounded-2xl border border-border bg-white">
+                        <h3 class="text-lg font-heading font-bold text-main mb-3">À propos de ce logement</h3>
+                        <p class="text-main leading-relaxed whitespace-pre-line">
+                            {{ match.targetHome.description || 'Aucune description fournie pour le moment.' }}
+                        </p>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>
+
+<!-- STICKY_ACTIONS -->
+<div *ngIf="match" class="md:hidden fixed bottom-0 left-0 right-0 px-4 pb-6 pointer-events-none">
+    <div
+        class="pointer-events-auto bg-white/90 backdrop-blur-xl border border-border rounded-2xl shadow-card p-4 flex items-center justify-between gap-4">
+        <!-- Normal state (not NOT_INTERESTED) -->
+        <ng-container *ngIf="match.status !== MatchStatus.NOT_INTERESTED && match.status !== MatchStatus.ARCHIVED">
+            <div class="flex flex-col">
+                <span class="text-lg font-heading font-bold text-main">{{ match.targetHome.rent }} €</span>
+                <button class="text-xs text-secondary underline mt-1 text-left"
+                    [disabled]="isActionLoading" (click)="notInterested()">Pas intéressé</button>
+            </div>
+            <button (click)="launchChat()" [disabled]="isActionLoading"
+                class="flex-1 py-3 bg-primary text-white rounded-xl font-semibold shadow-card hover:bg-primary-hover transition-all disabled:opacity-60">
+                Lancer le chat
+            </button>
+        </ng-container>
+
+        <!-- Archived state (NOT_INTERESTED) -->
+        <ng-container *ngIf="match.status === MatchStatus.NOT_INTERESTED">
+            <div class="flex flex-col">
+                <span class="text-sm font-semibold text-gray-500">Match archivé</span>
+                <span class="text-xs text-secondary">{{ match.targetHome.rent }} € /mois</span>
+            </div>
+            <button (click)="restoreToList()" [disabled]="isActionLoading"
+                class="flex-1 py-3 bg-primary text-white rounded-xl font-semibold shadow-card hover:bg-primary-hover transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                <i class="pi pi-refresh"></i>
+                Remettre en liste
+            </button>
+        </ng-container>
+
+        <!-- Archived state (auto-archive) -->
+        <ng-container *ngIf="match.status === MatchStatus.ARCHIVED">
+            <div class="flex flex-col">
+                <span class="text-sm font-semibold text-gray-500">Match archiv?</span>
+                <span class="text-xs text-secondary">{{ match.targetHome.rent }} ?'? /mois</span>
+            </div>
+        </ng-container>
+    </div>
+</div>
+
+<!-- FULLSCREEN_GALLERY -->
+<div *ngIf="isGalleryOpen" class="fixed inset-0 bg-black/90 z-50 flex flex-col">
+    <div class="flex items-center justify-between p-4">
+        <button (click)="closeGallery()"
+            class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+            <i class="pi pi-times text-white text-xl"></i>
+        </button>
+        <span class="text-white font-semibold">{{ galleryImageIndex + 1 }} / {{ images.length }}</span>
+        <div class="w-10"></div>
+    </div>
+    <div class="flex-1 flex items-center justify-center relative px-6">
+        <button *ngIf="images.length > 1" (click)="previousGalleryImage()"
+            class="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+            <i class="pi pi-chevron-left text-2xl text-white"></i>
+        </button>
+
+        <img [src]="images[galleryImageIndex]" alt="Photo en plein écran"
+            class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl">
+
+        <button *ngIf="images.length > 1" (click)="nextGalleryImage()"
+            class="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+            <i class="pi pi-chevron-right text-2xl text-white"></i>
+        </button>
+    </div>
+
+    <div *ngIf="images.length > 1" class="p-4 bg-black/80">
+        <div class="flex gap-2 overflow-x-auto justify-center">
+            <button *ngFor="let img of images; let i = index" (click)="goToGalleryImage(i)"
+                [ngClass]="galleryImageIndex === i ? 'ring-2 ring-white' : 'opacity-70'"
+                class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all">
+                <img [src]="img" alt="Miniature" class="w-full h-full object-cover">
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- SNAPSHOT_MODAL (Externalized) -->
+<app-match-criteria-modal [match]="match" [isOpen]="isSnapshotOpen" (close)="closeSnapshot()">
+</app-match-criteria-modal>
+
+<!-- CONFIRMATION_MODAL_NOT_INTERESTED -->
+<app-confirmation-modal [isOpen]="isNotInterestedModalOpen" title="Mettre de côté ce match ?"
+    message="Vous ne verrez plus ce logement dans la liste principale. Vous pourrez toujours le retrouver plus tard dans vos archives."
+    confirmText="Archiver" cancelText="Annuler" (confirm)="confirmNotInterested()" (cancel)="cancelNotInterested()">
+</app-confirmation-modal>
+

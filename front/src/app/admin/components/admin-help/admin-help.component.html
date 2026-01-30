@@ -1,0 +1,314 @@
+<div class="space-y-6">
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">En attente</p>
+          <p class="text-2xl font-bold text-yellow-600">{{ stats.open }}</p>
+        </div>
+        <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">En cours</p>
+          <p class="text-2xl font-bold text-blue-600">{{ stats.inProgress }}</p>
+        </div>
+        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">Resolus aujourd'hui</p>
+          <p class="text-2xl font-bold text-green-600">{{ stats.resolvedToday }}</p>
+        </div>
+        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="flex space-x-2">
+    <button
+      (click)="setFilter('')"
+      [class]="statusFilter === '' ? 'bg-primary text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
+      class="px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-gray-200">
+      Tous
+    </button>
+    <button
+      (click)="setFilter('OPEN')"
+      [class]="statusFilter === 'OPEN' ? 'bg-yellow-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
+      class="px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-gray-200">
+      En attente
+    </button>
+    <button
+      (click)="setFilter('IN_PROGRESS')"
+      [class]="statusFilter === 'IN_PROGRESS' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
+      class="px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-gray-200">
+      En cours
+    </button>
+    <button
+      (click)="setFilter('RESOLVED')"
+      [class]="statusFilter === 'RESOLVED' ? 'bg-green-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
+      class="px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-gray-200">
+      Resolus
+    </button>
+  </div>
+
+  <!-- Requests List -->
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <!-- Loading state -->
+    <div *ngIf="loading && requests.length === 0" class="p-8 text-center text-gray-500">
+      <svg class="animate-spin h-8 w-8 mx-auto mb-2 text-primary" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Chargement...
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && requests.length === 0" class="p-8 text-center text-gray-500">
+      <svg class="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+      </svg>
+      Aucune demande d'aide
+    </div>
+
+    <!-- Requests table -->
+    <table *ngIf="requests.length > 0" class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilisateur</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sujet</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pris par</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <tr *ngFor="let request of requests" class="hover:bg-gray-50 cursor-pointer" (click)="openDetail(request)">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-8 w-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <span class="text-primary font-medium text-sm">{{ request.user?.firstName?.charAt(0) || '?' }}</span>
+              </div>
+              <div class="ml-3">
+                <div class="text-sm font-medium text-gray-900">{{ getUserName(request.user) }}</div>
+                <div class="text-xs text-gray-500">{{ request.user?.mail }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+              {{ getTopicLabel(request.topic) }}
+            </span>
+            <span *ngIf="request.hasAttachments" class="ml-1 text-gray-400" title="Pieces jointes">
+              <svg class="inline w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+              </svg>
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span [class]="getStatusConfig(request.status).bgClass + ' ' + getStatusConfig(request.status).textClass"
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+              {{ getStatusConfig(request.status).label }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <span *ngIf="request.claimedBy">{{ getUserName(request.claimedBy) }}</span>
+            <span *ngIf="!request.claimedBy" class="text-gray-400">-</span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ formatShortDate(request.createdAt) }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <button (click)="openDetail(request); $event.stopPropagation()" class="text-primary hover:text-primary/80">
+              Voir
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Load more button -->
+    <div *ngIf="hasMore" class="p-4 text-center border-t border-gray-200">
+      <button (click)="loadMore()" [disabled]="loading"
+        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50">
+        <span *ngIf="loading">Chargement...</span>
+        <span *ngIf="!loading">Charger plus</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div *ngIf="showDetailModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+    <!-- Header -->
+    <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-bold text-gray-900">Demande d'aide</h2>
+        <p class="text-sm text-gray-500 mt-1" *ngIf="selectedRequest">Ref: {{ selectedRequest.uid }}</p>
+      </div>
+      <button (click)="closeDetail()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 overflow-y-auto p-6" *ngIf="selectedRequest && !loadingDetail">
+      <div class="flex gap-6">
+        <!-- Left: Request Info -->
+        <div class="space-y-6 w-full">
+          <!-- User Info -->
+          <div class="bg-gray-50 rounded-xl p-4">
+            <h3 class="font-medium text-gray-900 mb-3">Utilisateur</h3>
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
+                <span class="text-primary font-medium text-lg">{{ selectedRequest.user?.firstName?.charAt(0) || '?' }}</span>
+              </div>
+              <div class="ml-4">
+                <p class="font-medium text-gray-900">{{ getUserName(selectedRequest.user) }}</p>
+                <p class="text-sm text-gray-500">{{ selectedRequest.user?.mail }}</p>
+              </div>
+            </div>
+            <button (click)="viewUserContext()"
+              class="mt-4 w-full py-2 text-sm text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+              Voir le profil complet
+            </button>
+          </div>
+
+          <!-- Request Details -->
+          <div class="bg-gray-50 rounded-xl p-4">
+            <h3 class="font-medium text-gray-900 mb-3">Details</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-gray-500">Sujet</span>
+                <span class="font-medium">{{ getTopicLabel(selectedRequest.topic) }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Statut</span>
+                <span [class]="getStatusConfig(selectedRequest.status).bgClass + ' ' + getStatusConfig(selectedRequest.status).textClass"
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                  {{ getStatusConfig(selectedRequest.status).label }}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Cree le</span>
+                <span>{{ formatDate(selectedRequest.createdAt) }}</span>
+              </div>
+              <div *ngIf="selectedRequest.claimedBy" class="flex justify-between">
+                <span class="text-gray-500">Pris par</span>
+                <span>{{ getUserName(selectedRequest.claimedBy) }}</span>
+              </div>
+              <div *ngIf="selectedRequest.resolvedAt" class="flex justify-between">
+                <span class="text-gray-500">Resolu le</span>
+                <span>{{ formatDate(selectedRequest.resolvedAt) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="bg-gray-50 rounded-xl p-4">
+            <h3 class="font-medium text-gray-900 mb-3">Description</h3>
+            <p class="text-gray-700 whitespace-pre-wrap">{{ selectedRequest.description }}</p>
+          </div>
+
+          <!-- Resolution Note -->
+          <div *ngIf="selectedRequest.resolutionNote" class="bg-green-50 rounded-xl p-4 border border-green-200">
+            <h3 class="font-medium text-green-800 mb-2">Note de resolution</h3>
+            <p class="text-green-700 whitespace-pre-wrap">{{ selectedRequest.resolutionNote }}</p>
+          </div>
+        </div>
+
+        <!-- Right: Attachments & Context -->
+        <div  *ngIf="selectedRequest.attachments && selectedRequest.attachments.length > 0" class="space-y-6 w-full">
+          <!-- Attachments -->
+          <div *ngIf="selectedRequest.attachments && selectedRequest.attachments.length > 0" class="bg-gray-50 rounded-xl p-4">
+            <h3 class="font-medium text-gray-900 mb-3">Pieces jointes ({{ selectedRequest.attachments.length }})</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <a *ngFor="let att of selectedRequest.attachments"
+                [href]="att.url" target="_blank"
+                class="block aspect-video bg-gray-200 rounded-lg overflow-hidden hover:opacity-80 transition-opacity">
+                <img [src]="att.url" class="w-full h-full object-cover" alt="Piece jointe">
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="loadingDetail" class="flex-1 flex items-center justify-center">
+      <svg class="animate-spin h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="p-6 border-t border-gray-200 flex justify-end space-x-3" *ngIf="selectedRequest && !loadingDetail && selectedRequest.status !== 'RESOLVED'">
+      <button *ngIf="!selectedRequest.claimedBy" (click)="claimRequest()"
+        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+        Prendre en charge
+      </button>
+      <button *ngIf="selectedRequest.claimedBy" (click)="releaseRequest()"
+        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+        Liberer
+      </button>
+      <button (click)="openResolveModal()"
+        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+        Marquer comme resolu
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Resolve Modal -->
+<div *ngIf="showResolveModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+  <div class="bg-white rounded-2xl w-full max-w-md">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-lg font-bold text-gray-900">Resoudre la demande</h2>
+    </div>
+    <div class="p-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Note de resolution (optionnel)</label>
+      <textarea [(ngModel)]="resolutionNote" rows="4" placeholder="Expliquez comment le probleme a ete resolu..."
+        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"></textarea>
+      <p class="text-xs text-gray-500 mt-2">Cette note sera envoyee par email a l'utilisateur.</p>
+    </div>
+    <div class="p-6 border-t border-gray-200 flex justify-end space-x-3">
+      <button (click)="closeResolveModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+        Annuler
+      </button>
+      <button (click)="resolveRequest()" [disabled]="resolving"
+        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50">
+        <span *ngIf="resolving">Traitement...</span>
+        <span *ngIf="!resolving">Confirmer</span>
+      </button>
+    </div>
+  </div>
+</div>

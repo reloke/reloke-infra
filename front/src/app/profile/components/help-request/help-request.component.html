@@ -1,0 +1,457 @@
+
+<div class="max-w-2xl mx-auto">
+
+
+      <input
+        #fileInput
+        type="file"
+        (change)="onFileSelect($event)"
+         class="sr-only"
+        accept="image/png,image/jpeg,image/jpg"
+        multiple
+      />
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-main">Demander de l'aide</h1>
+    <p class="text-secondary mt-1">
+      Notre equipe vous repondra dans les plus brefs delais.
+    </p>
+  </div>
+
+  <!-- Success State -->
+  <div
+    *ngIf="submitted"
+    class="bg-bg-card rounded-2xl shadow-sm border border-border p-8 text-center"
+  >
+    <div
+      class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+    >
+      <svg
+        class="w-8 h-8 text-green-600"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 13l4 4L19 7"
+        ></path>
+      </svg>
+    </div>
+    <h2 class="text-xl font-bold text-main mb-2">Demande envoyee !</h2>
+    <p class="text-secondary mb-6">
+      Vous recevrez un email de confirmation. Notre equipe traitera votre
+      demande rapidement.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <button
+        type="button"
+        (click)="resetForm()"
+        class="px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-hover transition-colors"
+      >
+        Nouvelle demande
+      </button>
+      <button
+        type="button"
+        (click)="goBack()"
+        class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+      >
+        Retour au compte
+      </button>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <form *ngIf="!submitted" [formGroup]="helpForm" class="space-y-6">
+    <!-- Error Alert -->
+    <div
+      *ngIf="error"
+      class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start"
+    >
+      <svg
+        class="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <p class="text-red-700 text-sm">{{ error }}</p>
+    </div>
+
+    <!-- Topic Selection -->
+    <div class="bg-bg-card rounded-2xl shadow-sm border border-border p-6">
+      <label
+        class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1 block mb-3"
+      >
+        Sujet de votre demande <span class="text-red-500">*</span>
+      </label>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <button
+          *ngFor="let topic of topics"
+          type="button"
+          (click)="selectTopic(topic.value)"
+          [ngClass]="
+            helpForm.get('topic')?.value === topic.value
+              ? 'border-primary bg-primary/5 text-primary ring-2 ring-primary/20'
+              : 'border-border-light bg-white text-gray-700 hover:border-gray-300'
+          "
+          class="p-3 rounded-xl border text-sm font-medium transition-all text-center"
+        >
+          {{ topic.label }}
+        </button>
+      </div>
+      <p
+        *ngIf="helpForm.get('topic')?.touched && helpForm.get('topic')?.errors?.['required']"
+        class="text-red-500 text-xs mt-2"
+      >
+        Veuillez selectionner un sujet
+      </p>
+    </div>
+
+    <!-- Description -->
+    <div class="bg-bg-card rounded-2xl shadow-sm border border-border p-6">
+      <label
+        class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1 block mb-3"
+      >
+        Decrivez votre probleme <span class="text-red-500">*</span>
+      </label>
+      <textarea
+        formControlName="description"
+        rows="6"
+        placeholder="Expliquez en detail votre probleme ou votre question..."
+        class="w-full p-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm resize-none"
+        [class.border-red-300]="
+          helpForm.get('description')?.touched &&
+          helpForm.get('description')?.invalid
+        "
+      ></textarea>
+      <div class="flex justify-between items-center mt-2 px-1">
+        <div>
+          <p
+            *ngIf="helpForm.get('description')?.touched && helpForm.get('description')?.errors?.['required']"
+            class="text-red-500 text-xs"
+          >
+            La description est requise
+          </p>
+          <p
+            *ngIf="helpForm.get('description')?.touched && helpForm.get('description')?.errors?.['minlength']"
+            class="text-red-500 text-xs"
+          >
+            Minimum 10 caracteres
+          </p>
+        </div>
+        <p
+          class="text-xs text-gray-400"
+          [class.text-red-500]="descriptionLength > MAX_DESCRIPTION_LENGTH"
+        >
+          {{ descriptionLength }} / {{ MAX_DESCRIPTION_LENGTH }}
+        </p>
+      </div>
+    </div>
+
+    <!-- File Upload -->
+    <div class="bg-bg-card rounded-2xl shadow-sm border border-border p-6">
+      <label
+        class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1 block mb-3"
+      >
+        Pieces jointes
+        <span class="text-gray-400 normal-case font-normal">(optionnel)</span>
+      </label>
+      <p class="text-xs text-secondary mb-4 pl-1">
+        Ajoutez jusqu'a {{ MAX_FILES }} images (max 10 Mo chacune) pour
+        illustrer votre probleme.
+      </p>
+
+      <!-- File Previews -->
+      <div *ngIf="files.length > 0" class="grid grid-cols-3 gap-3 mb-4">
+        <div
+          *ngFor="let f of files; let i = index"
+          class="relative aspect-square rounded-xl overflow-hidden bg-gray-100 group"
+        >
+          <img
+            [src]="f.preview"
+            class="w-full h-full object-cover"
+            alt="Apercu"
+          />
+
+          <!-- Loading overlay -->
+          <div
+            *ngIf="f.uploading"
+            class="absolute inset-0 bg-black/50 flex items-center justify-center"
+          >
+            <svg
+              class="animate-spin h-6 w-6 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </div>
+
+          <!-- Error overlay -->
+          <div
+            *ngIf="f.error"
+            class="absolute inset-0 bg-red-500/50 flex items-center justify-center"
+          >
+            <svg
+              class="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </div>
+
+          <!-- Remove button -->
+          <button
+            *ngIf="!f.uploading"
+            type="button"
+            (click)="removeFile(i)"
+            class="absolute top-2 right-2 w-6 h-6 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <svg
+              class="w-4 h-4 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+
+
+      <!-- Button to trigger file selection -->
+      <button
+        *ngIf="files.length < MAX_FILES"
+        type="button"
+(click)="triggerFileInput()"
+        class="w-full py-4 border-2 border-dashed border-border-light rounded-xl text-secondary hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2 cursor-pointer"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Ajouter une image
+      </button>
+    </div>
+
+    <!-- Submit Button -->
+    <button
+      type="submit"
+      [disabled]="helpForm.invalid || submitting"
+      (click)="onSubmit()"
+      class="w-full py-4 bg-primary text-white rounded-xl font-semibold shadow-md hover:bg-primary-hover hover:shadow-lg transform active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+    >
+      <svg
+        *ngIf="submitting"
+        class="animate-spin h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        ></circle>
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        ></path>
+      </svg>
+      <span *ngIf="submitting">Envoi en cours...</span>
+      <span *ngIf="!submitting">Envoyer ma demande</span>
+    </button>
+  </form>
+</div>
+
+
+<!-- Floating shortcut (bottom-right) -->
+<button
+  type="button"
+  (click)="openMyRequestsModal()"
+  class="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-2xl bg-primary text-white shadow-xl hover:bg-primary-hover transition-colors"
+>
+  <i class="pi pi-inbox text-base"></i>
+  <span class="text-sm font-semibold">Mes demandes</span>
+</button>
+
+<!-- My requests modal -->
+<div *ngIf="isMyRequestsModalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/40" (click)="closeMyRequestsModal()"></div>
+
+  <div class="relative w-[min(1100px,92vw)] max-h-[86vh] bg-white rounded-2xl shadow-2xl border border-border-light overflow-hidden">
+    <div class="flex items-center justify-between gap-3 p-5 border-b border-border-light">
+      <div>
+        <h3 class="text-lg font-bold text-main">Mes demandes d’aide</h3>
+        <p class="text-xs text-secondary">
+          {{ myRequestsTotal }} demande(s)
+        </p>
+      </div>
+      <button
+        type="button"
+        (click)="closeMyRequestsModal()"
+        class="h-10 w-10 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors flex items-center justify-center"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-5">
+      <!-- List -->
+      <div class="md:col-span-2 border-b md:border-b-0 md:border-r border-border-light max-h-[78vh] overflow-y-auto">
+        <div class="p-4">
+          <div *ngIf="myRequestsError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700 mb-4">
+            {{ myRequestsError }}
+          </div>
+
+          <div *ngIf="isLoadingMyRequests && myRequests.length === 0" class="space-y-3">
+            <div class="h-16 bg-gray-100 rounded-xl animate-pulse"></div>
+            <div class="h-16 bg-gray-100 rounded-xl animate-pulse"></div>
+            <div class="h-16 bg-gray-100 rounded-xl animate-pulse"></div>
+          </div>
+
+          <div *ngIf="!isLoadingMyRequests && myRequests.length === 0" class="text-sm text-secondary">
+            Aucune demande pour le moment.
+          </div>
+
+          <button
+            *ngFor="let req of myRequests"
+            type="button"
+            (click)="openRequestDetails(req.uid)"
+            class="w-full text-left p-4 rounded-xl border border-border-light hover:border-gray-300 hover:bg-gray-50 transition-colors mb-3"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-bold text-main">{{ getTopicLabel(req.topic) }}</p>
+                <p class="text-xs text-secondary mt-1">{{ formatDate(req.createdAt) }}</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span
+                  class="px-2 py-1 rounded-full text-xs font-semibold"
+                  [ngClass]="getStatusInfo(req.status).class"
+                >
+                  {{ getStatusInfo(req.status).label }}
+                </span>
+                <i *ngIf="req.hasAttachments" class="pi pi-image text-secondary"></i>
+              </div>
+            </div>
+          </button>
+
+          <button
+            *ngIf="myRequestsHasMore"
+            type="button"
+            (click)="loadMyRequests(false)"
+            [disabled]="isLoadingMyRequests"
+            class="w-full py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {{ isLoadingMyRequests ? 'Chargement...' : 'Charger plus' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="md:col-span-3 max-h-[78vh] overflow-y-auto">
+        <div class="p-5">
+          <div *ngIf="isLoadingMyRequestDetails" class="space-y-3">
+            <div class="h-6 bg-gray-100 rounded animate-pulse w-1/2"></div>
+            <div class="h-4 bg-gray-100 rounded animate-pulse w-1/3"></div>
+            <div class="h-32 bg-gray-100 rounded-xl animate-pulse"></div>
+          </div>
+
+          <div *ngIf="selectedRequestError" class="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700 mb-4">
+            {{ selectedRequestError }}
+          </div>
+
+          <div *ngIf="!isLoadingMyRequestDetails && !selectedRequest" class="text-sm text-secondary">
+            Sélectionnez une demande pour voir les détails.
+          </div>
+
+          <div *ngIf="selectedRequest" class="space-y-5">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h4 class="text-xl font-bold text-main">{{ getTopicLabel(selectedRequest.topic) }}</h4>
+                <p class="text-xs text-secondary mt-1">
+                  Créée le {{ formatDate(selectedRequest.createdAt) }}
+                </p>
+              </div>
+              <span
+                class="px-3 py-1 rounded-full text-xs font-semibold"
+                [ngClass]="getStatusInfo(selectedRequest.status).class"
+              >
+                {{ getStatusInfo(selectedRequest.status).label }}
+              </span>
+            </div>
+
+            <div class="bg-bg-card rounded-2xl border border-border-light p-5">
+              <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Description</p>
+              <p class="text-sm text-main whitespace-pre-line leading-relaxed">
+                {{ selectedRequest.description }}
+              </p>
+            </div>
+
+            <div *ngIf="selectedRequest.attachments?.length" class="bg-bg-card rounded-2xl border border-border-light p-5">
+              <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Images</p>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <a
+                  *ngFor="let att of selectedRequest.attachments"
+                  [href]="att.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="block aspect-square rounded-xl overflow-hidden bg-gray-100 border border-border-light hover:border-gray-300 transition-colors"
+                >
+                  <img [src]="att.url" class="w-full h-full object-cover" alt="Pièce jointe" />
+                </a>
+              </div>
+            </div>
+
+            <div *ngIf="!selectedRequest.attachments?.length" class="text-sm text-secondary">
+              Aucune image attachée.
+            </div>
+
+            <div *ngIf="selectedRequest.status === 'RESOLVED' && selectedRequest.resolutionNote" class="bg-green-50 border border-green-200 rounded-2xl p-5">
+              <p class="text-xs font-semibold uppercase tracking-wider text-green-700 mb-2">Réponse</p>
+              <p class="text-sm text-green-900 whitespace-pre-line">{{ selectedRequest.resolutionNote }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

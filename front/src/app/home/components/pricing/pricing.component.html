@@ -1,0 +1,60 @@
+<app-navbar></app-navbar>
+
+<div class="pt-24 min-h-screen flex flex-col justify-between bg-main">
+    <section id="tarifs" class="py-20 md:py-32 px-6 max-w-7xl mx-auto flex-grow">
+        <div class="text-center mb-20">
+            <h2 class="font-serif text-3xl md:text-5xl font-bold text-main mb-6">Budget maîtrisé, esprit libre.
+            </h2>
+            <p class="text-secondary max-w-2xl mx-auto mb-8 text-lg">
+                Achetez des crédits de mise en relation. <br />
+                <span class="font-semibold text-primary">Vous n'êtes débité que si vous matchez.</span>
+            </p>
+            <div
+                class="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-sm text-sm text-main font-medium border border-border">
+                <i class="pi pi-refresh text-primary"></i> Satisfait ou remboursé (crédits restants)
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-16 md:gap-8 items-start max-w-6xl mx-auto">
+            <div *ngFor="let pack of MATCH_PACKS"
+                [class]="'relative group bg-white rounded-[2rem] p-8 border transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 flex flex-col h-full ' + (pack.isRecommended ? 'border-primary shadow-xl scale-105 z-10' : 'border-border shadow-sm')">
+
+                <div *ngIf="pack.isRecommended" class="absolute -top-5 left-0 right-0 flex justify-center">
+                    <span
+                        class="bg-primary text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase shadow-lg">Le
+                        plus populaire</span>
+                </div>
+
+                <div class="mb-8 text-center border-b border-main pb-8">
+                    <h3 class="font-serif text-2xl font-bold text-main mb-2">{{pack.label}}</h3>
+                    <p class="text-secondary text-sm">{{pack.description}}</p>
+                </div>
+
+                <div class="text-center mb-8">
+                    <div class="flex items-center justify-center gap-1">
+                        <span class="text-5xl font-bold text-main">{{pack.baseAmount}}€</span>
+                    </div>
+                    <div class="mt-4 bg-main rounded-xl py-3 px-4 inline-block w-full">
+                        <p class="font-bold text-primary text-lg">{{pack.credits}} <span
+                                class="text-sm font-normal text-secondary">Crédits de matchs</span></p>
+                        <p class="text-xs text-placeholder mt-1">{{pack.pricePerMatch}}</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-10 flex-grow px-2">
+                    <div *ngFor="let feat of COMMON_FEATURES" class="flex items-start gap-3 text-sm text-secondary">
+                        <i class="pi pi-check-circle text-primary text-sm shrink-0 mt-0.5"></i>
+                        <span>{{feat}}</span>
+                    </div>
+                </div>
+
+                <button
+                    [class]="pack.isRecommended ? 'btn-landing-primary w-full text-sm py-4 rounded-xl' : 'btn-landing-outline w-full text-sm py-4 rounded-xl'">
+                    Choisir ce pack
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <app-footer></app-footer>
+</div>

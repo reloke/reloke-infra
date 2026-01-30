@@ -1,0 +1,73 @@
+<div class="card overflow-hidden transition-shadow duration-300 h-full flex flex-col cursor-pointer hover:shadow-lg"
+    (click)="viewDetails()">
+    <!-- Image -->
+    <div class="h-48 bg-gray-200 relative">
+        <ng-container *ngIf="match">
+            <img *ngIf="match.home.images && match.home.images.length > 0" [src]="match.home.images[0].url"
+                class="w-full h-full object-cover" alt="Logement">
+        </ng-container>
+        <ng-container *ngIf="confirmedMatch">
+            <img *ngIf="confirmedMatch.targetHome.imageUrl" [src]="confirmedMatch.targetHome.imageUrl"
+                class="w-full h-full object-cover" alt="Logement">
+        </ng-container>
+
+        <div *ngIf="(!match || !match.home.images?.length) && (!confirmedMatch || !confirmedMatch.targetHome.imageUrl)"
+            class="w-full h-full flex items-center justify-center text-gray-400">
+            <span class="text-4xl">🏠</span>
+        </div>
+
+        <div class="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full text-sm font-bold text-primary shadow-sm"
+            *ngIf="match">
+            {{ match.home.rent }}€ / mois
+        </div>
+        <div class="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full text-sm font-bold text-primary shadow-sm"
+            *ngIf="confirmedMatch">
+            {{ confirmedMatch.targetHome.rent }}€ / mois
+        </div>
+    </div>
+
+    <div class="p-6 flex-1 flex flex-col">
+        <div class="flex justify-between items-start mb-4">
+            <div *ngIf="match">
+                <h3 class="text-xl font-heading font-bold text-main mb-1">
+                    {{ match.home.homeType }} • {{ match.home.surface }}m²
+                </h3>
+                <p class="text-secondary text-sm">
+                    Proposé par {{ match.user.firstName }}
+                </p>
+            </div>
+            <div *ngIf="confirmedMatch">
+                <h3 class="text-xl font-heading font-bold text-main mb-1">
+                    {{ confirmedMatch.targetHome.homeType }} • {{ confirmedMatch.targetHome.surface }}m²
+                </h3>
+                <p class="text-secondary text-sm font-bold text-green-600 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Match confirmé avec {{ confirmedMatch.targetUserFirstName }}
+                </p>
+            </div>
+        </div>
+
+        <p class="text-secondary text-sm line-clamp-2 mb-6">
+            {{ match?.home?.description || confirmedMatch?.targetHome?.description }}
+        </p>
+
+        <div class="mt-auto">
+            <button *ngIf="match" (click)="onRequest($event)" class="btn btn-primary w-full">
+                Matcher avec ce logement
+            </button>
+            <button *ngIf="confirmedMatch" (click)="onChat($event)"
+                class="btn bg-green-600 text-white hover:bg-green-700 w-full flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                Contacter par chat
+            </button>
+        </div>
+    </div>
+</div>

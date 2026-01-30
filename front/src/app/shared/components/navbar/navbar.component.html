@@ -1,0 +1,84 @@
+<nav class="fixed w-full z-50 transition-all duration-500 bg-card"
+    [ngClass]="{'shadow-sm py-3': scrolled, 'py-6': !scrolled}">
+    <div class="max-w-7xl mx-auto px-6 md:px-8 flex items-center justify-between">
+        <div class="flex items-center gap-1 group cursor-pointer" routerLink="/">
+            <!-- Logo Icon Stylisé (Clé Solaire) -->
+            <div
+                class="relative w-fit h-fit flex items-center justify-center text-primary transition-transform duration-500 group-hover:rotate-12">
+                <div class="absolute inset-0 scale-125"></div>
+                <!-- Key Icon Replacement -->
+                <img src="assets/images/reloke.png" alt="Reloke Key" class=" w-8 ">
+            </div>
+            <div class="flex flex-col justify-center">
+                <!-- Logo Text Replacement -->
+                <img src="assets/images/logo/logo-without-key.svg" alt="Reloke Logo" class="h-12">
+            </div>
+        </div>
+
+        <div class="hidden md:flex items-center gap-10 text-sm font-medium text-secondary">
+
+            <a routerLink="/tarif" class="hover:text-primary transition-colors relative group cursor-pointer">
+                Tarifs
+                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+            </a>
+              <a routerLink="/contact" class="hover:text-primary transition-colors relative group cursor-pointer">
+                Contact
+                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+            </a>
+            <a routerLink="/faq" class="hover:text-primary transition-colors relative group cursor-pointer">
+                FAQ
+                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+            </a>
+        </div>
+
+        <div class="hidden md:flex items-center gap-4">
+            <a routerLink="/auth/register" class="text-main font-medium hover:text-primary text-sm px-4 cursor-pointer">S'inscrire</a>
+            <button routerLink="/auth/login"
+                class="btn-landing-primary px-6 py-2.5 rounded-full font-medium text-sm shadow-none hover:shadow-lg transition-transform cursor-pointer">Se connecter</button>
+        </div>
+
+        <button class="md:hidden p-2 text-main" (click)="toggleMenu()">
+            <i class="pi" [ngClass]="isMenuOpen ? 'pi-times' : 'pi-bars'" style="font-size: 1.5rem"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div *ngIf="isMenuOpen"
+        class="fixed inset-0 bg-main/95 backdrop-blur-xl p-8 flex flex-col items-center justify-center gap-8 z-50 animate-in fade-in zoom-in-95 duration-300">
+
+        <button class="absolute top-6 right-6 p-2 text-main hover:text-primary transition-colors" (click)="closeMenu()">
+            <i class="pi pi-times" style="font-size: 2rem"></i>
+        </button>
+
+        <!-- Navigation Links -->
+        <div class="flex flex-col items-center gap-6 w-full">
+            <a routerLink="/tarif" (click)="closeMenu()"
+                class="text-3xl font-serif font-bold text-main hover:text-primary transition-colors">
+                Tarifs
+            </a>
+              <a routerLink="/contact" (click)="closeMenu()"
+                class="text-3xl font-serif font-bold text-main hover:text-primary transition-colors">
+                Contact
+            </a>
+            <a routerLink="/faq" (click)="closeMenu()"
+                class="text-3xl font-serif font-bold text-main hover:text-primary transition-colors">
+                FAQ
+            </a>
+        </div>
+
+        <!-- Separator -->
+        <div class="w-16 h-px bg-border my-2"></div>
+
+        <!-- Auth Buttons -->
+        <div class="flex flex-col gap-4 w-full max-w-xs animate-in slide-in-from-bottom-4 delay-100 duration-500">
+            <a routerLink="/auth/register" (click)="closeMenu()"
+                class="w-full text-center py-4 text-lg font-medium text-main hover:text-primary transition-colors border border-border rounded-xl bg-white">
+                S'inscrire
+            </a>
+            <a routerLink="/auth/login" (click)="closeMenu()"
+                class="btn-landing-primary w-full py-4 text-lg rounded-xl shadow-lg flex items-center justify-center gap-2">
+                Se connecter
+            </a>
+        </div>
+    </div>
+</nav>

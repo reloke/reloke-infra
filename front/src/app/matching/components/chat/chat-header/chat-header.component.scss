@@ -1,0 +1,55 @@
+.chat-header {
+    z-index: 20 !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.2s ease-out forwards;
+}
+
+@keyframes vibrate-y {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    15% {
+        transform: translateY(-4px);
+    }
+
+    30% {
+        transform: translateY(4px);
+    }
+
+    45% {
+        transform: translateY(-3px);
+    }
+
+    60% {
+        transform: translateY(3px);
+    }
+
+    75% {
+        transform: translateY(-1px);
+    }
+
+    85% {
+        transform: translateY(1px);
+    }
+}
+
+.animate-vibrate-y {
+    animation: vibrate-y 3s infinite ease-in-out;
+}

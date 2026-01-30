@@ -1,0 +1,172 @@
+@use 'variables' as *;
+
+
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.2s ease-out forwards;
+}
+
+
+
+
+::ng-deep .mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: #000000 !important;
+  border-radius: 1rem !important;
+  box-shadow: none !important;
+}
+
+::ng-deep .mat-mdc-snack-bar-container .mdc-snackbar__label {
+  color: #ffffff !important;
+  padding-left: 20px;
+  padding-top: 25px;
+  padding-bottom: 25px;
+  font-size: 1rem !important;
+}
+
+@import 'variables';
+
+/* ============================================================
+   SNACKBAR – BASE (cohérent avec ton design global)
+   ============================================================ */
+
+::ng-deep .mat-mdc-snack-bar-container {
+  // Le container MDC contient la surface
+  .mdc-snackbar__surface {
+    background: $color-bg-card !important;
+    color: $color-text-main !important;
+    border: 1px solid $color-border !important;
+    border-radius: $border-radius-2xl !important;
+    box-shadow: $shadow-card !important;
+
+    // Layout plus "app-like"
+    padding: 14px 14px !important;
+    min-height: 56px;
+  }
+
+  .mdc-snackbar__label {
+    color: $color-text-main !important;
+    font-family: $font-family-body;
+    font-size: $font-size-sm;
+    line-height: 1.35;
+  }
+
+  .mat-mdc-button.mat-mdc-snack-bar-action {
+    border-radius: $border-radius-xl !important;
+    padding: 10px 14px !important;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    margin-left: 12px !important;
+    margin-right: 0 !important;
+  }
+
+  // Ripple/hover du bouton action (MDC)
+  .mat-mdc-button .mdc-button__ripple {
+    border-radius: $border-radius-xl !important;
+  }
+}
+
+/* ============================================================
+   VARIANTES (SUCCESS / ERROR / WARNING / NOTIF)
+   - On applique un accent via border-left + bouton action assorti
+   ============================================================ */
+
+/* SUCCESS */
+::ng-deep .mat-mdc-snack-bar-container.custom-snackbar-action-success {
+  .mdc-snackbar__surface {
+    border-left: 6px solid $color-success-text !important;
+    background: rgba($color-success-bg, 1) !important;
+  }
+
+  .mat-mdc-button.mat-mdc-snack-bar-action {
+    background: $color-success-text !important;
+    color: $color-white !important;
+
+    &:hover {
+      filter: brightness(0.95);
+    }
+  }
+}
+
+/* ERROR (on reste dans ton univers, pas rouge flashy) */
+::ng-deep .mat-mdc-snack-bar-container.custom-snackbar-action-error {
+  $error-accent: #8E3B2E; // terre cuite sombre (cohérent avec $color-primary)
+  $error-bg: rgba(#F3D6D1, 1);
+
+  .mdc-snackbar__surface {
+    border-left: 6px solid $error-accent !important;
+    background: $error-bg !important;
+  }
+
+  .mat-mdc-button.mat-mdc-snack-bar-action {
+    background: $error-accent !important;
+    color: $color-white !important;
+
+    &:hover {
+      filter: brightness(0.95);
+    }
+  }
+}
+
+/* WARNING (ambre doux, pas jaune agressif) */
+::ng-deep .mat-mdc-snack-bar-container.custom-snackbar-action-warning {
+  $warn-accent: #8A6A12;
+  $warn-bg: rgba(#F5E7B8, 1);
+
+  .mdc-snackbar__surface {
+    border-left: 6px solid $warn-accent !important;
+    background: $warn-bg !important;
+  }
+
+  .mat-mdc-button.mat-mdc-snack-bar-action {
+    background: $warn-accent !important;
+    color: $color-white !important;
+
+    &:hover {
+      filter: brightness(0.95);
+    }
+  }
+}
+
+/* NOTIF (neutre, “info” minimaliste) */
+::ng-deep .mat-mdc-snack-bar-container.custom-snackbar-action-notif {
+  $info-accent: $color-primary;
+
+  .mdc-snackbar__surface {
+    border-left: 6px solid $info-accent !important;
+    background: $color-bg-card !important;
+  }
+
+  .mdc-snackbar__label {
+    color: $color-text-secondary !important;
+  }
+
+  .mat-mdc-button.mat-mdc-snack-bar-action {
+    background: $color-primary !important;
+    color: $color-white !important;
+
+    &:hover {
+      background: $color-primary-hover !important;
+    }
+  }
+}
+
+/* ============================================================
+   POSITION TOP pour NOTIF (tu l’avais déjà)
+   ============================================================ */
+
+::ng-deep .mdc-snackbar.custom-snackbar-action-notif {
+  bottom: auto !important;
+}
+

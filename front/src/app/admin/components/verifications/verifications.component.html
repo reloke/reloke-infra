@@ -1,0 +1,233 @@
+<div class="space-y-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center px-2 md:px-0 gap-4">
+        <div>
+            <h2 class="text-2xl font-bold font-heading text-gray-800">Suivi KYC Didit</h2>
+            <p class="text-sm text-gray-500 mt-1">{{ total }} vérifications trouvées</p>
+        </div>
+
+        <!-- Search -->
+        <div class="relative w-full md:w-80">
+            <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()"
+                placeholder="Rechercher par email, nom..."
+                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm shadow-sm bg-white">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <button *ngIf="searchTerm" (click)="searchTerm = ''; onSearch()"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-4 items-center">
+        <div class="flex bg-gray-100 p-1 rounded-xl border border-gray-200 shadow-sm text-xs">
+            <button (click)="setStatusFilter('')"
+                [class]="statusFilter === '' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                class="px-3 py-1.5 rounded-lg font-medium transition-all">
+                Tous les statuts (non-OK)
+            </button>
+            <button *ngFor="let s of statusList" (click)="setStatusFilter(s.value)"
+                [class]="statusFilter === s.value ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                class="px-3 py-1.5 rounded-lg font-medium transition-all">
+                {{ s.label }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Verifications Table -->
+    <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+        <div *ngIf="loading && verifications.length === 0" class="p-20 text-center">
+            <app-loading size="lg"></app-loading>
+            <p class="text-gray-500 mt-4 font-medium">Chargement des vérifications...</p>
+        </div>
+
+        <div *ngIf="!loading && verifications.length === 0" class="p-20 text-center">
+            <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <p class="text-gray-500 font-medium">Aucune vérification à afficher</p>
+        </div>
+
+        <div class="overflow-x-auto" *ngIf="verifications.length > 0">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50/50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            Utilisateur</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Statut
+                            KYC</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Raison
+                            / Session</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Date
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr *ngFor="let v of verifications" class="hover:bg-gray-50/80 transition-all group">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="h-10 w-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary font-bold shadow-sm">
+                                    {{ v.firstName[0] }}{{ v.lastName[0] }}
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-gray-900">{{ v.firstName }} {{ v.lastName }}
+                                    </div>
+                                    <div class="text-xs text-gray-500">{{ v.mail }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span
+                                class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border"
+                                [ngClass]="getStatusClass(v.kycStatus)">
+                                {{ v.kycStatus }}
+                            </span>
+                            <div *ngIf="v.kycAttempts > 0" class="mt-1 text-[10px] text-gray-500 font-medium">
+                                Tentatives: {{ v.kycAttempts }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="max-w-md text-sm text-gray-600 whitespace-pre-wrap break-words">
+                                <span *ngIf="v.kycStatus === 'MANUAL_REVIEW'"
+                                    class="block mb-1 text-orange-600 font-bold">
+                                    [Revue requise]
+                                </span>
+                                {{ v.kycLastError || v.kycReason || 'Pas de raison spécifiée' }}
+                            </div>
+                            <div class="text-[10px] text-gray-400 font-mono mt-1">ID: {{ v.diditSessionId || '-' }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-xs text-gray-900">{{ v.updatedAt | date:'short' }}</div>
+                            <div class="text-[10px] text-gray-400">Inscrit le: {{ v.createdAt | date:'shortDate' }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <div class="flex justify-end gap-2">
+                                <button (click)="openClarifyModal(v)"
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/5 hover:bg-primary/10 text-primary rounded-lg text-xs font-bold transition-all border border-primary/20"
+                                    title="Envoyer un mail d'explication">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    Relance
+                                </button>
+                                <button (click)="confirmValidation(v)"
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg text-xs font-bold transition-all border border-green-200"
+                                    title="Approuver manuellement">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Valider
+                                </button>
+                                <button (click)="confirmReset(v)"
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold transition-all border border-red-200"
+                                    title="Réinitialiser le statut KYC">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                        </path>
+                                    </svg>
+                                    Reset
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between"
+            *ngIf="totalPages > 1">
+            <div class="text-xs text-gray-500 font-medium">
+                Page {{ page }} sur {{ totalPages }}
+            </div>
+            <div class="flex gap-2">
+                <button (click)="changePage(page - 1)" [disabled]="page === 1"
+                    class="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
+                    </svg>
+                </button>
+                <button (click)="changePage(page + 1)" [disabled]="page === totalPages"
+                    class="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Clarification Modal -->
+<div *ngIf="showClarifyModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm animate-fade-in" (click)="closeClarifyModal()"></div>
+
+    <!-- Modal Content -->
+    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-zoom-in">
+        <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+            <h3 class="text-xl font-bold text-gray-900">Envoyer mail de précision</h3>
+            <p class="text-sm text-gray-500 mt-1">À destination de <strong>{{ selectedUser?.firstName }} {{
+                    selectedUser?.lastName }}</strong></p>
+        </div>
+
+        <div class="p-8">
+            <label class="block text-sm font-bold text-gray-700 mb-2">Raison personnalisée (en français)</label>
+            <textarea [(ngModel)]="clarificationReason"
+                placeholder="Ex: La photo de votre pièce d'identité est trop floue, merci de recommencer avec un meilleur éclairage."
+                rows="5"
+                class="w-full p-4 rounded-2xl border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm resize-none"></textarea>
+            <p class="text-[10px] text-gray-400 mt-2 italic">Ce texte sera inclus dans l'email envoyé à l'utilisateur
+                pour l'aider à corriger son dossier.</p>
+        </div>
+
+        <div class="px-8 py-6 bg-gray-50 flex flex-col md:flex-row gap-3 justify-end items-center">
+            <button (click)="closeClarifyModal()" [disabled]="isSendingClarification"
+                class="w-full md:w-auto px-6 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-100 rounded-xl transition-all">
+                Annuler
+            </button>
+            <button (click)="confirmClarification()" [disabled]="isSendingClarification || !clarificationReason.trim()"
+                class="w-full md:w-auto px-8 py-2.5 bg-primary text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/30 hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:scale-100 flex items-center justify-center gap-2">
+                <span *ngIf="isSendingClarification"
+                    class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                {{ isSendingClarification ? 'Envoi...' : 'Envoyer le mail' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation and Info Modals -->
+<app-confirmation-modal [isOpen]="showValidationConfirm" [title]="modalTitle" [message]="modalMessage"
+    [confirmText]="isResetAction ? 'Confirmer le Reset' : 'Valider lui-même'"
+    [type]="isResetAction ? 'danger' : 'primary'" (confirm)="onConfirmModal()"
+    (cancel)="showValidationConfirm = false; isResetAction = false">
+</app-confirmation-modal>
+
+
+
+
+<app-confirmation-modal [isOpen]="showErrorModal" [title]="modalTitle" [message]="modalMessage" confirmText="OK"
+    [cancelText]="''" type="danger" (confirm)="showErrorModal = false">
+</app-confirmation-modal>

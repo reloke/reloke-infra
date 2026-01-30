@@ -1,0 +1,19 @@
+REGISTER
+
+    OTP
+        send OTP via email
+        OTP duration ==> 15 min
+
+    Registration complete
+        Send welcome message via email
+
+    JWT & ROLES
+        Manage ROLES
+        Generate JWT
+            Acess token 
+            Refresh token
+        Store Token in cookie
+        
+
+
+LOGIN

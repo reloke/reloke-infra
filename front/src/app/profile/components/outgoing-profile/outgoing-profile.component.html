@@ -1,0 +1,584 @@
+<div class="min-h-screen bg-bg-main flex items-center justify-center p-4 sm:p-6 font-body">
+
+  <!-- Main Card -->
+  <div
+    class="w-full max-w-2xl bg-bg-card rounded-3xl shadow-card border border-border overflow-hidden transition-all duration-500 ease-in-out relative">
+
+    <!-- Loading Overlay -->
+    <div *ngIf="isLoading" class="absolute inset-0 bg-white/80 flex items-center justify-center z-50 rounded-3xl">
+      <div class="flex flex-col items-center gap-3">
+        <app-loading size="lg"></app-loading>
+        <span class="text-secondary text-sm">Chargement...</span>
+      </div>
+    </div>
+
+    <!-- Header with Steps -->
+    <div class="bg-white/50 px-8 py-6 border-b border-border">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl text-main font-heading font-bold tracking-tight">
+          {{ currentStep === 3 ? 'Profil enregistré' : 'Votre logement sortant' }}
+        </h1>
+        <button *ngIf="currentStep !== 3" (click)="openCancelModal()"
+          class="text-gray-400 hover:text-gray-600 transition-colors p-2">
+          <i class="pi pi-times text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Progress Steps -->
+      <div *ngIf="currentStep !== 3" class="flex items-center gap-2">
+        <ng-container *ngFor="let step of steps; let i = index">
+          <div class="flex items-center gap-2">
+            <!-- Step Circle -->
+            <div [ngClass]="{
+                   'bg-primary text-white': currentStep >= step.number,
+                   'bg-gray-200 text-gray-400': currentStep < step.number
+                 }"
+              class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all cursor-pointer"
+              (click)="goToStep(step.number)">
+              <span *ngIf="currentStep <= step.number">{{ step.number }}</span>
+              <i *ngIf="currentStep > step.number" class="pi pi-check text-xs"></i>
+            </div>
+            <!-- Step Label -->
+            <span [ngClass]="{
+                    'text-primary font-medium': currentStep === step.number,
+                    'text-gray-400': currentStep !== step.number
+                  }" class="text-xs hidden sm:inline">
+              {{ step.label }}
+            </span>
+          </div>
+          <!-- Connector -->
+          <div *ngIf="i < steps.length - 1"
+            [ngClass]="{'bg-primary': currentStep > step.number, 'bg-gray-200': currentStep <= step.number}"
+            class="flex-1 h-0.5 mx-2 transition-all"></div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="p-8 relative">
+
+      <!-- ==================== STEP 1: Informations ==================== -->
+      <ng-container *ngIf="currentStep === 1">
+        <form [formGroup]="homeForm" class="space-y-6">
+
+          <!-- Address with Custom Google Autocomplete Dropdown -->
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1">
+              Adresse complète <span class="text-red-500">*</span>
+            </label>
+            <div class="address-autocomplete-container">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 z-10">
+                <i class="pi pi-map-marker text-lg"></i>
+              </div>
+              <input type="text" #addressInput [value]="addressSelection.rawInput"
+                (input)="onAddressInputChange($event)" (keydown)="onKeyDown($event)"
+                placeholder="12 rue des Lilas, 75000 Paris" autocomplete="off"
+                class="z-11 w-full pl-11 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
+
+              <div *ngIf="isLoadingPredictions"
+                class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                <app-loading size="sm"></app-loading>
+              </div>
+
+              <!-- Custom Predictions Dropdown -->
+              <div *ngIf="showPredictions && predictions.length > 0" class="address-predictions-dropdown">
+                <ul class="py-2">
+                  <li *ngFor="let prediction of predictions; let i = index; trackBy: trackByPredictionId"
+                    (mousedown)="selectPrediction(prediction)"
+                    [class.address-prediction-item--selected]="selectedPredictionIndex === i"
+                    class="address-prediction-item">
+                    <div class="address-prediction-icon">
+                      <i class="pi pi-map-marker"></i>
+                    </div>
+                    <div class="address-prediction-content">
+                      <div class="address-prediction-main">{{ prediction.mainText }}</div>
+                      <div class="address-prediction-secondary">{{ prediction.secondaryText }}</div>
+                    </div>
+                  </li>
+                </ul>
+                <!-- Attribution Google (obligatoire) -->
+                <div class="address-google-attribution">
+                  <img src="https://developers.google.com/maps/documentation/images/powered_by_google_on_white.png"
+                    alt="Powered by Google" class="h-4">
+                </div>
+              </div>
+            </div>
+            <p *ngIf="getFieldError('address')" class="text-red-500 text-xs pl-1">
+              {{ getFieldError('address') }}
+            </p>
+          </div>
+
+          <!-- Grid: Type & Rooms -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Home Type Dropdown -->
+            <div class="space-y-2">
+              <label class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1">
+                Type de logement <span class="text-red-500">*</span>
+              </label>
+              <div class="relative" #homeTypeDropdown>
+                <button type="button" (click)="isHomeTypeDropdownOpen = !isHomeTypeDropdownOpen"
+                  class="w-full pl-11 pr-10 py-4 bg-white border border-border-light rounded-xl text-main text-left focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm cursor-pointer">
+                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <i class="pi pi-home text-lg"></i>
+                  </div>
+                  {{ getSelectedHomeTypeLabel() }}
+                  <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                    <i class="pi pi-chevron-down text-sm transition-transform"
+                      [ngClass]="{'rotate-180': isHomeTypeDropdownOpen}"></i>
+                  </div>
+                </button>
+                <!-- Dropdown Menu -->
+                <div *ngIf="isHomeTypeDropdownOpen"
+                  class="absolute z-20 w-full mt-1 bg-white border border-border-light rounded-xl shadow-lg max-h-60 overflow-auto">
+                  <button type="button" *ngFor="let option of homeTypeOptions" (click)="selectHomeType(option.value)"
+                    [ngClass]="{'bg-primary/10 text-primary': homeForm.get('homeType')?.value === option.value}"
+                    class="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex flex-col">
+                    <span class="font-medium">{{ option.label }}</span>
+                    <span class="text-xs text-gray-400">{{ option.description }}</span>
+                  </button>
+                </div>
+              </div>
+              <p *ngIf="selectedHomeTypeDescription" class="text-xs text-gray-400 pl-1">
+                {{ selectedHomeTypeDescription }}
+              </p>
+            </div>
+
+            <!-- Number of Rooms -->
+            <div class="space-y-2">
+              <label class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1">
+                Nombre de pièces <span class="text-red-500">*</span>
+              </label>
+              <div class="relative" #roomsDropdown>
+                <button type="button" (click)="isRoomsDropdownOpen = !isRoomsDropdownOpen"
+                  class="w-full pl-11 pr-10 py-4 bg-white border border-border-light rounded-xl text-main text-left focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm cursor-pointer">
+                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <i class="pi pi-th-large text-lg"></i>
+                  </div>
+                  {{ homeForm.get('nbRooms')?.value }} pièce{{ homeForm.get('nbRooms')?.value > 1 ? 's' : '' }}
+                  <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                    <i class="pi pi-chevron-down text-sm transition-transform"
+                      [ngClass]="{'rotate-180': isRoomsDropdownOpen}"></i>
+                  </div>
+                </button>
+                <!-- Dropdown Menu -->
+                <div *ngIf="isRoomsDropdownOpen"
+                  class="absolute z-20 w-full mt-1 bg-white border border-border-light rounded-xl shadow-lg max-h-60 overflow-auto">
+                  <button type="button" *ngFor="let num of roomOptions" (click)="selectRooms(num)"
+                    [ngClass]="{'bg-primary/10 text-primary': homeForm.get('nbRooms')?.value === num}"
+                    class="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors">
+                    {{ num }} pièce{{ num > 1 ? 's' : '' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grid: Surface & Rent -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Surface -->
+            <div class="space-y-2">
+              <label class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1">
+                Surface (m²) <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <i class="pi pi-arrows-alt text-lg"></i>
+                </div>
+                <input type="number" formControlName="surface" placeholder="Ex : 45"
+                  class="w-full pl-11 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
+              </div>
+              <p *ngIf="getFieldError('surface')" class="text-red-500 text-xs pl-1">
+                {{ getFieldError('surface') }}
+              </p>
+            </div>
+
+            <!-- Rent -->
+            <div class="space-y-2">
+              <label class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1">
+                Loyer mensuel (€) <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <i class="pi pi-euro text-lg"></i>
+                </div>
+                <input type="number" formControlName="rent" placeholder="Ex : 850"
+                  class="w-full pl-11 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
+              </div>
+              <p *ngIf="getFieldError('rent')" class="text-red-500 text-xs pl-1">
+                {{ getFieldError('rent') }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-6 flex gap-4">
+            <button type="button" (click)="openCancelModal()"
+              class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-xl font-semibold hover:bg-gray-200 transition-all">
+              Annuler
+            </button>
+            <button type="button" (click)="nextStep()" [disabled]="isLoading"
+              class="flex-1 py-4 bg-primary text-white rounded-xl font-semibold shadow-md hover:bg-primary-hover hover:shadow-lg transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+              <app-loading size="sm" *ngIf="isLoading"></app-loading>
+              Suivant
+              <i class="pi pi-arrow-right"></i>
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <!-- ==================== STEP 2: Photos ==================== -->
+      <ng-container *ngIf="currentStep === 2">
+        <div class="space-y-6" [formGroup]="homeForm">
+          <!-- Photo Count -->
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-main">Photos de votre logement</h2>
+            <span
+              [ngClass]="{ 'text-red-500': !isMinPhotosMet, 'text-green-600': isMinPhotosMet }"
+              class="text-sm font-medium">
+              {{ photoCountText }}
+            </span>
+          </div>
+
+          <!-- Camera Section -->
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div *ngIf="!isCameraActive" class="text-center py-8">
+              <i class="pi pi-camera text-4xl text-gray-300 mb-4"></i>
+              <p class="text-gray-500 mb-4">Prenez des photos de votre logement</p>
+              <button type="button" (click)="startCamera()" [disabled]="!canAddMorePhotos"
+                class="px-6 py-3 mx-auto bg-primary text-white rounded-xl font-medium hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                <i class="pi pi-camera"></i>
+                Ouvrir la caméra
+              </button>
+            </div>
+
+            <!-- Camera View -->
+            <div *ngIf="isCameraActive" class="relative">
+              <video #videoElement autoplay playsinline class="w-full rounded-xl bg-black">
+              </video>
+              <canvas #canvasElement class="hidden"></canvas>
+
+              <!-- Camera Controls -->
+              <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-4">
+                <button type="button" (click)="stopCamera()"
+                  class="p-3 bg-white/90 rounded-full shadow-lg hover:bg-white transition-all">
+                  <i class="pi pi-times text-xl text-gray-600"></i>
+                </button>
+                <button type="button" (click)="capturePhoto()" [disabled]="!canAddMorePhotos"
+                  class="p-4 bg-primary rounded-full shadow-lg hover:bg-primary-hover transition-all disabled:opacity-50">
+                  <i class="pi pi-camera text-2xl text-white"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Camera Error -->
+            <p *ngIf="cameraError" class="text-red-500 text-sm text-center mt-4">
+              {{ cameraError }}
+            </p>
+          </div>
+
+          <!-- Photo Grid -->
+          <div *ngIf="capturedImages.length > 0" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div *ngFor="let image of capturedImages; let i = index"
+              class="relative aspect-square rounded-xl overflow-hidden group"
+              [ngClass]="{'opacity-60 grayscale': image.isExisting && image.markedForDeletion}">
+              <img [src]="image.previewUrl" alt="Photo {{ i + 1 }}" class="w-full h-full object-cover">
+
+              <!-- Order Badge -->
+              <div class="absolute top-2 left-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center">
+                <span class="text-white text-xs font-medium">{{ i + 1 }}</span>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <!-- View Fullscreen Button -->
+                <button type="button" (click)="openFullscreenPreview(image)"
+                  class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+                  <i class="pi pi-eye text-white text-sm"></i>
+                </button>
+
+                <!-- Delete / Undo Buttons -->
+                <button *ngIf="!(image.isExisting && image.markedForDeletion)" type="button" (click)="removeImage(image.id)"
+                  class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
+                  <i class="pi pi-trash text-white text-sm"></i>
+                </button>
+
+                <button *ngIf="image.isExisting && image.markedForDeletion" type="button" (click)="removeImage(image.id)"
+                  class="w-24 h-8 bg-green-600 rounded-full flex items-center justify-center hover:bg-green-700 transition-colors text-white text-xs font-medium">
+                  Annuler
+                </button>
+              </div>
+
+              <!-- Existing Badge -->
+              <div *ngIf="image.isExisting"
+                class="absolute bottom-2 left-2 px-2 py-1 rounded text-white text-xs"
+                [ngClass]="image.markedForDeletion ? 'bg-gray-500' : 'bg-green-500'">
+                {{ image.markedForDeletion ? 'Suppression en attente' : 'Enregistrée' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1">
+              Description & Environnement
+            </label>
+            <textarea formControlName="description" rows="4"
+              placeholder="Décrivez votre logement, son environnement, les transports à proximité..."
+              class="w-full p-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm resize-none"></textarea>
+            <div class="flex justify-between text-xs text-gray-400 px-1">
+              <span *ngIf="getFieldError('description')" class="text-red-500">
+                {{ getFieldError('description') }}
+              </span>
+              <span class="ml-auto">
+                {{ (homeForm.get('description')?.value?.length || 0) }}/1000
+              </span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-6 flex gap-4">
+            <button type="button" (click)="previousStep()"
+              class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2">
+              <i class="pi pi-arrow-left"></i>
+              Retour
+            </button>
+            <button type="button" (click)="nextStep()" [disabled]="isLoading || !isMinPhotosMet"
+              class="flex-1 py-4 bg-primary text-white rounded-xl font-semibold shadow-md hover:bg-primary-hover hover:shadow-lg transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+              <app-loading size="sm" *ngIf="isLoading"></app-loading>
+              Terminer
+              <i class="pi pi-check"></i>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ==================== STEP 3: Success / Summary ==================== -->
+      <ng-container *ngIf="currentStep === 3">
+        <div class="flex flex-col items-center justify-center text-center animate-fade-in">
+
+          <!-- Success Message (only shown after completing step 2) -->
+          <div *ngIf="showSuccessMessage" class="mb-6">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 text-green-600 mx-auto">
+              <i class="pi pi-check-circle text-4xl"></i>
+            </div>
+            <h2 class="text-2xl text-main font-bold mb-2">Profil enregistré avec succès !</h2>
+            <p class="text-secondary mb-4 max-w-md">
+              Votre logement sortant a été ajouté. Vous pouvez maintenant recevoir des propositions d’échange.
+            </p>
+          </div>
+
+          <!-- Image Carousel -->
+          <div *ngIf="capturedImages.length > 0" class="w-full mb-6">
+            <div class="relative rounded-2xl overflow-hidden bg-gray-100">
+              <!-- Main Image -->
+              <div class="relative aspect-[4/3] cursor-pointer" (click)="openSummaryFullscreen(currentImageIndex)">
+                <img [src]="capturedImages[currentImageIndex].previewUrl" alt="Photo {{ currentImageIndex + 1 }}"
+                  class="w-full h-full object-cover">
+
+                <!-- Image Counter Badge -->
+                <div class="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+                  {{ currentImageIndex + 1 }} / {{ capturedImages.length }}
+                </div>
+
+                <!-- View Photos Button -->
+                <button type="button" (click)="openSummaryFullscreen(currentImageIndex); $event.stopPropagation()"
+                  class="absolute bottom-4 left-4 bg-white/90 hover:bg-white text-gray-800 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-lg transition-all">
+                  <i class="pi pi-camera"></i>
+                  Afficher les {{ capturedImages.length }} photos
+                </button>
+              </div>
+
+              <!-- Navigation Arrows -->
+              <button *ngIf="capturedImages.length > 1" type="button" (click)="previousImage()"
+                class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all">
+                <i class="pi pi-chevron-left text-gray-700"></i>
+              </button>
+              <button *ngIf="capturedImages.length > 1" type="button" (click)="nextImage()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all">
+                <i class="pi pi-chevron-right text-gray-700"></i>
+              </button>
+            </div>
+
+            <!-- Thumbnail Strip -->
+            <div *ngIf="capturedImages.length > 1" class="flex gap-2 mt-3 overflow-x-auto py-2 px-1">
+              <button *ngFor="let image of capturedImages; let i = index" type="button" (click)="goToImage(i)"
+                [ngClass]="{'ring-2 ring-primary ring-offset-2': currentImageIndex === i}"
+                class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all">
+                <img [src]="image.previewUrl" alt="Miniature {{ i + 1 }}" class="w-full h-full object-cover">
+              </button>
+            </div>
+          </div>
+
+          <!-- Property Details Card -->
+          <div class="w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-left">
+            <!-- Property Type & Price Header -->
+            <div class="p-5 border-b border-gray-100">
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3 class="text-2xl font-bold text-main mt-1">
+                    {{ homeForm.get('rent')?.value }} €<span class="text-base font-normal text-gray-500">/mois</span>
+                  </h3>
+                  <span class="text-sm text-gray-500">Loyer mensuel</span>
+                </div>
+                <div class="bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm font-medium">
+                  Validé
+                </div>
+              </div>
+            </div>
+
+            <!-- Property Stats -->
+            <div class="grid grid-cols-3 divide-x divide-gray-100 border-b border-gray-100">
+              <div class="p-4 text-center">
+                <div class="flex items-center justify-center gap-2 text-gray-600 mb-1">
+                  <i class="pi pi-th-large text-primary"></i>
+                  <span class="text-lg font-semibold text-main">{{ homeForm.get('nbRooms')?.value }}</span>
+                </div>
+                <span class="text-xs text-gray-500">pièce{{ homeForm.get('nbRooms')?.value > 1 ? 's' : '' }}</span>
+              </div>
+              <div class="p-4 text-center">
+                <div class="flex items-center justify-center gap-2 text-gray-600 mb-1">
+                  <i class="pi pi-arrows-alt text-primary"></i>
+                  <span class="text-lg font-semibold text-main">{{ homeForm.get('surface')?.value }}</span>
+                </div>
+                <span class="text-xs text-gray-500">Surface en m²</span>
+              </div>
+              <div class="p-4 text-center">
+                <div class="flex items-center justify-center gap-2 text-gray-600 mb-1">
+                  <i class="pi pi-home text-primary"></i>
+                  <span class="text-lg font-semibold text-main">{{ getSelectedHomeTypeLabel() }}</span>
+                </div>
+                <span class="text-xs text-gray-500">Type de logement</span>
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="p-5 border-b border-gray-100">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i class="pi pi-map-marker text-primary"></i>
+                </div>
+                <div>
+                  <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Adresse</span>
+                  <p class="text-main font-medium mt-1">
+                    {{ addressSelection.formattedAddress || addressSelection.rawInput }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description (if available) -->
+            <div *ngIf="homeForm.get('description')?.value" class="p-5">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i class="pi pi-align-left text-blue-500"></i>
+                </div>
+                <div class="flex-1">
+                  <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Description</span>
+                  <p class="text-gray-600 mt-1 text-sm leading-relaxed">{{ homeForm.get('description')?.value }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 w-full mt-6">
+            <button type="button" (click)="modifyProfile()"
+              class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2">
+              <i class="pi pi-pencil"></i>
+              Modifier
+            </button>
+            <button type="button" (click)="goToDashboard()"
+              class="flex-1 py-4 bg-primary text-white rounded-xl font-semibold shadow-md hover:bg-primary-hover hover:shadow-lg transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2">
+              Voir le tableau de bord
+              <i class="pi pi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+
+  <!-- Cancel Modal -->
+  <div *ngIf="showCancelModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
+    style="z-index: 100;" (click)="closeCancelModal()">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl" (click)="$event.stopPropagation()">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="pi pi-exclamation-triangle text-3xl text-orange-500"></i>
+        </div>
+        <h3 class="text-xl font-bold text-main mb-2">Abandonner les modifications ?</h3>
+        <p class="text-secondary">
+          Les informations non sauvegardées seront perdues.
+        </p>
+      </div>
+      <div class="flex gap-3">
+        <button type="button" (click)="closeCancelModal()"
+          class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-semibold hover:bg-gray-200 transition-all">
+          Continuer l’édition
+        </button>
+        <button type="button" (click)="confirmCancel()"
+          class="flex-1 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 transition-all">
+          Abandonner
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Image Preview Modal (Step 2) -->
+  <div *ngIf="showFullscreenPreview && fullscreenImage"
+    class="fixed inset-0 bg-black/90 flex items-center justify-center z-50" (click)="closeFullscreenPreview()">
+    <!-- Close Button -->
+    <button type="button" (click)="closeFullscreenPreview()"
+      class="absolute top-4 right-4 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors z-10">
+      <i class="pi pi-times text-2xl text-white"></i>
+    </button>
+    <!-- Image -->
+    <img [src]="fullscreenImage.previewUrl" alt="Photo en plein écran" class="max-w-full max-h-full object-contain p-4"
+      (click)="$event.stopPropagation()">
+  </div>
+
+  <!-- Summary Fullscreen Gallery Modal (Step 3) -->
+  <div *ngIf="showSummaryGallery" class="fixed inset-0 bg-black z-50 flex flex-col">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 bg-black/80">
+      <button type="button" (click)="closeSummaryGallery()"
+        class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+        <i class="pi pi-times text-xl text-white"></i>
+      </button>
+      <span class="text-white font-medium">{{ galleryImageIndex + 1 }} / {{ capturedImages.length }}</span>
+      <div class="w-10"></div>
+    </div>
+
+    <!-- Main Image Area -->
+    <div class="flex-1 flex items-center justify-center relative px-4">
+      <!-- Previous Button -->
+      <button *ngIf="capturedImages.length > 1" type="button" (click)="previousGalleryImage()"
+        class="absolute left-4 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+        <i class="pi pi-chevron-left text-2xl text-white"></i>
+      </button>
+
+      <!-- Image -->
+      <img [src]="capturedImages[galleryImageIndex].previewUrl" alt="Photo {{ galleryImageIndex + 1 }}"
+        class="max-w-full max-h-full object-contain">
+
+      <!-- Next Button -->
+      <button *ngIf="capturedImages.length > 1" type="button" (click)="nextGalleryImage()"
+        class="absolute right-4 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+        <i class="pi pi-chevron-right text-2xl text-white"></i>
+      </button>
+    </div>
+
+    <!-- Thumbnail Strip -->
+    <div class="p-4 bg-black/80">
+      <div class="flex gap-2 justify-center overflow-x-auto">
+        <button *ngFor="let image of capturedImages; let i = index" type="button" (click)="goToGalleryImage(i)"
+          [ngClass]="{'ring-2 ring-white': galleryImageIndex === i, 'opacity-50': galleryImageIndex !== i}"
+          class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all">
+          <img [src]="image.previewUrl" alt="Miniature {{ i + 1 }}" class="w-full h-full object-cover">
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

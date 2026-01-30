@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Vérification en revue manuelle</title>
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap');
+
+        body,
+        table,
+        td,
+        a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table,
+        td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            outline: none;
+            text-decoration: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            background-color: #FDFBF7;
+            font-family: 'Inter', Helvetica, Arial, sans-serif;
+            color: #2C2825;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .content-padding {
+                padding: 30px 20px !important;
+            }
+        }
+    </style>
+</head>
+
+<body style="margin: 0; padding: 0; background-color: #FDFBF7;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+        style="background-color: #FDFBF7;">
+        <tr>
+            <td align="center" style="padding: 40px 10px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" class="container"
+                    style="background-color: #ffffff; max-width: 600px; margin: 0 auto; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 24px rgba(245, 158, 11, 0.08); border-top: 6px solid #F59E0B;">
+
+                    {{> email-header}}
+
+                    <tr>
+                        <td class="content-padding" style="padding: 20px 50px 50px 50px;">
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 20px;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td width="60" height="60" align="center" valign="middle"
+                                                    style="width:60px; height:60px; background-color:#FFFBEB; border-radius:50%;">
+                                                    <span
+                                                        style="display:inline-block; font-size:28px; line-height:60px;">📄</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td align="center" style="padding-bottom: 15px;">
+                                        <h1
+                                            style="margin: 0; font-family: 'Merriweather', serif; font-size: 24px; color: #2C2825; font-weight: 700; line-height: 1.3;">
+                                            Vérification en cours d'analyse
+                                        </h1>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td align="center" style="padding-bottom: 30px;">
+                                        <p
+                                            style="margin: 0; font-size: 16px; line-height: 1.6; color: #6B665F; max-width: 90%;">
+                                            Bonjour {{firstName}}, suite à plusieurs tentatives échouées, votre dossier
+                                            a été transmis à notre équipe pour une validation manuelle.
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td align="center" style="padding-bottom: 30px;">
+                                        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #4A4540;">
+                                            Nous allons examiner vos documents dans les plus brefs délais. Vous recevrez
+                                            une réponse sous <span style="font-weight: 600;">24 heures ouvrées</span>.
+                                        </p>
+                                        <p style="margin-top: 15px; font-size: 15px; line-height: 1.6; color: #4A4540;">
+                                            Vous n'avez rien à faire pour le moment. Nous vous contacterons si nous
+                                            avons besoin de précisions supplémentaires.
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                {{!-- Tips Section --}}
+                                <tr>
+                                    <td
+                                        style="padding: 25px; background-color: #F8FAFC; border-radius: 12px; border: 1px solid #E2E8F0;">
+                                        <h3
+                                            style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            💡 Astuces pour la prochaine fois
+                                        </h3>
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0"
+                                            width="100%">
+                                            <tr>
+                                                <td width="24" valign="top" style="padding-bottom: 10px;">
+                                                    <span style="font-size: 16px;">☀️</span>
+                                                </td>
+                                                <td
+                                                    style="padding-bottom: 10px; font-size: 14px; color: #475569; line-height: 1.5;">
+                                                    <strong>Luminosité :</strong> Assurez-vous d'être dans un endroit
+                                                    bien éclairé, sans contre-jour.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="24" valign="top" style="padding-bottom: 10px;">
+                                                    <span style="font-size: 16px;">📸</span>
+                                                </td>
+                                                <td
+                                                    style="padding-bottom: 10px; font-size: 14px; color: #475569; line-height: 1.5;">
+                                                    <strong>Netteté :</strong> La photo doit être nette. Posez votre
+                                                    pièce d'identité sur une surface plane.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="24" valign="top">
+                                                    <span style="font-size: 16px;">👓</span>
+                                                </td>
+                                                <td style="font-size: 14px; color: #475569; line-height: 1.5;">
+                                                    <strong>Sans reflets :</strong> Évitez les reflets du flash sur la
+                                                    carte plastifiée.
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td align="center" style="padding-top: 30px;">
+                                        <a href="{{dashboardUrl}}"
+                                            style="color: #6B7280; font-size: 14px; text-decoration: underline;">Retourner
+                                            au tableau de bord</a>
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </td>
+                    </tr>
+
+                    {{> email-footer}}
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

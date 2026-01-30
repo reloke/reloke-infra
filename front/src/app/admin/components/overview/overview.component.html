@@ -1,0 +1,361 @@
+<!-- User Statistics Cards -->
+<div class="stats-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4 animate-fade-in-up" *ngIf="stats">
+
+    <!-- Users Card -->
+    <div
+        class="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Utilisateurs Totaux</h3>
+            <div class="p-2 bg-blue-50 text-blue-500 rounded-lg group-hover:bg-blue-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </div>
+        </div>
+        <p class="stat-value text-3xl font-bold text-gray-900">{{ stats.totalUsers }}</p>
+    </div>
+
+    <!-- Active Users Card -->
+    <div
+        class="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Utilisateurs Actifs</h3>
+            <div class="p-2 bg-green-50 text-green-500 rounded-lg group-hover:bg-green-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+            </div>
+        </div>
+        <p class="text-xs text-gray-400 mb-1">Derniers 30 jours</p>
+        <p class="stat-value text-3xl font-bold text-gray-900">{{ stats.activeUsers }}</p>
+    </div>
+
+    <!-- Flow Users Card -->
+    <div
+        class="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">En Flux</h3>
+            <div class="p-2 bg-purple-50 text-purple-500 rounded-lg group-hover:bg-purple-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+            </div>
+        </div>
+        <p class="stat-value text-3xl font-bold text-gray-900">{{ stats.usersInFlow }}</p>
+    </div>
+
+    <!-- Pending Verifications Card -->
+    <div
+        class="stat-card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Verifs. en Attente</h3>
+            <div class="p-2 bg-orange-50 text-orange-500 rounded-lg group-hover:bg-orange-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+        </div>
+        <p class="stat-value text-3xl font-bold text-gray-900">{{ stats.pendingVerifications }}</p>
+    </div>
+
+</div>
+
+<!-- Loading State for User Stats -->
+<div *ngIf="statsLoading && !stats" class="flex justify-center items-center h-32 p-4">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+</div>
+
+<!-- Financial Statistics Section -->
+<div class="p-4 mt-2">
+    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Statistiques Financieres
+    </h2>
+
+    <!-- Financial Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6" *ngIf="financialStats">
+
+        <!-- Total Revenue Card -->
+        <div class="bg-gradient-to-br from-green-500 to-emerald-600 p-6 rounded-2xl shadow-lg text-white">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold uppercase tracking-wider opacity-90">Revenu Total</h3>
+                <div class="p-2 bg-white/20 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-3xl font-bold">{{ formatCurrency(financialStats.totalRevenue) }} EUR</p>
+            <p class="text-sm opacity-75 mt-1">{{ formatNumber(financialStats.totalMatchesSold) }} matchs vendus</p>
+        </div>
+
+        <!-- Earned Revenue Card -->
+        <div class="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-2xl shadow-lg text-white">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold uppercase tracking-wider opacity-90">Revenu Acquis</h3>
+                <div class="p-2 bg-white/20 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-3xl font-bold">{{ formatCurrency(financialStats.earnedRevenue) }} EUR</p>
+            <p class="text-sm opacity-75 mt-1">{{ formatNumber(financialStats.totalMatchesUsed) }} matchs utilises</p>
+        </div>
+
+        <!-- Refunded Revenue Card -->
+        <div class="bg-gradient-to-br from-red-500 to-rose-600 p-6 rounded-2xl shadow-lg text-white">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold uppercase tracking-wider opacity-90">Rembourse</h3>
+                <div class="p-2 bg-white/20 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-3xl font-bold">{{ formatCurrency(financialStats.refundedRevenue) }} EUR</p>
+            <p class="text-sm opacity-75 mt-1">{{ formatNumber(financialStats.totalMatchesRefunded) }} matchs rembourses</p>
+        </div>
+
+        <!-- Pending Revenue Card -->
+        <div class="bg-gradient-to-br from-amber-500 to-orange-600 p-6 rounded-2xl shadow-lg text-white">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold uppercase tracking-wider opacity-90">En Attente</h3>
+                <div class="p-2 bg-white/20 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-3xl font-bold">{{ formatCurrency(financialStats.pendingRevenue) }} EUR</p>
+            <p class="text-sm opacity-75 mt-1">{{ formatNumber(financialStats.totalMatchesPending) }} matchs en attente</p>
+        </div>
+
+    </div>
+
+    <!-- Payment Stats Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" *ngIf="financialStats">
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="p-3 bg-green-100 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Paiements reussis</p>
+                <p class="text-xl font-bold text-gray-900">{{ formatNumber(financialStats.successfulPayments) }}</p>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="p-3 bg-orange-100 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Partiellement rembourses</p>
+                <p class="text-xl font-bold text-gray-900">{{ formatNumber(financialStats.partiallyRefundedPayments) }}</p>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="p-3 bg-red-100 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Totalement rembourses</p>
+                <p class="text-xl font-bold text-gray-900">{{ formatNumber(financialStats.refundedPayments) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State for Financial Stats -->
+    <div *ngIf="financialLoading && !financialStats" class="flex justify-center items-center h-48">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="p-4">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+        <!-- Chart Header -->
+        <div class="p-5 border-b border-gray-100">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">Evolution des Matchs</h3>
+                    <p class="text-sm text-gray-500 mt-1">
+                        {{ showRevenueChart ? 'Revenus en euros' : 'Nombre de matchs' }} par periode
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Toggle Revenue/Count -->
+                    <button
+                        (click)="toggleChartType()"
+                        class="px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+                        [class.bg-primary]="showRevenueChart"
+                        [class.text-white]="showRevenueChart"
+                        [class.border-primary]="showRevenueChart"
+                        [class.bg-white]="!showRevenueChart"
+                        [class.text-gray-600]="!showRevenueChart"
+                        [class.border-gray-300]="!showRevenueChart">
+                        {{ showRevenueChart ? 'EUR' : 'Nb' }}
+                    </button>
+
+                    <!-- Period Selector -->
+                    <div class="flex bg-gray-100 rounded-lg p-1">
+                        <button
+                            *ngFor="let p of periods"
+                            (click)="onPeriodChange(p.value)"
+                            class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors"
+                            [class.bg-white]="selectedPeriod === p.value"
+                            [class.text-gray-900]="selectedPeriod === p.value"
+                            [class.shadow-sm]="selectedPeriod === p.value"
+                            [class.text-gray-500]="selectedPeriod !== p.value">
+                            {{ p.label }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Container -->
+        <div class="p-5" *ngIf="timeSeriesData && !timeSeriesLoading">
+
+            <!-- Totals Summary -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="text-center p-3 bg-blue-50 rounded-lg">
+                    <p class="text-xs text-blue-600 font-medium uppercase">Matchs utilises</p>
+                    <p class="text-xl font-bold text-blue-700">{{ formatNumber(timeSeriesData.totals.matchesUsed) }}</p>
+                </div>
+                <div class="text-center p-3 bg-blue-50 rounded-lg">
+                    <p class="text-xs text-blue-600 font-medium uppercase">Revenus utilises</p>
+                    <p class="text-xl font-bold text-blue-700">{{ formatCurrency(timeSeriesData.totals.revenueUsed) }} EUR</p>
+                </div>
+                <div class="text-center p-3 bg-red-50 rounded-lg">
+                    <p class="text-xs text-red-600 font-medium uppercase">Matchs rembourses</p>
+                    <p class="text-xl font-bold text-red-700">{{ formatNumber(timeSeriesData.totals.matchesRefunded) }}</p>
+                </div>
+                <div class="text-center p-3 bg-red-50 rounded-lg">
+                    <p class="text-xs text-red-600 font-medium uppercase">Revenus rembourses</p>
+                    <p class="text-xl font-bold text-red-700">{{ formatCurrency(timeSeriesData.totals.revenueRefunded) }} EUR</p>
+                </div>
+            </div>
+
+            <!-- Matches Used Chart -->
+            <div class="mb-8">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <h4 class="text-sm font-semibold text-gray-700">Matchs Utilises</h4>
+                </div>
+                <div class="relative bg-gray-50 rounded-xl p-4 pt-8">
+                    <!-- Y-axis labels -->
+                    <div class="absolute left-0 top-8 bottom-8 w-12 flex flex-col justify-between text-xs text-gray-400 text-right pr-2">
+                        <span>{{ showRevenueChart ? formatCurrency(getMaxValue('used')) : getMaxValue('used') }}</span>
+                        <span>{{ showRevenueChart ? formatCurrency(getMaxValue('used') / 2) : (getMaxValue('used') / 2) | number:'1.0-0' }}</span>
+                        <span>0</span>
+                    </div>
+
+                    <!-- Chart area -->
+                    <div class="ml-14 flex items-end gap-1 overflow-x-auto overflow-y-visible pb-6" style="height: 160px;">
+                        <ng-container *ngFor="let point of timeSeriesData.data; let i = index">
+                            <div class="flex-1 min-w-[20px] max-w-[60px] h-full flex flex-col justify-end items-center group relative">
+                                <!-- Tooltip -->
+                                <div class="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block z-50 pointer-events-none">
+                                    <div class="bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap shadow-lg">
+                                        {{ formatDateLabel(point.date) }}: {{ getBarValue(point, 'used') }}
+                                    </div>
+                                </div>
+
+                                <!-- Bar -->
+                                <div
+                                    class="chart-bar w-full bg-blue-500 rounded-t-sm cursor-pointer"
+                                    [style.height.%]="getBarHeight(point, 'used')"
+                                    [style.min-height.px]="getBarHeight(point, 'used') > 0 ? 2 : 0">
+                                </div>
+
+                                <!-- X-axis label (show every few labels to avoid crowding) -->
+                                <span
+                                    class="absolute -bottom-5 text-[10px] text-gray-400 whitespace-nowrap"
+                                    *ngIf="timeSeriesData.data.length <= 15 || i % 3 === 0">
+                                    {{ formatDateLabel(point.date) }}
+                                </span>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matches Refunded Chart -->
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <h4 class="text-sm font-semibold text-gray-700">Matchs Rembourses</h4>
+                </div>
+                <div class="relative bg-gray-50 rounded-xl p-4 pt-8">
+                    <!-- Y-axis labels -->
+                    <div class="absolute left-0 top-8 bottom-8 w-12 flex flex-col justify-between text-xs text-gray-400 text-right pr-2">
+                        <span>{{ showRevenueChart ? formatCurrency(getMaxValue('refunded')) : getMaxValue('refunded') }}</span>
+                        <span>{{ showRevenueChart ? formatCurrency(getMaxValue('refunded') / 2) : (getMaxValue('refunded') / 2) | number:'1.0-0' }}</span>
+                        <span>0</span>
+                    </div>
+
+                    <!-- Chart area -->
+                    <div class="ml-14 flex items-end gap-1 overflow-x-auto overflow-y-visible pb-6" style="height: 160px;">
+                        <ng-container *ngFor="let point of timeSeriesData.data; let i = index">
+                            <div class="flex-1 min-w-[20px] max-w-[60px] h-full flex flex-col justify-end items-center group relative">
+                                <!-- Tooltip -->
+                                <div class="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block z-50 pointer-events-none">
+                                    <div class="bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap shadow-lg">
+                                        {{ formatDateLabel(point.date) }}: {{ getBarValue(point, 'refunded') }}
+                                    </div>
+                                </div>
+
+                                <!-- Bar -->
+                                <div
+                                    class="chart-bar w-full bg-red-500 rounded-t-sm cursor-pointer"
+                                    [style.height.%]="getBarHeight(point, 'refunded')"
+                                    [style.min-height.px]="getBarHeight(point, 'refunded') > 0 ? 2 : 0">
+                                </div>
+
+                                <!-- X-axis label -->
+                                <span
+                                    class="absolute -bottom-5 text-[10px] text-gray-400 whitespace-nowrap"
+                                    *ngIf="timeSeriesData.data.length <= 15 || i % 3 === 0">
+                                    {{ formatDateLabel(point.date) }}
+                                </span>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Loading State for Charts -->
+        <div *ngIf="timeSeriesLoading" class="flex justify-center items-center h-64">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!timeSeriesLoading && (!timeSeriesData || timeSeriesData.data.length === 0)" class="flex flex-col items-center justify-center h-64 text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <p class="text-sm">Aucune donnee disponible pour cette periode</p>
+        </div>
+
+    </div>
+</div>

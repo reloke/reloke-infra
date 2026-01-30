@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:wght@300;400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #2C2825;
+            background-color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .email-wrapper {
+            background-color: #ffffff;
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FDFBF7;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            background-color: #FDFBF7;
+            padding: 40px 40px 20px 40px;
+            text-align: center;
+        }
+
+        .logo {
+            font-family: 'Merriweather', serif;
+            font-weight: 700;
+            font-size: 28px;
+            color: #C25E46;
+            text-decoration: none;
+        }
+
+        .content {
+            padding: 20px 40px 40px 40px;
+        }
+
+        h1 {
+            font-family: 'Merriweather', serif;
+            color: #2C2825;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            line-height: 1.3;
+            text-align: center;
+        }
+
+        p {
+            font-size: 16px;
+            color: #6B665F;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            background-color: #FDFBF7;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #EAE5D9;
+        }
+
+        .footer p {
+            color: #BDB8AE;
+            font-size: 12px;
+            margin: 8px 0;
+        }
+
+        .footer a {
+            color: #C25E46;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .email-wrapper {
+                padding: 20px 10px;
+            }
+
+            .header,
+            .content {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+            <div class="header">
+                <div class="logo">Reloke</div>
+            </div>
+
+            <div class="content">
+                {{> content}}
+            </div>
+
+            <div class="footer">
+                <p>© {{year}} Reloke. Tous droits réservés.</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

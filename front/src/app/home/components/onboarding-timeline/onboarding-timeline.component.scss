@@ -1,0 +1,29 @@
+/* Visible, clean horizontal scrollbar */
+.timeline-scrollbar {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #d1d5db #e5e7eb; /* thumb track */
+}
+
+.timeline-scrollbar::-webkit-scrollbar {
+  height: 10px;
+}
+
+.timeline-scrollbar::-webkit-scrollbar-track {
+  background: #e5e7eb; /* gray-200 */
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.timeline-scrollbar::-webkit-scrollbar-thumb {
+  background: #d1d5db; /* gray-300 */
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+.timeline-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af; /* gray-400 */
+}
+
+:host {
+  display: block;
+}

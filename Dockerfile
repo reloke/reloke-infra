@@ -1,17 +1,17 @@
 # --- ÉTAPE 1 : Build du Frontend Angular ---
 FROM node:20 AS build-front
 WORKDIR /app/frontend
-COPY frontend/package*.json ./
+COPY front/package*.json ./
 RUN npm install
-COPY frontend/ .
+COPY front/ .
 RUN npm run build -- --configuration production
 
 # --- ÉTAPE 2 : Build du Backend NestJS ---
 FROM node:20 AS build-back
 WORKDIR /app/backend
-COPY backend/package*.json ./
+COPY back/package*.json ./
 RUN npm install
-COPY backend/ .
+COPY back/ .
 RUN npm run build
 
 # --- ÉTAPE 3 : Image Finale (Production) ---

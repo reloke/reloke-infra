@@ -1,0 +1,209 @@
+<div class="card p-6 md:p-8 mb-16">
+  <div class="flex items-start justify-between gap-4 mb-5">
+    <div>
+      <h2 class="text-lg md:text-xl font-bold text-main">Parcours Reloke</h2>
+      <p class="text-secondary text-sm">Suivez votre progression et avancez étape par étape.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-3 text-xs text-secondary">
+        <span class="inline-flex items-center gap-2">
+          <span class="h-2.5 w-2.5 rounded-full bg-primary"></span>Fait
+        </span>
+        <span class="inline-flex items-center gap-2">
+          <span class="h-2.5 w-2.5 rounded-full bg-accent ring-2 ring-accent/20"></span>À faire
+        </span>
+        <span class="inline-flex items-center gap-2">
+          <span class="h-2.5 w-2.5 rounded-full bg-gray-200 border border-border-light"></span>À venir
+        </span>
+      </div>
+
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border-light bg-white text-xs font-semibold text-main hover:bg-gray-50 transition-colors"
+        (click)="toggleCollapsed()"
+      >
+        <span>{{ isCollapsed ? 'Voir la timeline' : 'Masquer la timeline' }}</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 transition-transform"
+          [ngClass]="{ 'rotate-180': !isCollapsed }"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Progress bar (always visible) -->
+  <div class="mb-5">
+    <div class="flex items-center justify-between gap-3 mb-2">
+      <p class="text-xs font-semibold text-secondary">{{ progressLabel }}</p>
+      <p class="text-xs font-semibold text-main">{{ progressPercent }}%</p>
+    </div>
+    <div class="h-3 bg-gray-100 rounded-full overflow-hidden relative border border-border-light">
+      <div class="absolute inset-0 opacity-50"></div>
+      <div
+        class="h-full bg-gradient-to-r from-primary to-indigo-500 rounded-full transition-all duration-1000 ease-out relative"
+        [style.width.%]="progressPercent"
+      >
+        <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="!isCollapsed"
+    #scrollContainer
+    class="relative overflow-x-auto overflow-y-hidden timeline-scrollbar touch-pan-x -mx-6 md:-mx-8 px-6 md:px-8 pt-20 pb-6"
+    aria-label="Onboarding timeline"
+  >
+    <div *ngIf="isLoading" class="flex items-start min-w-max relative">
+      <ng-container *ngFor="let _ of [0,1,2,3,4,5,6]">
+        <div class="flex flex-col items-center flex-shrink-0 w-[9.5rem]">
+          <div class="h-12 w-12 rounded-full bg-gray-100 border border-border-light animate-pulse"></div>
+          <div class="mt-3 h-4 w-24 bg-gray-100 rounded animate-pulse"></div>
+        </div>
+        <div class="flex-shrink-0 w-10 sm:w-14 h-12 flex items-center">
+          <div class="h-px w-full bg-gray-100"></div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div *ngIf="!isLoading" class="flex items-start min-w-max relative">
+      <ng-container *ngFor="let step of mainSteps; let i = index; let last = last; trackBy: trackByKey">
+        <ng-container
+          [ngTemplateOutlet]="stepNode"
+          [ngTemplateOutletContext]="{ step: step }"
+        ></ng-container>
+
+        <ng-container *ngIf="!last">
+          <div class="flex-shrink-0 w-10 sm:w-14 h-12 flex items-center">
+            <div
+              class="-mx-[52px] w-[calc(100%+104px)] opacity-90"
+              [ngClass]="getConnectorClass(step, mainSteps[i + 1])"
+            ></div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #stepNode let-step="step">
+  <div
+    #stepItem
+    [attr.data-step-key]="step.key"
+    class="relative z-10 group flex flex-col items-center flex-shrink-0 w-[9.5rem]"
+    (mouseenter)="onStepMouseEnter(step, stepItem)"
+    (mouseleave)="onStepMouseLeave()"
+  >
+    <div class="relative">
+      <div [ngClass]="getCircleClass(step)">
+        <ng-container [ngSwitch]="step.key">
+          <svg *ngSwitchCase="OnboardingStepKey.Account" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <svg *ngSwitchCase="OnboardingStepKey.Home" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9v9a1 1 0 01-1 1h-5v-6H10v6H5a1 1 0 01-1-1v-9z" />
+          </svg>
+          <svg *ngSwitchCase="OnboardingStepKey.Search" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <svg *ngSwitchCase="OnboardingStepKey.Kyc" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 10-8 0v1H5a2 2 0 00-2 2v8a2 2 0 002 2h14a2 2 0 002-2v-8a2 2 0 00-2-2h-3V7z" />
+          </svg>
+          <svg *ngSwitchCase="OnboardingStepKey.Payment" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8h18M7 16h4M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <svg *ngSwitchCase="OnboardingStepKey.Matches" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.921-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.98 10.101c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+          </svg>
+          <svg *ngSwitchCase="OnboardingStepKey.DossierFacile" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M7 4h7l3 3v13a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
+          </svg>
+          <svg *ngSwitchCase="OnboardingStepKey.Chat" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h6m-8 9l3-3h11a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v11a3 3 0 003 3z" />
+          </svg>
+        </ng-container>
+      </div>
+
+      <div
+        *ngIf="step.visualState === OnboardingVisualState.Done"
+        class="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-green-500 text-white flex items-center justify-center border-2 border-white"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+
+      <div
+        *ngIf="step.visualState === OnboardingVisualState.Locked"
+        class="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-gray-400 text-white flex items-center justify-center border-2 border-white"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a4 4 0 00-8 0v4m12 0h1a2 2 0 012 2v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7a2 2 0 012-2h10z" />
+        </svg>
+      </div>
+
+    </div>
+
+    <div [ngClass]="getTitleClass(step)">
+      {{ step.title }}
+    </div>
+
+    <div *ngIf="step.isOptional" class="mt-1 text-[10px] font-semibold uppercase tracking-wider text-purple-600">
+      Optionnel
+    </div>
+  </div>
+</ng-template>
+
+<!-- Fixed tooltip overlay (not clipped by scroll/overflow) -->
+<div
+  *ngIf="tooltipStep"
+  class="fixed z-[9999]"
+  [style.top.px]="tooltipPosition.topPx"
+  [style.left.px]="tooltipPosition.leftPx"
+  (mouseenter)="onTooltipMouseEnter()"
+  (mouseleave)="onTooltipMouseLeave()"
+>
+  <div
+    #tooltipBox
+    class="w-72 rounded-xl border border-border-light bg-white p-4 shadow-2xl"
+  >
+    <div
+      *ngIf="tooltipPlacement === 'top'"
+      class="absolute left-1/2 -translate-x-1/2 -bottom-2 h-0 w-0 border-x-8 border-x-transparent border-t-8 border-t-white drop-shadow-sm"
+    ></div>
+    <div
+      *ngIf="tooltipPlacement === 'bottom'"
+      class="absolute left-1/2 -translate-x-1/2 -top-2 h-0 w-0 border-x-8 border-x-transparent border-b-8 border-b-white drop-shadow-sm"
+    ></div>
+
+    <p class="text-xs text-secondary leading-relaxed">{{ tooltipStep.tooltip }}</p>
+
+    <div *ngIf="tooltipStep.actions?.length" class="mt-3 flex flex-wrap gap-2">
+      <ng-container *ngFor="let action of tooltipStep.actions">
+        <a
+          *ngIf="action.href"
+          class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-hover transition-colors"
+          [href]="action.href"
+          [target]="action.target || '_self'"
+          rel="noopener noreferrer"
+        >
+          {{ action.label }}
+        </a>
+        <a
+          *ngIf="!action.href && action.routerLink"
+          class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-hover transition-colors"
+          [routerLink]="action.routerLink"
+          [queryParams]="action.queryParams || null"
+        >
+          {{ action.label }}
+        </a>
+      </ng-container>
+    </div>
+  </div>
+</div>

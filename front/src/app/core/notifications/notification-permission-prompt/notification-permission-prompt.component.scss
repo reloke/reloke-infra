@@ -1,0 +1,181 @@
+// Design tokens matching app style
+$color-bg-card: #FDFBF7;
+$color-border: #EAE5D9;
+$color-text-main: #2C2825;
+$color-text-secondary: #6B6560;
+$color-primary: #C25E46;
+$color-primary-hover: #A04530;
+
+.notification-prompt {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+  max-width: 360px;
+  width: calc(100% - 32px);
+  animation: slideIn 0.3s ease-out;
+
+  @media (min-width: 640px) {
+    width: 360px;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.prompt-content {
+  background: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03),
+    0 10px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+.prompt-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba($color-primary, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $color-primary;
+  margin-bottom: 16px;
+}
+
+.prompt-text {
+  margin-bottom: 20px;
+}
+
+.prompt-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: $color-text-main;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.prompt-body {
+  font-size: 14px;
+  color: $color-text-main;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+}
+
+.prompt-note {
+  font-size: 12px;
+  color: $color-text-secondary;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.prompt-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.btn-primary {
+  flex: 1;
+  background: $color-primary;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover:not(:disabled) {
+    background: $color-primary-hover;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  flex: 1;
+  background: transparent;
+  color: $color-text-main;
+  border: 1px solid $color-border;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.btn-link {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: $color-text-secondary;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 0;
+  text-align: center;
+  transition: color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: $color-text-main;
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

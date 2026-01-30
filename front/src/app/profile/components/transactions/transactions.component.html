@@ -1,0 +1,290 @@
+<div class="min-h-screen bg-main p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <i class="pi pi-credit-card text-lg"></i>
+                </div>
+                <h1 class="text-2xl md:text-3xl font-heading font-bold text-main">Mes transactions</h1>
+            </div>
+            <p class="text-secondary text-sm md:text-base">Historique de vos paiements et remboursements</p>
+        </header>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+            <app-loading size="lg"></app-loading>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && transactions.length === 0" class="card p-8 text-center">
+            <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-50 flex items-center justify-center">
+                <i class="pi pi-credit-card text-3xl text-gray-300"></i>
+            </div>
+            <h4 class="text-lg font-bold text-main mb-2">Aucune transaction</h4>
+            <p class="text-secondary text-sm max-w-md mx-auto">
+                Vous n'avez pas encore effectué de paiement. Vos transactions apparaîtront ici.
+            </p>
+        </div>
+
+        <!-- Desktop Table View -->
+        <div *ngIf="!isLoading && !isMobile && transactions.length > 0" class="card overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Date
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Type
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Statut
+                            </th>
+                            <th
+                                class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Montant
+                            </th>
+                            <th
+                                class="px-4 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr *ngFor="let tx of transactions; trackBy: trackById"
+                            class="hover:bg-gray-50 transition-colors cursor-pointer" (click)="openDetails(tx)">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                {{ formatDate(tx.occurredAt) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center gap-2">
+                                    <i class="pi {{ getTypeIcon(tx.type) }} {{ getTypeIconClass(tx.type) }}"></i>
+                                    <span class="text-sm text-main">{{ getTypeLabel(tx.type) }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="px-2.5 py-1 rounded-full text-xs font-medium {{ getStatusClass(tx.status) }}">
+                                    {{ getStatusLabel(tx.status) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-main text-right font-medium">
+                                {{ formatAmount(tx.amountTotal, tx.currency) }}
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-center flex justify-center">
+                                <button (click)="openDetails(tx); $event.stopPropagation()"
+                                    class="w-9 h-9 rounded-full bg-gray-100 hover:bg-primary/10 text-gray-500 hover:text-primary flex items-center justify-center transition-colors"
+                                    title="Voir les détails">
+                                    <i class="pi pi-eye text-sm"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Desktop Pagination -->
+            <div *ngIf="totalPages > 1" class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                <p class="text-sm text-gray-500">
+                    Page {{ currentPage }} sur {{ totalPages }} ({{ total }} transactions)
+                </p>
+                <div class="flex gap-2">
+                    <button (click)="previousPage()" [disabled]="currentPage === 1"
+                        class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:border-gray-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                        <i class="pi pi-chevron-left text-xs"></i>
+                    </button>
+                    <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+                        class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:border-gray-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                        <i class="pi pi-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Feed View (Infinite Scroll) -->
+        <div *ngIf="!isLoading && isMobile && transactions.length > 0" class="space-y-4">
+            <div *ngFor="let tx of transactions; trackBy: trackById"
+                class="card p-4 hover:shadow-md transition-shadow cursor-pointer" (click)="openDetails(tx)">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                            <i class="pi {{ getTypeIcon(tx.type) }} {{ getTypeIconClass(tx.type) }}"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-main">{{ getTypeLabel(tx.type) }}</p>
+                            <p class="text-xs text-gray-500">{{ formatDate(tx.occurredAt) }}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-main">{{ formatAmount(tx.amountTotal, tx.currency) }}</p>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ getStatusClass(tx.status) }}">
+                            {{ getStatusLabel(tx.status) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sentinel for IntersectionObserver -->
+            <div #sentinel class="h-4"></div>
+
+            <!-- Loading More Indicator -->
+            <div *ngIf="isLoadingMore" class="flex justify-center py-4">
+                <app-loading size="sm"></app-loading>
+            </div>
+
+            <!-- End of List -->
+            <div *ngIf="!hasMore && transactions.length > 0" class="text-center py-4">
+                <p class="text-sm text-gray-400">Fin des transactions</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Detail Modal -->
+<div *ngIf="showDetailModal" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50" (click)="closeDetails()"></div>
+    <div class="relative bg-white rounded-2xl p-6 max-w-lg w-full mx-4 shadow-xl max-h-[90vh] overflow-y-auto">
+        <!-- Close button -->
+        <button (click)="closeDetails()"
+            class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+            <i class="pi pi-times text-gray-500"></i>
+        </button>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoadingDetails" class="flex justify-center items-center py-12">
+            <app-loading size="lg"></app-loading>
+        </div>
+
+        <!-- Content -->
+        <div *ngIf="!isLoadingDetails && selectedTransaction">
+            <!-- Header -->
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                    <i
+                        class="pi {{ getTypeIcon(selectedTransaction.type) }} {{ getTypeIconClass(selectedTransaction.type) }} text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-main">{{ getTypeLabel(selectedTransaction.type) }}</h3>
+                    <p class="text-sm text-gray-500">{{ formatDate(selectedTransaction.occurredAt) }}</p>
+                </div>
+            </div>
+
+            <!-- Transaction Info -->
+            <div class="bg-gray-50 rounded-xl p-4 mb-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Montant</p>
+                        <p class="text-lg font-bold text-main">
+                            {{ formatAmount(selectedTransaction.amountTotal, selectedTransaction.currency) }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Statut</p>
+                        <span
+                            class="px-2.5 py-1 rounded-full text-xs font-medium {{ getStatusClass(selectedTransaction.status) }}">
+                            {{ getStatusLabel(selectedTransaction.status) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Details (if available) -->
+            <div *ngIf="selectedTransaction.payment" class="border border-gray-200 rounded-xl p-4">
+                <h4 class="text-sm font-semibold text-main mb-4 flex items-center gap-2">
+                    <i class="pi pi-credit-card text-primary"></i>
+                    Détails du paiement
+                </h4>
+
+                <div class="space-y-3">
+                    <!-- Pack -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Pack</span>
+                        <span class="text-sm font-medium text-main">
+                            {{ getPlanLabel(selectedTransaction.payment.planType) }}
+                        </span>
+                    </div>
+
+                    <!-- Matches -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Matchs inclus</span>
+                        <span class="text-sm font-medium text-main">
+                            {{ selectedTransaction.payment.matchesInitial }}
+                        </span>
+                    </div>
+
+                    <!-- Matches Used -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Matchs utilisés</span>
+                        <span class="text-sm font-medium text-main">
+                            {{ selectedTransaction.payment.matchesUsed }}
+                        </span>
+                    </div>
+
+                    <!-- Matches Remaining -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Matchs restants</span>
+                        <span class="text-sm font-medium text-green-600">
+                            {{ selectedTransaction.payment.matchesRemaining }}
+                        </span>
+                    </div>
+
+                    <div class="border-t border-gray-100 my-3"></div>
+
+                    <!-- Amount Base -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Montant HT</span>
+                        <span class="text-sm text-main">
+                            {{ formatAmount(selectedTransaction.payment.amountBase, 'EUR') }}
+                        </span>
+                    </div>
+
+                    <!-- Fees -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Frais de service</span>
+                        <span class="text-sm text-main">
+                            {{ formatAmount(selectedTransaction.payment.amountFees, 'EUR') }}
+                        </span>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+                        <span class="text-sm font-medium text-main">Total</span>
+                        <span class="text-sm font-bold text-main">
+                            {{ formatAmount(selectedTransaction.payment.amountTotal, 'EUR') }}
+                        </span>
+                    </div>
+
+                    <div class="border-t border-gray-100 my-3"></div>
+
+                    <!-- Payment Status -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Statut du paiement</span>
+                        <span
+                            class="px-2 py-0.5 rounded-full text-xs font-medium {{ getPaymentStatusClass(selectedTransaction.payment.status) }}">
+                            {{ getPaymentStatusLabel(selectedTransaction.payment.status) }}
+                        </span>
+                    </div>
+
+                    <!-- Price per Match -->
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Prix par match</span>
+                        <span class="text-sm text-main">
+                            {{ formatAmount(selectedTransaction.payment.pricePerMatch, 'EUR') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Payment Info -->
+            <div *ngIf="!selectedTransaction.payment" class="text-center py-4 text-gray-400">
+                <i class="pi pi-info-circle text-2xl mb-2"></i>
+                <p class="text-sm">Pas de détails de paiement disponibles</p>
+            </div>
+        </div>
+    </div>
+</div>

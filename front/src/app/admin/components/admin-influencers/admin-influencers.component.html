@@ -1,0 +1,623 @@
+<div class="space-y-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center px-2 md:px-0 gap-4">
+        <h2 class="text-2xl font-bold font-heading text-gray-800">Partenariats</h2>
+        <div class="relative w-full md:w-auto flex items-center gap-3">
+            <!-- Refresh Button -->
+            <button (click)="loadData()"
+                class="px-2 py-2 rounded-xl border border-gray-200 text-gray-500 hover:text-primary hover:border-primary hover:bg-primary/5 transition-colors"
+                title="Actualiser">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </button>
+
+            <!-- Search Bar -->
+            <div class="relative flex-1 md:w-64">
+                <input type="text" [(ngModel)]="searchTerm" placeholder="Rechercher..."
+                    class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Action Button: Influencer -->
+            <button *ngIf="activeTab === 'influencers'" (click)="openAddInfluencer()"
+                class="bg-primary text-white px-4 py-2 rounded-xl shadow-lg hover:bg-primary-hover transition-all flex items-center gap-2 font-medium text-sm whitespace-nowrap">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                        clip-rule="evenodd" />
+                </svg>
+                Ajouter Influenceur
+            </button>
+
+            <!-- Action Button: Promo Code (DEACTIVATED) -->
+            <button *ngIf="activeTab === 'codes'"
+                class="bg-gray-300 text-gray-500 cursor-not-allowed px-4 py-2 rounded-xl flex items-center gap-2 font-medium text-sm whitespace-nowrap"
+                title="La création de codes promo est désormais désactivée au profit des liens d'affiliation.">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                        clip-rule="evenodd" />
+                </svg>
+                Créer Code Promo (Désactivé)
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8 px-2 md:px-0">
+            <button (click)="switchTab('influencers')" [class.border-primary]="activeTab === 'influencers'"
+                [class.text-primary]="activeTab === 'influencers'"
+                class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Influenceurs
+            </button>
+            <button (click)="switchTab('codes')" [class.border-primary]="activeTab === 'codes'"
+                [class.text-primary]="activeTab === 'codes'"
+                class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center gap-2">
+                Codes Promo
+                <span
+                    class="text-[10px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded uppercase font-bold">Obsolète</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Global Alert -->
+    <app-alert *ngIf="alertMessage" [type]="alertType" [message]="alertMessage" (closed)="closeAlert()"></app-alert>
+
+    <!-- Content: Influencers -->
+    <div *ngIf="activeTab === 'influencers'" class="space-y-4">
+        <!-- Action buttons moved to header -->
+
+        <!-- Desktop Table -->
+        <div class="bg-white rounded-xl shadow-card border border-gray-100 overflow-hidden hidden md:block">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nom
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Lien Affiliation</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Date Ajout</th>
+                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr *ngFor="let inf of filteredInfluencers"
+                        class="cursor-pointer hover:bg-gray-50 transition-colors" (click)="openEditInfluencer(inf)">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                    {{ inf.firstName.charAt(0) }}{{ inf.lastName.charAt(0) }}
+                                </div>
+                                <div class="text-sm font-semibold text-gray-900">{{ inf.firstName }} {{ inf.lastName }}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">{{ inf.email }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div *ngIf="inf.influencerHash" class="flex flex-col">
+                                <span
+                                    class="text-xs font-mono text-primary font-bold bg-primary/5 px-2 py-0.5 rounded border border-primary/10 max-w-[100px] truncate"
+                                    [title]="inf.influencerHash">
+                                    {{ inf.influencerHash }}
+                                </span>
+                            </div>
+                            <div *ngIf="!inf.influencerHash" class="text-xs text-gray-400 italic">
+                                Non généré
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ inf.createdAt | date:'dd/MM/yyyy' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end gap-2">
+                            <button (click)="$event.stopPropagation(); generateLink(inf.id)"
+                                class="text-primary hover:text-primary-hover p-2 rounded-full hover:bg-primary/5 transition-colors"
+                                title="Générer un nouveau lien d'affiliation">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                </svg>
+                            </button>
+                            <button *ngIf="inf.influencerHash"
+                                (click)="$event.stopPropagation(); sendAffiliateLink(inf.id)"
+                                class="text-green-500 hover:text-green-700 p-2 rounded-full hover:bg-green-50 transition-colors"
+                                title="Envoyer le lien par email à l'influenceur">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </button>
+                            <!-- Legacy Report -->
+                            <button (click)="$event.stopPropagation(); sendReport(inf.id)"
+                                class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-50 transition-colors"
+                                title="Envoyer rapport d'utilisation des codes promo (Legacy)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </button>
+                            <button (click)="$event.stopPropagation(); initiateDeleteInfluencer(inf.id)"
+                                class="text-red-400 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition-colors"
+                                title="Supprimer">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mobile List View -->
+        <div class="space-y-3 md:hidden">
+            <div *ngFor="let inf of filteredInfluencers"
+                class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 relative cursor-pointer"
+                (click)="openEditInfluencer(inf)">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                            {{ inf.firstName.charAt(0) }}{{ inf.lastName.charAt(0) }}
+                        </div>
+                        <div>
+                            <div class="font-semibold text-gray-900">{{ inf.firstName }} {{ inf.lastName }}</div>
+                            <div class="text-xs text-gray-500">{{ inf.email }}</div>
+                        </div>
+                    </div>
+
+                    <!-- 3 Dot Menu -->
+                    <div class="relative">
+                        <button (click)="$event.stopPropagation(); toggleActionMenu(inf.id)"
+                            class="text-gray-400 hover:text-gray-600 p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                            </svg>
+                        </button>
+
+                        <div *ngIf="openActionMenuId === inf.id"
+                            class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl z-10 border border-gray-100 overflow-hidden animate-fade-in-up">
+                            <button (click)="$event.stopPropagation(); openEditInfluencer(inf)"
+                                class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 border-b border-gray-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Modifier
+                            </button>
+                            <button (click)="$event.stopPropagation(); sendReport(inf.id)"
+                                class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 border-b border-gray-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Envoyer Rapport
+                            </button>
+                            <button (click)="$event.stopPropagation(); initiateDeleteInfluencer(inf.id)"
+                                class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3 flex items-center justify-between text-sm py-2 border-t border-gray-50">
+                    <span class="text-gray-500">Codes Actifs</span>
+                    <span class="font-medium text-gray-900 bg-green-50 text-green-700 px-2 py-0.5 rounded-full">{{
+                        inf.promoCodes?.length || 0 }}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-400">
+                    <span>Ajouté le</span>
+                    <span>{{ inf.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Content: Promo Codes -->
+    <div *ngIf="activeTab === 'codes'" class="space-y-4">
+        <!-- Action buttons moved to header -->
+
+        <!-- Desktop Table -->
+        <div class="bg-white rounded-xl shadow-card border border-gray-100 overflow-hidden hidden md:block">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Code</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Influenceur</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Réduction</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Usage / Limite</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Validité
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Statut
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr *ngFor="let promo of filteredPromos" class="cursor-pointer hover:bg-gray-50 transition-colors"
+                        (click)="openEditPromo(promo)">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span
+                                class="font-mono text-sm font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20">
+                                {{ promo.code }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 font-medium">{{ promo.influencer?.firstName }} {{
+                                promo.influencer?.lastName }}</div>
+                            <div class="text-xs text-gray-500">{{ promo.influencer?.email }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                -{{ promo.discountPercentage }}%
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500 flex items-center gap-1">
+                                <span class="font-medium text-gray-900">{{ promo.currentUsageCount }}</span>
+                                <span class="text-gray-400">/</span>
+                                <span *ngIf="promo.usageLimit !== null">{{ promo.usageLimit }}</span>
+                                <span *ngIf="promo.usageLimit === null" class="text-xl leading-none">∞</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ promo.validUntil | date:'dd/MM/yyyy' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center justify-center">
+                                <div [class]="promo.isActive ? 'bg-primary/10 text-primary border-primary/20' : 'bg-gray-100 text-gray-400 border-gray-200'"
+                                    class="w-5 h-5 rounded border flex items-center justify-center transition-colors">
+                                    <svg *ngIf="promo.isActive" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5"
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button (click)="$event.stopPropagation(); deletePromo(promo.id)"
+                                class="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors"
+                                title="Supprimer">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mobile Promo List -->
+        <div class="space-y-3 md:hidden">
+            <div *ngFor="let promo of filteredPromos"
+                class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 relative cursor-pointer"
+                (click)="openEditPromo(promo)">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span
+                            class="font-mono text-sm font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20">
+                            {{ promo.code }}
+                        </span>
+                    </div>
+
+                    <!-- Toggle and 3 Dot Menu -->
+                    <div class="flex items-center gap-1">
+                        <div [class]="promo.isActive ? 'bg-primary/10 text-primary border-primary/20' : 'bg-gray-100 text-gray-400 border-gray-200'"
+                            class="w-5 h-5 rounded border flex items-center justify-center transition-colors">
+                            <svg *ngIf="promo.isActive" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+
+                        <div class="relative">
+                            <button (click)="$event.stopPropagation(); toggleActionMenu('promo-' + promo.id)"
+                                class="text-gray-400 hover:text-gray-600 p-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                </svg>
+                            </button>
+
+                            <div *ngIf="openActionMenuId === 'promo-' + promo.id"
+                                class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl z-10 border border-gray-100 overflow-hidden animate-fade-in-up">
+                                <button (click)="$event.stopPropagation(); openEditPromo(promo)"
+                                    class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 border-b border-gray-50">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    Modifier
+                                </button>
+                                <button (click)="$event.stopPropagation(); deletePromo(promo.id)"
+                                    class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-2 gap-y-2 text-sm">
+                        <div class="text-gray-500">Influenceur</div>
+                        <div class="font-medium text-gray-900 text-right">{{ promo.influencer?.firstName }} {{
+                            promo.influencer?.lastName }}</div>
+
+                        <div class="text-gray-500">Réduction</div>
+                        <div class="font-bold text-blue-600 text-right">-{{ promo.discountPercentage }}%</div>
+
+                        <div class="text-gray-500">Utilisation</div>
+                        <div class="text-right text-gray-700">
+                            {{ promo.currentUsageCount }} /
+                            <span *ngIf="promo.usageLimit === null">∞</span>
+                            <span *ngIf="promo.usageLimit !== null">{{ promo.usageLimit }}</span>
+                        </div>
+
+                        <div class="text-gray-500">Valide jusqu'au</div>
+                        <div class="text-right text-gray-700">{{ promo.validUntil | date:'dd/MM/yyyy' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add Influencer -->
+    <div *ngIf="showAddInfluencerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity"
+            (click)="showAddInfluencerModal = false"></div>
+
+        <!-- Modal Content -->
+        <div class="relative w-full max-w-lg mx-auto my-6 z-50">
+
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in-up border border-gray-100">
+                <h3 class="text-xl font-bold font-heading text-gray-900 mb-6">{{ editingInfluencerId ? 'Modifier
+                    Influenceur' :
+                    'Nouvel Influenceur' }}</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Prénom <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" [(ngModel)]="newInfluencer.firstName"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                            [class.border-red-300]="!newInfluencer.firstName && showValidationErrors">
+                    </div>
+                    <div class="md:col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom</label>
+                        <input type="text" [(ngModel)]="newInfluencer.lastName"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span
+                                class="text-red-500">*</span></label>
+                        <input type="email" [(ngModel)]="newInfluencer.email"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                            [class.border-red-300]="!newInfluencer.email && showValidationErrors">
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end gap-3">
+                    <button (click)="showAddInfluencerModal = false"
+                        class="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-50 rounded-xl transition-colors">Annuler</button>
+                    <button (click)="submitInfluencer()"
+                        class="px-5 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover shadow-lg shadow-primary/30 transition-all">
+                        {{ editingInfluencerId ? 'Modifier' : 'Créer' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add Promo -->
+    <div *ngIf="showAddPromoModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity" (click)="showAddPromoModal = false">
+        </div>
+
+        <div class="relative w-full max-w-lg mx-auto my-6 z-50">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in-up border border-gray-100">
+                <h3 class="text-xl font-bold font-heading text-gray-900 mb-6">{{ editingPromoId ? 'Modifier Code Promo'
+                    :
+                    'Nouveau Code Promo' }}</h3>
+
+                <app-alert *ngIf="alertMessage" [type]="alertType" [message]="alertMessage" (closed)="closeAlert()"
+                    class="mb-4"></app-alert>
+                <!-- ... -->
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Code (ex: PROMO20) <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" [(ngModel)]="newPromo.code"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none uppercase font-mono"
+                            [class.border-red-300]="!newPromo.code && showValidationErrors">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Influenceur <span
+                                class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select [(ngModel)]="newPromo.influencerId"
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none appearance-none bg-white"
+                                [class.border-red-300]="!newPromo.influencerId && showValidationErrors">
+                                <option [ngValue]="null" disabled>Choisir...</option>
+                                <option *ngFor="let inf of influencers" [ngValue]="inf.id">
+                                    {{ inf.firstName }} {{ inf.lastName }}
+                                </option>
+                            </select>
+                            <div
+                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Réduction (%)</label>
+                        <input type="number" [(ngModel)]="newPromo.discountPercentage" min="1" max="100"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none">
+                    </div>
+                    <div class="md:col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Limite (optionnel)</label>
+                        <input type="number" [(ngModel)]="newPromo.usageLimit" placeholder="Illimité"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Valide jusqu'au</label>
+                        <input type="date" [(ngModel)]="newPromo.validUntil"
+                            class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none">
+                    </div>
+
+                    <div *ngIf="editingPromoId"
+                        class="md:col-span-2 flex items-center justify-between py-2 border-t border-gray-50 mt-2">
+                        <div>
+                            <span class="text-sm font-medium text-gray-700">Statut du code</span>
+                            <p class="text-xs text-gray-400">Désactiver pour suspendre provisoirement</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" [(ngModel)]="newPromo.isActive" class="sr-only peer">
+                            <div
+                                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end gap-3">
+                    <button (click)="showAddPromoModal = false"
+                        class="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-50 rounded-xl transition-colors">Annuler</button>
+                    <button (click)="submitPromo()"
+                        class="px-5 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover shadow-lg shadow-primary/30 transition-all">
+                        {{ editingPromoId ? 'Modifier' : 'Créer' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal: Delete Confirmation -->
+    <div *ngIf="showDeleteConfirmModal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-fade-in-up border border-gray-100">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="bg-red-100 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold font-heading text-gray-900">Suppression</h3>
+            </div>
+
+            <p class="text-gray-600 mb-6 leading-relaxed">
+                Vous êtes sur le point de supprimer un influenceur.
+                Cette action est <span class="font-semibold text-gray-900">irréversible</span>.
+            </p>
+
+            <div *ngIf="deletionImpactCount > 0" class="bg-red-50 p-4 rounded-xl border border-red-100 mb-6 flex gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 flex-shrink-0" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-sm text-red-800 font-medium">
+                    {{ deletionImpactCount }} code(s) promo actif(s) seront désactivés immédiatement.
+                </p>
+            </div>
+
+            <div *ngIf="deletionImpactCount === 0"
+                class="bg-green-50 p-4 rounded-xl border border-green-100 mb-6 flex gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 flex-shrink-0" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-sm text-green-800 font-medium">
+                    Aucun code promo actif impacté.
+                </p>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button (click)="showDeleteConfirmModal = false"
+                    class="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-50 rounded-xl transition-colors">Annuler</button>
+                <button (click)="confirmDeleteInfluencer()"
+                    class="px-5 py-2.5 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 shadow-lg shadow-red-600/20 transition-all">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+
+    <app-confirmation-modal *ngIf="showDeletePromoConfirmModal" title="Supprimer le code promo"
+        message="Êtes-vous sûr de vouloir supprimer ce code promo ? Cette action est irréversible."
+        confirmText="Supprimer" cancelText="Annuler" type="danger" (confirm)="confirmDeletePromo()"
+        (cancel)="showDeletePromoConfirmModal = false">
+
+        <app-confirmation-modal *ngIf="showTogglePromoModal"
+            [title]="selectedPromoToToggle?.isActive ? 'Désactiver le code promo' : 'Activer le code promo'"
+            [message]="selectedPromoToToggle?.isActive ? 'Voulez-vous vraiment désactiver ce code promo ? Il ne pourra plus être utilisé.' : 'Voulez-vous réactiver ce code promo ?'"
+            [confirmText]="selectedPromoToToggle?.isActive ? 'Désactiver' : 'Activer'" cancelText="Annuler"
+            [type]="selectedPromoToToggle?.isActive ? 'danger' : 'info'" (confirm)="confirmTogglePromo()"
+            (cancel)="showTogglePromoModal = false">
+        </app-confirmation-modal>

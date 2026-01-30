@@ -1,0 +1,38 @@
+{
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^src/(.*)$": "<rootDir>/../src/$1"
+  },
+  "transformIgnorePatterns": [
+    "node_modules/(?!(uuid)/)"
+  ],
+  "collectCoverage": true,
+  "coverageDirectory": "../coverage-e2e",
+  "coverageReporters": [
+    "text",
+    "html"
+  ],
+  "reporters": [
+    "default",
+    [
+      "jest-html-reporters",
+      {
+        "publicPath": "./test-report",
+        "filename": "report.html",
+        "expand": true,
+        "pageTitle": "Rapport des Tests GDPR E2E",
+        "openReport": false
+      }
+    ]
+  ]
+}

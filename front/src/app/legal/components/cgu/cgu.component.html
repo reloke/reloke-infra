@@ -1,0 +1,1343 @@
+<app-navbar></app-navbar>
+<div class="min-h-screen bg-bg-main p-4 sm:p-6 font-body pt-24">
+  <div
+    class="w-full max-w-6xl mx-auto bg-bg-card rounded-3xl shadow-card border border-border overflow-hidden mt-24 mb-6">
+    <!-- ======================= HEADER ======================= -->
+    <div class="relative overflow-hidden px-6 sm:px-10 py-10 sm:py-12 border-b border-border">
+      <div class="absolute inset-0 bg-white"></div>
+      <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-primary/10 blur-3xl"></div>
+      <div class="absolute -bottom-28 -left-24 w-80 h-80 rounded-full bg-primary/5 blur-3xl"></div>
+
+      <div class="relative flex flex-col gap-5">
+        <div
+          class="inline-flex items-center gap-2 self-start rounded-full bg-white/70 border border-border px-3 py-1.5 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-primary"></span>
+          <span class="text-[11px] sm:text-xs font-semibold tracking-wider uppercase text-gray-600">
+            Conditions d’utilisation générales
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <h1
+            class="text-3xl sm:text-4xl lg:text-5xl text-main font-heading font-extrabold tracking-tight leading-[1.05]">
+            Conditions d’utilisation de Reloke
+          </h1>
+
+          <p class="text-secondary text-[15px] sm:text-[16px] lg:text-[17px] leading-7 max-w-4xl">
+            Ces conditions encadrent l’accès et l’utilisation de Reloke :
+            <span class="font-semibold text-gray-700">création de compte</span>,
+            <span class="font-semibold text-gray-700">matching</span>,
+            <span class="font-semibold text-gray-700">mise en relation</span>,
+            <span class="font-semibold text-gray-700">packs de matchs</span>,
+            <span class="font-semibold text-gray-700">messagerie</span>,
+            <span class="font-semibold text-gray-700">modération</span> et
+            <span class="font-semibold text-gray-700">remboursements</span>.
+          </p>
+
+          <div
+            class="text-[13px] sm:text-sm text-gray-600 bg-white/70 border border-border rounded-2xl p-4 leading-relaxed">
+            <span class="font-semibold text-gray-700">Point clé :</span> Reloke
+            n’est pas un bailleur, ni une agence immobilière, ni un
+            propriétaire. La plateforme permet uniquement la
+            <span class="font-semibold text-gray-700">mise en relation</span>
+            entre locataires sortants ayant des projets de mobilité compatibles,
+            sans garantie d’obtenir un logement.
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-[12px] sm:text-xs text-gray-500">
+          <div class="inline-flex items-center gap-2 rounded-full bg-white/70 border border-border px-3 py-1.5">
+            <span class="font-semibold text-gray-600">Version</span>
+            <span class="text-gray-700">{{ cguVersion }}</span>
+          </div>
+
+          <div class="inline-flex items-center gap-2 rounded-full bg-white/70 border border-border px-3 py-1.5">
+            <span class="font-semibold text-gray-600">Dernière mise à jour</span>
+            <span class="text-gray-700">{{
+              lastUpdated || "À compléter"
+              }}</span>
+          </div>
+
+          <div class="inline-flex items-center gap-2 rounded-full bg-white/70 border border-border px-3 py-1.5">
+            <i class="pi pi-envelope text-primary text-xs"></i>
+            <span class="font-semibold text-gray-600">Support</span>
+            <a href="mailto:support&#64;reloke.com" class="text-primary hover:underline">support&#64;reloke.com</a>
+          </div>
+
+          <div class="inline-flex items-center gap-2 rounded-full bg-white/70 border border-border px-3 py-1.5">
+            <i class="pi pi-shield text-primary text-xs"></i>
+            <span class="font-semibold text-gray-600">DPO</span>
+            <a href="mailto:dpo&#64;reloke.com" class="text-primary hover:underline">dpo&#64;reloke.com</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================= LAYOUT ======================= -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-0">
+      <!-- ======================= NAV ======================= -->
+      <aside class="lg:col-span-4 xl:col-span-3 border-b lg:border-b-0 lg:border-r border-border bg-white">
+        <div class="p-6 sm:p-8 sticky top-0">
+          <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">
+            Sommaire
+          </h2>
+
+          <nav class="mt-4 space-y-2 text-sm">
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-1">1) Éditeur & contacts</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-2">2) Définitions</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-3">3) Accès au service</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-4">4) Parcours utilisateur & matching</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-5">5) Packs, prix, TVA</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-6">6) Droit de rétractation</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-7">7) Remboursement prorata (hors rétractation)</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-8">8) Messagerie, règles & modération</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-9">9) DossierFacile (badge)</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-10">10) Notifications & emails</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-11">11) Disponibilité du service</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-12">12) Responsabilité</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-13">13) Résiliation / suspension</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-14">14) Données personnelles</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-15">15) Litiges, droit applicable, médiation</a>
+            <a class="block px-3 py-2 rounded-xl hover:bg-white/70 text-gray-700" [routerLink]="[]"
+              fragment="section-16">16) Modifications</a>
+          </nav>
+
+          <div class="mt-6 p-4 rounded-2xl bg-white/70 border border-border text-xs text-gray-600 leading-relaxed">
+            <span class="font-semibold text-gray-700">Conseil :</span> conserve
+            une version PDF/HTML de ces CGU associée à chaque paiement, pour
+            prouver la version acceptée.
+          </div>
+        </div>
+      </aside>
+
+      <!-- ======================= CONTENT ======================= -->
+      <main class="lg:col-span-8 xl:col-span-9 p-6 sm:p-10 space-y-10">
+        <!-- 1) Editeur -->
+        <section id="section-1" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            1) Éditeur du service & contacts
+          </h2>
+
+          <div class="bg-white rounded-2xl border border-border p-5 space-y-3 text-base text-secondary leading-relaxed">
+            <p>
+              <span class="font-semibold text-gray-700">Éditeur / opérateur :</span>
+              <span class="font-semibold text-gray-700">Reloke LTD</span>
+              (société de droit britannique).
+            </p>
+
+            <p>
+              <span class="font-semibold text-gray-700">Adresse légale :</span>
+              <span class="text-gray-700">[Adresse UK à compléter]</span>
+              <span class="text-gray-500">(ajoutée dès finalisation de la domiciliation)</span>.
+            </p>
+
+            <p>
+              <span class="font-semibold text-gray-700">Support :</span>
+              <a href="mailto:support&#64;reloke.com" class="text-primary hover:underline">support&#64;reloke.com</a>
+            </p>
+
+            <p>
+              <span class="font-semibold text-gray-700">DPO (fonction) :</span>
+              Reloke a désigné un DPO parmi ses directeurs. <br>
+              <span class="font-semibold text-gray-700">Contact DPO :</span>
+              <a href="mailto:dpo&#64;reloke.com" class="text-primary hover:underline">dpo&#64;reloke.com</a>
+              <span class="text-gray-500">(objet : “RGPD / Données personnelles”)</span>.
+            </p>
+
+            <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+              <div class="font-semibold text-gray-700 mb-1">
+                Exemple d’usage
+              </div>
+              <ul class="list-disc pl-5 space-y-1">
+                <li>
+                  Question sur un paiement : écris à support&#64;reloke.com.
+                </li>
+                <li>
+                  Question RGPD (accès / suppression) : écris à
+                  dpo&#64;reloke.com.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2) Définitions -->
+        <section id="section-2" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            2) Définitions
+          </h2>
+
+          <div class="bg-white rounded-2xl border border-border p-5 text-base text-secondary leading-relaxed space-y-3">
+            <ul class="list-disc pl-5 space-y-2">
+              <li>
+                <span class="font-semibold text-gray-700">Utilisateur</span> :
+                toute personne disposant d’un compte Reloke.
+              </li>
+              <li>
+                <span class="font-semibold text-gray-700">Locataire sortant</span>
+                : utilisateur qui renseigne un logement qu’il occupe et qu’il
+                envisage de quitter.
+              </li>
+              <li>
+                <span class="font-semibold text-gray-700">Logement sortant</span>
+                : logement renseigné par un utilisateur (adresse, pièces,
+                surface, loyer, photos, description optionnelle).
+              </li>
+              <li>
+                <span class="font-semibold text-gray-700">Recherche</span> :
+                critères de mobilité (zones, budget, surface, pièces, types,
+                période).
+              </li>
+              <li>
+                <span class="font-semibold text-gray-700">Match</span> :
+                proposition de mise en relation (standard ou triangulaire)
+                produite par l’algorithme à partir des données des utilisateurs.
+              </li>
+              <li>
+                <span class="font-semibold text-gray-700">Match standard</span>
+                : compatibilité bilatérale A ⇄ B.
+              </li>
+              <li>
+                <span class="font-semibold text-gray-700">Match triangulaire</span>
+                : compatibilité A → B → C → A.
+              </li>
+              <li>
+                <span class="font-semibold text-gray-700">Pack</span> : achat
+                donnant droit à un nombre déterminé de matchs (“crédits”).
+              </li>
+              <li>
+                <span class="font-semibold text-gray-700">Crédit</span> : unité
+                consommée lorsque Reloke délivre un match.
+              </li>
+              <li>
+                <span class="font-semibold text-gray-700">Flux de matching</span>
+                : état dans lequel l’utilisateur est éligible à recevoir des
+                matchs (identité vérifiée + crédits disponibles + recherche
+                active).
+              </li>
+              <li>
+                <span class="font-semibold text-gray-700">DossierFacile</span> :
+                service public permettant de valider un dossier locatif ; Reloke
+                peut afficher un “badge” si un lien public valide est fourni.
+              </li>
+            </ul>
+
+            <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+              <div class="font-semibold text-gray-700 mb-1">Important</div>
+              <p>
+                Reloke ne publie pas de “liste de logements de propriétaires” et
+                ne fournit pas de coordonnées de bailleurs. La mise en relation
+                se fait entre utilisateurs ; chacun reste responsable de
+                contacter le bailleur/propriétaire en dehors de Reloke et de
+                respecter la réglementation applicable.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3) Accès -->
+        <section id="section-3" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            3) Accès au service
+          </h2>
+
+          <div class="space-y-5 text-base text-secondary leading-relaxed">
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                3.1 Conditions d’éligibilité
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Reloke est réservé aux personnes
+                  <span class="font-semibold text-gray-700">âgées de 18 ans ou plus</span>.
+                </li>
+                <li>
+                  Reloke peut exiger une
+                  <span class="font-semibold text-gray-700">preuve d’âge</span>
+                  via vérification d’identité avant tout paiement.
+                </li>
+                <li>
+                  Vous garantissez que les informations fournies sont exactes et
+                  à jour.
+                </li>
+              </ul>
+              <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+                <div class="font-semibold text-gray-700 mb-1">
+                  Pourquoi c’est strict
+                </div>
+                <p>
+                  Un mineur non émancipé a une capacité contractuelle limitée ;
+                  Reloke évite d’exposer des utilisateurs à des situations
+                  juridiquement incertaines (paiements, mise en relation,
+                  démarches locatives).
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                3.2 Création de compte & vérification email
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Données requises :
+                  <span class="font-semibold text-gray-700">nom, prénom, email, mot de passe</span>.
+                </li>
+                <li>
+                  Vérification de l’email via
+                  <span class="font-semibold text-gray-700">code à 6 chiffres</span>
+                  envoyé par email.
+                </li>
+                <li>
+                  Sans validation de l’email, le compte ne peut pas être activé.
+                </li>
+              </ul>
+              <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+                <div class="font-semibold text-gray-700 mb-1">
+                  Exemple d’usage
+                </div>
+                <p>
+                  Tu t’inscris, tu reçois un code 6 chiffres, tu le saisis : le
+                  compte passe en “email vérifié”.
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                3.3 Vérification d’identité (obligatoire avant paiement)
+              </h3>
+              <p class="text-gray-600">
+                Avant de pouvoir acheter un pack, Reloke impose une vérification
+                d’identité via un prestataire (Didit) : pièce d’identité,
+                selfie/vidéo, contrôle d’âge.
+              </p>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Reloke conserve uniquement un
+                  <span class="font-semibold text-gray-700">statut de vérification</span>
+                  (ex : “vérifié”) et des métadonnées minimales.
+                </li>
+                <li>
+                  Les documents d’identité ne sont pas stockés par Reloke (ils
+                  sont traités par le prestataire selon ses propres conditions).
+                </li>
+                <li>
+                  Une personne peut créer plusieurs comptes
+                  <span class="font-semibold text-gray-700">non vérifiés</span>,
+                  mais ne peut pas détenir plusieurs comptes
+                  <span class="font-semibold text-gray-700">vérifiés</span>.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4) Parcours & matching -->
+        <section id="section-4" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            4) Parcours utilisateur & matching
+          </h2>
+
+          <div class="bg-white rounded-2xl border border-border p-5 space-y-4 text-base text-secondary leading-relaxed">
+            <div class="space-y-2">
+              <h3 class="text-base font-semibold text-main">
+                4.1 Renseignement des informations
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Vous renseignez un
+                  <span class="font-semibold text-gray-700">logement sortant</span>
+                  (adresse précise, pièces, surface, loyer, photos, description
+                  optionnelle).
+                </li>
+                <li>
+                  Vous renseignez vos
+                  <span class="font-semibold text-gray-700">critères de recherche</span>
+                  (zones, budget min/max, surface, pièces, types, dates
+                  estimées).
+                </li>
+              </ul>
+            </div>
+
+            <div class="space-y-2">
+              <h3 class="text-base font-semibold text-main">
+                4.2 Entrée dans le flux de matching
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Pour recevoir des matchs, vous devez : (i) être
+                  <span class="font-semibold text-gray-700">vérifié</span>, (ii)
+                  avoir une
+                  <span class="font-semibold text-gray-700">recherche active</span>, (iii) disposer de
+                  <span class="font-semibold text-gray-700">crédits</span>.
+                </li>
+                <li>
+                  L’algorithme propose périodiquement des matchs compatibles.
+                </li>
+                <li>
+                  Reloke ne garantit ni un nombre minimal de matchs, ni
+                  l’obtention d’un logement.
+                </li>
+              </ul>
+              <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+                <div class="font-semibold text-gray-700 mb-1">
+                  Exemple d’usage
+                </div>
+                <p>
+                  Tu achètes un pack 5 matchs, tu entres dans le flux. Reloke te
+                  propose jusqu’à 5 matchs. Une fois les crédits consommés, tu
+                  sors du flux et tu dois recharger si tu veux continuer.
+                </p>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <h3 class="text-base font-semibold text-main">
+                4.3 Matchs standards & matchs triangulaires
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  <span class="font-semibold text-gray-700">Standards :</span>
+                  compatibilité A ⇄ B (préférés par l’algorithme).
+                </li>
+                <li>
+                  <span class="font-semibold text-gray-700">Triangulaires :</span>
+                  A → B → C → A (proposés notamment si les standards sont
+                  rares).
+                </li>
+              </ul>
+              <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+                <div class="font-semibold text-gray-700 mb-1">
+                  Exemple simple
+                </div>
+                <p>
+                  A veut aller dans la zone de B, B dans la zone de C, C dans la
+                  zone de A : Reloke peut proposer un match triangulaire.
+                </p>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <h3 class="text-base font-semibold text-main">
+                4.4 Accès aux informations
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Avant match : vous ne voyez pas les informations détaillées
+                  des autres utilisateurs.
+                </li>
+                <li>
+                  Après match : vous voyez les informations du logement sortant
+                  de l’autre (loyer, surface, pièces, type, description
+                  éventuelle, photos).
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5) Packs -->
+        <section id="section-5" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            5) Packs, prix, TVA, paiement
+          </h2>
+
+          <div class="space-y-5 text-base text-secondary leading-relaxed">
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                5.1 Packs disponibles
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  <span class="font-semibold text-gray-700">Pack Curieux :</span>
+                  12€ <span class="text-gray-500">(prix hors TVA)</span> pour 2
+                  matchs (6€/match).
+                </li>
+                <li>
+                  <span class="font-semibold text-gray-700">Pack Efficace :</span>
+                  25€ <span class="text-gray-500">(prix hors TVA)</span> pour 5
+                  matchs (5€/match).
+                </li>
+                <li>
+                  <span class="font-semibold text-gray-700">Pack Pro :</span>
+                  60€ <span class="text-gray-500">(prix hors TVA)</span> pour 15
+                  matchs (4€/match).
+                </li>
+              </ul>
+
+              <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+                <div class="font-semibold text-gray-700 mb-1">Important</div>
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>
+                    Le prix final,
+                    <span class="font-semibold text-gray-700">TVA incluse</span>, est affiché avant validation sur
+                    Stripe Checkout.
+                  </li>
+                  <li>
+                    Les frais éventuels du prestataire de paiement peuvent être
+                    inclus selon l’affichage au checkout.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                5.2 Paiement & démarrage immédiat
+              </h3>
+              <p class="text-gray-600">
+                Les paiements sont traités par Stripe. Lors du checkout, vous
+                confirmez notamment :
+              </p>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>avoir lu et accepté les présentes CGU ;</li>
+                <li>
+                  demander l’exécution immédiate du service (entrée dans le flux
+                  et lancement du matching) dès validation du paiement ;
+                </li>
+                <li>
+                  avoir compris les règles de rétractation et, le cas échéant,
+                  de paiement prorata temporis si vous vous rétractez après
+                  démarrage.
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                5.3 Consommation des crédits
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Un match délivré consomme
+                  <span class="font-semibold text-gray-700">1 crédit</span>.
+                </li>
+                <li>
+                  Lorsque vos crédits sont épuisés, vous sortez du flux et ne
+                  recevez plus de matchs tant que vous n’avez pas rechargé.
+                </li>
+                <li>
+                  Reloke peut appliquer des mécanismes techniques
+                  anti-concurrence / anti-abus (ex : verrouillage temporaire de
+                  traitement) afin d’éviter des anomalies.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6) Rétractation -->
+        <section id="section-6" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            6) Droit de rétractation (consommateurs)
+          </h2>
+
+          <div class="bg-white rounded-2xl border border-border p-5 space-y-4 text-base text-secondary leading-relaxed">
+            <p class="text-gray-600">
+              Si vous êtes un consommateur, vous disposez en principe d’un délai
+              de <span class="font-semibold text-gray-700">14 jours</span>
+              pour exercer votre droit de rétractation à compter de la
+              conclusion du contrat.
+            </p>
+
+            <div class="bg-gray-50 border border-border rounded-xl p-4 text-sm text-gray-700 leading-relaxed">
+              <div class="font-semibold mb-1">Cas concret Reloke</div>
+              <p>
+                Vous demandez expressément le démarrage immédiat (entrée dans le
+                flux + matching). Si vous vous rétractez après démarrage, vous
+                devez payer un montant
+                <span class="font-semibold">proportionné</span> au service
+                fourni jusqu’à la notification de rétractation.
+              </p>
+            </div>
+
+            <ul class="list-disc pl-5 space-y-2">
+              <li>
+                Pour exercer la rétractation : envoyez une demande claire à
+                <a class="text-primary hover:underline" href="mailto:support&#64;reloke.com">support&#64;reloke.com</a>.
+              </li>
+              <li>
+                Reloke accuse réception et applique le calcul légal applicable.
+              </li>
+            </ul>
+
+            <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+              <div class="font-semibold text-gray-700 mb-1">Exemple simple</div>
+              <p>
+                Vous achetez un pack, le service démarre, puis vous vous
+                rétractez : Reloke peut retenir un montant correspondant à ce
+                qui a été fourni jusqu’à votre rétractation (ex : matchs
+                délivrés / accès au flux), et rembourser le solde selon le cadre
+                légal.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7) Remboursement prorata -->
+        <section id="section-7" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            7) Remboursement prorata des crédits (politique commerciale)
+          </h2>
+
+          <div class="bg-white rounded-2xl border border-border p-5 space-y-4 text-base text-secondary leading-relaxed">
+            <p class="text-gray-600">
+              Indépendamment du droit de rétractation, Reloke propose une
+              politique commerciale de remboursement
+              <span class="font-semibold text-gray-700">au prorata des crédits non consommés</span>, déclenchable depuis
+              l’interface. Les crédits consommés ne sont
+              pas remboursables.
+            </p>
+
+            <div class="space-y-2">
+              <h3 class="text-base font-semibold text-main">
+                7.1 Règle de calcul
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Chaque pack a un
+                  <span class="font-semibold text-gray-700">prix par match</span>
+                  (hors TVA) déterminé à l’achat.
+                </li>
+                <li>
+                  Montant remboursable = (crédits non consommés) × (prix par
+                  match correspondant au pack).
+                </li>
+                <li>
+                  La TVA est traitée de manière cohérente avec le paiement
+                  initial et les règles applicables au remboursement.
+                </li>
+              </ul>
+
+              <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+                <div class="font-semibold text-gray-700 mb-1">Exemple</div>
+                <p>
+                  Pack Efficace (25€ HT, 5 matchs) : si 2 matchs consommés, 3
+                  matchs non consommés → remboursement HT = 3 × 5€ = 15€ (TVA
+                  ajustée).
+                </p>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <h3 class="text-base font-semibold text-main">
+                7.2 Ordre d’imputation & remboursement
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Les crédits sont consommés selon l’ordre défini par Reloke
+                  (généralement du plus ancien au plus récent).
+                </li>
+                <li>
+                  En cas de remboursement, Reloke applique le prorata sur les
+                  packs concernés selon les crédits restants et l’historique.
+                </li>
+              </ul>
+            </div>
+
+            <div class="space-y-2">
+              <h3 class="text-base font-semibold text-main">
+                7.3 Anti-abus & exceptions
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Reloke peut retarder un remboursement si un traitement
+                  technique de matching est en cours (verrouillage court) afin
+                  d’éviter des incohérences.
+                </li>
+                <li>
+                  Reloke peut refuser/annuler un remboursement en cas de fraude,
+                  abus manifeste, contournement du service ou violation grave
+                  des CGU.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8) Messagerie -->
+        <section id="section-8" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            8) Messagerie, règles de conduite & modération
+          </h2>
+
+          <div class="space-y-5 text-base text-secondary leading-relaxed">
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                8.1 Règles d’échange
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  La messagerie sert à organiser la mise en relation entre
+                  utilisateurs après match.
+                </li>
+                <li>
+                  Vous êtes responsable de ce que vous communiquez et du respect
+                  de la loi (données personnelles, harcèlement, menaces, etc.).
+                </li>
+                <li>
+                  Reloke ne vérifie pas et ne garantit pas la solvabilité, ni la
+                  véracité des déclarations d’un utilisateur.
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                8.2 Interdiction stricte : documents sensibles
+              </h3>
+              <p class="text-gray-600">
+                Il est interdit d’envoyer via Reloke des documents sensibles,
+                notamment : pièce d’identité, dossier locatif complet, bulletins
+                de salaire, avis d’imposition, RIB, justificatifs médicaux, etc.
+              </p>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Reloke peut supprimer ces contenus, restreindre l’accès et/ou
+                  suspendre le compte.
+                </li>
+                <li>
+                  En cas de signalement, Reloke peut conserver les éléments
+                  strictement nécessaires au traitement.
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                8.3 Signalement, blocage, sanctions
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Vous pouvez
+                  <span class="font-semibold text-gray-700">signaler</span> un
+                  utilisateur depuis un chat.
+                </li>
+                <li>
+                  Vous pouvez
+                  <span class="font-semibold text-gray-700">bloquer</span> un
+                  utilisateur ; l’accès au chat peut être restreint.
+                </li>
+                <li>
+                  Reloke peut appliquer des sanctions graduées : avertissement,
+                  limitation, suspension, clôture.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9) DossierFacile -->
+        <section id="section-9" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            9) DossierFacile (badge) — fonctionnement & limites
+          </h2>
+
+          <div class="bg-white rounded-2xl border border-border p-5 space-y-4 text-base text-secondary leading-relaxed">
+            <p class="text-gray-600">
+              Reloke peut afficher un indicateur (“badge”) lorsque vous
+              fournissez un lien public DossierFacile. Reloke ne récupère pas
+              vos pièces ; l’objectif est de vérifier que le lien est
+              <span class="font-semibold text-gray-700">accessible</span>.
+            </p>
+
+            <div class="space-y-2">
+              <h3 class="text-base font-semibold text-main">
+                9.1 Ce que Reloke vérifie
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Vérification technique du lien (format attendu,
+                  accessibilité).
+                </li>
+                <li>
+                  Vérification périodique pour éviter les liens expirés /
+                  désactivés.
+                </li>
+              </ul>
+            </div>
+
+            <div class="space-y-2">
+              <h3 class="text-base font-semibold text-main">
+                9.2 Ce que Reloke ne fait pas
+              </h3>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>Reloke ne confirme pas la solvabilité.</li>
+                <li>Reloke ne lit pas et ne stocke pas vos justificatifs.</li>
+                <li>
+                  Reloke ne garantit pas l’acceptation de votre dossier par un
+                  bailleur.
+                </li>
+              </ul>
+            </div>
+
+            <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+              <div class="font-semibold text-gray-700 mb-1">
+                Exemple d’usage
+              </div>
+              <p>
+                Tu fournis un lien “partage sans justificatifs”. Reloke vérifie
+                qu’il répond et affiche le badge. Si le lien devient invalide,
+                le badge peut être retiré jusqu’à réactivation.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 10) Notifications -->
+        <section id="section-10" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            10) Emails & notifications
+          </h2>
+
+          <div class="bg-white rounded-2xl border border-border p-5 space-y-3 text-base text-secondary leading-relaxed">
+            <ul class="list-disc pl-5 space-y-2">
+              <li>
+                Emails transactionnels : vérification email, notification de
+                match, notification de messages, informations de sécurité.
+              </li>
+              <li>
+                Emails de rappel : fin de période de recherche, absence de
+                crédits, recherche inactive (si activés).
+              </li>
+              <li>
+                Reloke n’envoie pas de newsletters marketing par défaut (à
+                date), sauf activation ultérieure avec base légale appropriée.
+              </li>
+              <li>
+                <span class="font-semibold text-gray-700">Archivage des matchs inactifs :</span>
+                pour garder une liste lisible, Reloke peut archiver les matchs
+                <span class="font-semibold text-gray-700">sans activité depuis 6 mois</span>. L’inactivité est évaluée
+                sur la date du dernier message du
+                chat lié ou, si elle n’existe pas, sur la date de création du chat
+                .
+                <span class="font-semibold text-gray-700">Un match archivé n’est pas supprimé</span>
+                : il reste accessible via la section/filtre “Anciens”.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 11) Disponibilité -->
+        <section id="section-11" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            11) Disponibilité du service
+          </h2>
+
+          <div class="bg-white rounded-2xl border border-border p-5 space-y-3 text-base text-secondary leading-relaxed">
+            <ul class="list-disc pl-5 space-y-2">
+              <li>
+                Reloke peut effectuer des maintenances planifiées ou urgentes.
+              </li>
+              <li>
+                Reloke peut limiter certaines fonctionnalités en cas d’incident
+                de sécurité.
+              </li>
+              <li>
+                Reloke n’est pas responsable des interruptions dues aux réseaux,
+                aux prestataires (Stripe, emails, etc.) ou à des cas de force
+                majeure.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 12) Responsabilité -->
+        <section id="section-12" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            12) Responsabilité — nature du service, rôle de Reloke, rôle des
+            utilisateurs
+          </h2>
+
+          <div class="space-y-5 text-base text-secondary leading-relaxed">
+            <!-- 12.0 Nature / qualification -->
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                12.0 Nature exacte du service (mise en relation uniquement)
+              </h3>
+
+              <p class="text-gray-600">
+                Reloke est une plateforme de
+                <span class="font-semibold text-gray-700">mise en relation entre locataires</span>. Reloke ne publie pas
+                un catalogue de logements “à louer”
+                appartenant à des bailleurs, ne commercialise pas une “liste” de
+                logements préexistants, et ne perçoit pas de rémunération en
+                contrepartie de la transmission de coordonnées de bailleurs.
+              </p>
+
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Reloke met en relation des
+                  <span class="font-semibold text-gray-700">locataires sortants</span>
+                  sur la base d’informations qu’ils saisissent eux-mêmes
+                  (logement sortant + recherche).
+                </li>
+                <li>
+                  Le service consiste à
+                  <span class="font-semibold text-gray-700">proposer des compatibilités (matchs)</span>
+                  et à permettre un
+                  <span class="font-semibold text-gray-700">échange direct entre utilisateurs</span>
+                  (messagerie), afin qu’ils puissent, s’ils le souhaitent,
+                  organiser leurs démarches
+                  <span class="font-semibold text-gray-700">hors plateforme</span>.
+                </li>
+                <li>
+                  Reloke
+                  <span class="font-semibold text-gray-700">n’intervient pas</span>
+                  dans la conclusion d’un bail, d’un échange de logement, d’un
+                  accord avec un bailleur, ni dans la décision d’attribution
+                  d’un logement.
+                </li>
+              </ul>
+
+              <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+                <div class="font-semibold text-gray-700 mb-1">
+                  Exemple d’usage
+                </div>
+                <p>
+                  Reloke peut faire matcher A et B parce que A cherche dans la
+                  zone de B et que le logement sortant de B correspond aux
+                  critères de A. Ensuite A et B discutent. Toute démarche auprès
+                  d’un bailleur/propriétaire (visite, dépôt de dossier,
+                  signature) se fait en dehors de Reloke et sous leur
+                  responsabilité.
+                </p>
+              </div>
+            </div>
+
+            <!-- 12.1 Ce que Reloke fait -->
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                12.1 Ce que Reloke fait (obligations de moyens)
+              </h3>
+
+              <p class="text-gray-600">
+                Reloke est soumis à une
+                <span class="font-semibold text-gray-700">obligation de moyens</span>
+                : fournir une plateforme fonctionnelle, sécurisée et conforme à
+                sa description, sans garantir un résultat (logement obtenu,
+                accord d’un bailleur, etc.).
+              </p>
+
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Mettre à disposition un parcours : compte → logement sortant →
+                  recherche → achat d’un pack → entrée dans le flux → délivrance
+                  de matchs dans la limite des crédits.
+                </li>
+                <li>
+                  Proposer des matchs
+                  <span class="font-semibold text-gray-700">calculés</span> à
+                  partir des données saisies (match standard ou triangulaire),
+                  et afficher les informations du logement sortant après match.
+                </li>
+                <li>
+                  Fournir une messagerie et des outils de sécurité/modération
+                  (signalement, blocage, restrictions).
+                </li>
+                <li>
+                  Mettre en place des mesures de sécurité raisonnables
+                  (chiffrement TLS, authentification, refresh tokens,
+                  protections anti-abus).
+                </li>
+              </ul>
+
+              <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+                <div class="font-semibold text-gray-700 mb-1">
+                  Ce que ça implique
+                </div>
+                <p>
+                  Même si vous payez un pack, Reloke ne promet pas un nombre
+                  minimal de matchs ni l’obtention d’un logement. Reloke exécute
+                  le service en vous rendant éligible au flux de matching et en
+                  délivrant des matchs lorsqu’une compatibilité existe.
+                </p>
+              </div>
+            </div>
+
+            <!-- 12.2 Ce que Reloke ne fait pas -->
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                12.2 Ce que Reloke ne fait pas (exclusions explicites)
+              </h3>
+
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Reloke n’est
+                  <span class="font-semibold text-gray-700">ni bailleur, ni agence immobilière, ni administrateur de
+                    biens</span>, et n’agit pas comme mandataire d’un bailleur.
+                </li>
+                <li>
+                  Reloke ne garantit pas : la disponibilité d’un logement, la
+                  réalité des informations fournies par un utilisateur,
+                  l’absence de fraude, ni l’acceptation d’un dossier par un
+                  bailleur/assureur.
+                </li>
+                <li>
+                  Reloke ne réalise pas d’évaluation juridique des situations
+                  (clause de bail, préavis, sous-location, transfert de bail,
+                  etc.) et ne fournit pas de conseil juridique, immobilier,
+                  fiscal ou financier.
+                </li>
+                <li>
+                  Reloke n’organise pas de visites, ne négocie pas, ne signe
+                  pas, ne collecte pas de dépôt, et ne centralise pas les
+                  dossiers locatifs.
+                </li>
+                <li>
+                  Reloke n’est pas responsable des contenus échangés entre
+                  utilisateurs, sauf obligations légales et actions de
+                  modération raisonnables.
+                </li>
+              </ul>
+
+              <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+                <div class="font-semibold text-gray-700 mb-1">
+                  Point “marchand de listes” (clarification)
+                </div>
+                <p>
+                  Le service ne consiste pas à “vendre” ou “fournir” une liste
+                  de logements à louer appartenant à des tiers. Il s’agit d’un
+                  service de matching entre utilisateurs, basé sur leurs propres
+                  données, avec mise en relation bilatérale conditionnée à
+                  l’entrée dans le flux (crédits + vérification d’identité).
+                </p>
+              </div>
+            </div>
+
+            <!-- 12.3 Responsabilités utilisateurs -->
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                12.3 Responsabilité des utilisateurs (déclarations, démarches,
+                respect de la loi)
+              </h3>
+
+              <p class="text-gray-600">
+                Vous êtes responsable de votre usage de Reloke, de vos
+                déclarations et de vos démarches. Vous vous engagez notamment à
+                :
+              </p>
+
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Fournir des informations
+                  <span class="font-semibold text-gray-700">exactes</span>
+                  (logement sortant, recherche, photos) et les maintenir à jour.
+                </li>
+                <li>
+                  Ne pas publier ou envoyer de contenus illicites (diffamation,
+                  menaces, harcèlement, incitation à la haine, etc.).
+                </li>
+                <li>
+                  Ne pas transmettre via la messagerie de
+                  <span class="font-semibold text-gray-700">documents sensibles</span>
+                  (pièce d’identité, bulletin de salaire, avis d’imposition,
+                  RIB, dossier complet).
+                </li>
+                <li>
+                  Vérifier que vous avez le
+                  <span class="font-semibold text-gray-700">droit</span> de
+                  communiquer des informations relatives à un bailleur, un
+                  propriétaire, ou un tiers (ex : coordonnées), et respecter la
+                  réglementation applicable (RGPD, secret, etc.).
+                </li>
+                <li>
+                  Comprendre que toute décision (contacter un bailleur, déposer
+                  un dossier, quitter un logement, etc.) est prise
+                  <span class="font-semibold text-gray-700">à vos risques</span>, sous votre responsabilité.
+                </li>
+              </ul>
+
+              <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+                <div class="font-semibold text-gray-700 mb-1">
+                  Exemple concret
+                </div>
+                <p>
+                  Si un utilisateur communique un loyer erroné, une localisation
+                  inexacte, ou des photos trompeuses, Reloke n’en est pas
+                  responsable. Le litige éventuel (déception, perte de temps,
+                  refus de bailleur) relève des utilisateurs.
+                </p>
+              </div>
+            </div>
+
+            <!-- 12.4 DossierFacile / vérifications -->
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                12.4 Vérifications (email, identité, DossierFacile) — limites
+              </h3>
+
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  <span class="font-semibold text-gray-700">Email</span> :
+                  Reloke vérifie la possession de l’email via code ; cela ne
+                  prouve pas l’identité civile.
+                </li>
+                <li>
+                  <span class="font-semibold text-gray-700">Identité (Didit)</span>
+                  : Reloke s’appuie sur un prestataire ; Reloke ne garantit pas
+                  l’absence totale d’usurpation, mais met en place cette
+                  barrière pour réduire le risque.
+                </li>
+                <li>
+                  <span class="font-semibold text-gray-700">DossierFacile</span>
+                  : Reloke peut vérifier l’accessibilité d’un lien public
+                  fourni. Reloke ne garantit pas la solvabilité, ni
+                  l’acceptation du dossier, ni le maintien du lien par
+                  l’utilisateur.
+                </li>
+              </ul>
+
+              <p class="text-gray-600">
+                Ces vérifications sont des mesures de réduction de risque, pas
+                des garanties de résultat.
+              </p>
+            </div>
+
+            <!-- 12.5 Limitation de responsabilité -->
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                12.5 Limitation de responsabilité (dans les limites autorisées
+                par la loi)
+              </h3>
+
+              <p class="text-gray-600">
+                Dans les limites autorisées par la loi, la responsabilité de
+                Reloke ne saurait être engagée pour :
+              </p>
+
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Les décisions, refus, conditions, exigences ou délais d’un
+                  bailleur, d’un assureur, d’une agence, ou de tout tiers.
+                </li>
+                <li>
+                  Les dommages indirects (perte d’opportunité, perte de chance,
+                  perte de revenus, préjudice commercial, etc.).
+                </li>
+                <li>
+                  Les indisponibilités causées par des événements extérieurs
+                  (réseaux, terminaux, pannes prestataires, force majeure), sous
+                  réserve des obligations légales applicables.
+                </li>
+              </ul>
+
+              <div class="bg-gray-50 border border-border rounded-xl p-4 text-sm text-gray-700 leading-relaxed">
+                <div class="font-semibold mb-1">
+                  Clause de sauvegarde (consommateurs)
+                </div>
+                <p>
+                  Aucune clause ne limite la responsabilité de Reloke en cas de
+                  faute lourde, de dol, ni ne prive le consommateur de ses
+                  droits impératifs. En cas de contradiction, les dispositions
+                  légales impératives prévalent.
+                </p>
+              </div>
+            </div>
+
+            <!-- 12.6 Responsabilité liée aux paiements -->
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                12.6 Responsabilité liée aux paiements (packs)
+              </h3>
+
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  Le paiement d’un pack déclenche l’exécution immédiate du
+                  service : entrée dans le flux et mise à disposition des
+                  crédits.
+                </li>
+                <li>
+                  Un pack donne droit à un
+                  <span class="font-semibold text-gray-700">nombre maximum de matchs</span>
+                  (crédits), sans garantie de disponibilité d’un match.
+                </li>
+                <li>
+                  Le remboursement prorata des crédits non consommés est une
+                  <span class="font-semibold text-gray-700">politique commerciale</span>, distincte du droit de
+                  rétractation.
+                </li>
+              </ul>
+
+              <div class="text-sm text-gray-600 bg-gray-50 border border-border rounded-xl p-4 leading-relaxed">
+                <div class="font-semibold text-gray-700 mb-1">Exemple</div>
+                <p>
+                  Si Reloke ne trouve que 1 match compatible pendant votre
+                  période active, vous pouvez rester dans le flux tant que vous
+                  avez des crédits et que votre recherche est active. En
+                  l’absence de compatibilités, Reloke ne peut pas “inventer” des
+                  matchs.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 13) Résiliation -->
+        <section id="section-13" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            13) Suspension, résiliation, suppression de compte
+          </h2>
+
+          <div class="bg-white rounded-2xl border border-border p-5 space-y-4 text-base text-secondary leading-relaxed">
+            <ul class="list-disc pl-5 space-y-2">
+              <li>
+                Vous pouvez demander la suppression de votre compte depuis votre
+                profil ; traitement sous 90 jours (sauf obligations légales /
+                litiges).
+              </li>
+              <li>
+                Reloke peut suspendre ou résilier un compte en cas de : fraude,
+                usurpation, harcèlement, contournement, envoi de documents
+                sensibles, atteinte à la sécurité.
+              </li>
+              <li>
+                Reloke peut refuser l’accès aux packs ou au flux si la
+                vérification d’identité échoue ou si une incohérence majeure est
+                détectée.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 14) Données -->
+        <section id="section-14" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            14) Données personnelles
+          </h2>
+
+          <div class="bg-white rounded-2xl border border-border p-5 space-y-3 text-base text-secondary leading-relaxed">
+            <p class="text-gray-600">
+              Les traitements de données personnelles (compte, matching, chat,
+              paiements, sécurité, DossierFacile) sont décrits dans la
+              <span [routerLink]="'/legal/privacy-policy'" class="font-semibold text-gray-700 cursor-pointer">Politique
+                de confidentialité</span>
+              Reloke, qui fait partie intégrante des présentes CGU.
+            </p>
+            <ul class="list-disc pl-5 space-y-2">
+              <li>
+                Vous pouvez exercer vos droits (accès, suppression, etc.) via
+                dpo&#64;reloke.com.
+              </li>
+              <li>
+                Les règles de conservation et de sécurité sont détaillées dans
+                la politique dédiée.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 15) Litiges -->
+        <section id="section-15" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            15) Litiges, droit applicable, médiation
+          </h2>
+
+          <div class="space-y-5 text-base text-secondary leading-relaxed">
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                15.1 Réclamation préalable
+              </h3>
+              <p class="text-gray-600">
+                Avant toute action, vous pouvez adresser une réclamation à
+                <a class="text-primary hover:underline" href="mailto:support&#64;reloke.com">support&#64;reloke.com</a>.
+              </p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                15.2 Médiation de la consommation (si applicable)
+              </h3>
+              <p class="text-gray-600">
+                Si vous êtes un consommateur, vous pouvez recourir gratuitement
+                à un médiateur de la consommation, sous conditions.
+                <span class="font-semibold text-gray-700">Reloke désignera un médiateur</span>
+                et indiquera ici ses coordonnées.
+              </p>
+
+              <div class="bg-gray-50 border border-border rounded-xl p-4 text-sm text-gray-700 leading-relaxed">
+                <div class="font-semibold mb-1">
+                  À compléter avant lancement public
+                </div>
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Nom du médiateur + site + adresse postale + email</li>
+                  <li>Procédure de saisine</li>
+                </ul>
+              </div>
+
+              <p class="text-gray-600">
+                <span class="font-semibold text-gray-700">Note :</span> la
+                plateforme européenne ODR (règlement en ligne des litiges) a été
+                fermée en 2025.
+              </p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-border p-5 space-y-3">
+              <h3 class="text-base font-semibold text-main">
+                15.3 Droit applicable
+              </h3>
+              <p class="text-gray-600">
+                Les présentes CGU sont régies par le droit applicable au regard
+                de la situation du consommateur et des règles impératives de
+                protection. Si vous êtes un consommateur résidant en France, les
+                dispositions impératives du droit français de la consommation
+                s’appliquent.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 16) Modifs -->
+        <section id="section-16" class="scroll-mt-24 space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-main font-heading">
+            16) Modification des CGU
+          </h2>
+
+          <div class="bg-white rounded-2xl border border-border p-5 space-y-3 text-base text-secondary leading-relaxed">
+            <ul class="list-disc pl-5 space-y-2">
+              <li>
+                Reloke peut modifier les CGU pour refléter une évolution légale,
+                technique ou du service.
+              </li>
+              <li>
+                En cas de modification substantielle, Reloke vous informera par
+                un moyen raisonnable (ex : notification email).
+              </li>
+              <li>
+                La version applicable est celle acceptée lors de votre
+                achat/usage, sauf exigences légales contraires.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <div class="pt-2">
+          <div class="text-xs text-gray-500 leading-relaxed">
+            <span class="font-semibold text-gray-600">Dernière mise à jour :</span>
+            {{ lastUpdated || "À compléter" }} —
+            <span class="font-semibold text-gray-600">Reloke LTD</span>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- --- FOOTER --- -->
+<app-footer></app-footer>

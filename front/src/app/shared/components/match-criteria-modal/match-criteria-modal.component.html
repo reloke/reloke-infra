@@ -1,0 +1,170 @@
+<div *ngIf="isOpen" class="fixed inset-0 z-[150] flex items-end md:items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="onClose()"></div>
+    <div
+        class="relative bg-white shadow-2xl w-full max-w-2xl rounded-t-3xl md:rounded-3xl overflow-hidden animate-fade-in-up flex flex-col max-h-[90vh]">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 bg-gray-50/50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[10px] uppercase tracking-wider text-secondary font-bold">Critères du match</p>
+                    <p class="text-main font-bold">Synthèse de votre recherche</p>
+                </div>
+            </div>
+            <button (click)="onClose()"
+                class="w-10 h-10 rounded-full hover:bg-white text-gray-400 hover:text-primary transition-colors flex items-center justify-center shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="overflow-y-auto p-6 space-y-6">
+            <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-12">
+                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-3"></div>
+                <p class="text-secondary text-sm">Chargement des critères...</p>
+            </div>
+
+            <ng-container *ngIf="!isLoading && criteriaVm as c; else noSnapshot">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Zones -->
+                    <div class="p-4 rounded-2xl border border-gray-100 bg-gray-50/30 space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                </svg>
+                            </span>
+                            <p class="text-[10px] uppercase text-secondary font-bold">Zones</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2" *ngIf="c.zones.length; else noZones">
+                            <span *ngFor="let z of c.zones"
+                                class="px-3 py-1.5 rounded-xl bg-white border border-gray-100 text-main text-xs font-bold inline-flex items-center gap-2 shadow-sm">
+                                {{ z.label }}
+                                <span class="text-[10px] text-secondary font-normal">({{ z.radiusLabel }})</span>
+                            </span>
+                        </div>
+                        <ng-template #noZones>
+                            <p class="text-secondary text-xs italic">Non renseigné</p>
+                        </ng-template>
+                    </div>
+
+                    <!-- Période -->
+                    <div class="p-4 rounded-2xl border border-gray-100 bg-gray-50/30 space-y-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span
+                                class="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z" />
+                                </svg>
+                            </span>
+                            <p class="text-[10px] uppercase text-secondary font-bold">Période</p>
+                        </div>
+                        <p class="text-main font-bold text-sm">{{ c.periodStartLabel }}</p>
+                        <p class="text-main font-bold text-sm">{{ c.periodEndLabel }}</p>
+                    </div>
+
+                    <!-- Budget -->
+                    <div class="p-4 rounded-2xl border border-gray-100 bg-gray-50/30 space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </span>
+                            <p class="text-[10px] uppercase text-secondary font-bold">Budget</p>
+                        </div>
+                        <p class="text-main font-bold text-lg">{{ c.budgetLabel }}</p>
+                        <div *ngIf="match?.targetHome?.rent != null && c.maxRent != null"
+                            class="flex flex-wrap gap-2 pt-1">
+                            <span class="px-2 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-bold">
+                                Votre max : {{ c.maxRent }} €
+                            </span>
+                            <span class="px-2 py-1 rounded-lg bg-gray-100 text-main text-[10px] font-bold">
+                                Logement : {{ match?.targetHome?.rent }} €
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Surface -->
+                    <div class="p-4 rounded-2xl border border-gray-100 bg-gray-50/30 space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                </svg>
+                            </span>
+                            <p class="text-[10px] uppercase text-secondary font-bold">Surface</p>
+                        </div>
+                        <p class="text-main font-bold text-lg">{{ c.surfaceLabel }}</p>
+                    </div>
+
+                    <!-- Type Logement -->
+                    <div class="p-4 rounded-2xl border border-gray-100 bg-gray-50/30 space-y-3 md:col-span-2">
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                            </span>
+                            <p class="text-[10px] uppercase text-secondary font-bold">Types recherchés</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2" *ngIf="c.homeTypes.length; else noTypes">
+                            <span *ngFor="let t of c.homeTypes"
+                                class="px-4 py-2 rounded-xl bg-white border border-indigo-100 text-indigo-700 text-xs font-bold shadow-sm">
+                                {{ getHomeTypeLabel(t) }}
+                            </span>
+                        </div>
+                        <ng-template #noTypes>
+                            <p class="text-secondary text-xs italic">Tous types acceptés</p>
+                        </ng-template>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-template #noSnapshot>
+                <div class="flex flex-col items-center justify-center py-12 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9.172 17.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <p class="text-secondary font-bold">Synthèse indisponible</p>
+                    <p class="text-xs text-secondary mt-1 max-w-xs">Les critères de ce match ne sont pas consultables
+                        pour le moment.</p>
+                </div>
+            </ng-template>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-6 bg-gray-50 border-t border-gray-100">
+            <button (click)="onClose()"
+                class="w-full py-4 bg-primary text-white rounded-2xl font-bold shadow-lg hover:shadow-primary/25 active:scale-95 transition-all">
+                C'est compris
+            </button>
+        </div>
+    </div>
+</div>

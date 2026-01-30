@@ -1,0 +1,88 @@
+<div class="min-h-screen bg-gray-100 p-4 md:p-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Administration <span class="font-canva text-primary">Reloke</span>
+        </h1>
+        <!-- Logout button could go here or in header, user said logout button must be present -->
+        <div class="w-48">
+            <app-logout-button (logoutClick)="openLogoutModal()"></app-logout-button>
+        </div>
+    </div>
+
+    <!-- Tabs Container -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[600px] flex flex-col">
+        <!-- Tab Navigation -->
+        <!-- Tab Navigation -->
+        <nav class="border-b border-gray-200 px-6 pt-4">
+            <!-- Desktop Tabs -->
+            <ul class="hidden md:flex space-x-8">
+                <li *ngFor="let item of navItems">
+                    <a [routerLink]="[item.link]" routerLinkActive="border-primary text-primary"
+                        (click)="selectTab(item.label)"
+                        class="flex items-center space-x-2 py-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition-colors cursor-pointer font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                [attr.d]="item.svgPath" />
+                        </svg>
+                        <span>{{ item.label }}</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Mobile Menu -->
+            <div class="md:hidden pb-4 relative">
+                <button (click)="toggleMobileMenu()"
+                    class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 flex items-center justify-between text-left shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                    <span class="flex items-center gap-2 font-medium text-gray-800">
+                        <span class="text-primary">
+                            <ng-container *ngFor="let item of navItems">
+                                <svg *ngIf="item.label === currentTabLabel" xmlns="http://www.w3.org/2000/svg"
+                                    class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        [attr.d]="item.svgPath" />
+                                </svg>
+                            </ng-container>
+                        </span>
+                        {{ currentTabLabel }}
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5 text-gray-400 transition-transform duration-200"
+                        [ngClass]="{'rotate-180': isMobileMenuOpen}" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <!-- Dropdown List -->
+                <div *ngIf="isMobileMenuOpen"
+                    class="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden animate-fade-in-up">
+                    <ul class="divide-y divide-gray-50">
+                        <li *ngFor="let item of navItems">
+                            <a [routerLink]="[item.link]" (click)="selectTab(item.label)"
+                                class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-sm text-gray-700"
+                                [ngClass]="{'bg-primary/5 text-primary font-medium': item.label === currentTabLabel}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                    [ngClass]="item.label === currentTabLabel ? 'text-primary' : 'text-gray-400'"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        [attr.d]="item.svgPath" />
+                                </svg>
+                                {{ item.label }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Tab Content -->
+        <div class="p-6 flex-1 bg-gray-50/50">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+
+    <app-confirmation-modal *ngIf="isLogoutModalOpen" [isOpen]="isLogoutModalOpen" title="Se déconnecter ?"
+        message="Êtes-vous sûr de vouloir vous déconnecter ?" confirmText="Déconnexion" cancelText="Annuler"
+        type="danger" (confirm)="confirmLogout()" (cancel)="closeLogoutModal()">
+    </app-confirmation-modal>
+</div>

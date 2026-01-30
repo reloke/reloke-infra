@@ -1,0 +1,298 @@
+<div class="space-y-6 animate-fade-in">
+    <!-- Header Actions -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="text-2xl font-bold text-main">Signalements (Moderation)</h2>
+            <p class="text-sm text-secondary">Examinez les signalements et prenez des mesures disciplinaires.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button (click)="toggleArchived()"
+                class="px-4 py-2 border rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
+                [ngClass]="showArchived ? 'bg-primary/10 border-primary text-primary' : 'bg-white border-gray-200 text-secondary hover:bg-gray-50'">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+                {{ showArchived ? 'Masquer archivés' : 'Afficher archivés' }}
+            </button>
+            <button (click)="loadReports()"
+                class="p-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Reports List -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 border-b border-gray-100">
+                    <tr>
+                        <th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider">Cible (Signalé)
+                        </th>
+                        <th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider">Auteur</th>
+                        <th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider">Motif /
+                            Description</th>
+                        <th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-wider text-right">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr *ngFor="let r of reports" class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-xs font-medium text-main">{{ r.createdAt | date:'dd/MM/yy HH:mm' }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-main">{{ r.reportedUser.firstName }} {{
+                                    r.reportedUser.lastName }}</span>
+                                <span class="text-[10px] text-secondary">{{ r.reportedUser.mail }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col">
+                                <span class="text-sm text-main">{{ r.reporter.firstName }} {{ r.reporter.lastName
+                                    }}</span>
+                                <span class="text-[10px] text-secondary">{{ r.reporter.mail }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 max-w-xs">
+                            <div class="text-sm text-main font-medium italic mb-1">{{ r.reason }}</div>
+                            <div class="text-xs text-secondary line-clamp-2" [title]="r.description">{{ r.description }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span [ngClass]="{
+                                'bg-yellow-100 text-yellow-700': r.status === 'PENDING',
+                                'bg-gray-100 text-gray-600': r.status === 'ARCHIVED',
+                                'bg-green-100 text-green-700': r.status === 'RESOLVED'
+                            }" class="px-2 py-1 rounded-full text-[10px] font-bold uppercase">
+                                {{ r.status }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <button (click)="openThread(r.chatId)"
+                                class="p-2 text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                                title="Voir le fil">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                            </button>
+                            <button *ngIf="r.status === 'PENDING'" (click)="openBanModal(r)"
+                                class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Bannir">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                </svg>
+                            </button>
+                            <button *ngIf="r.status === 'PENDING'" (click)="archiveReport(r.id)"
+                                class="p-2 text-secondary hover:bg-gray-100 rounded-lg transition-colors"
+                                title="Archiver">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr *ngIf="reports.length === 0 && !loading">
+                        <td colspan="6" class="px-6 py-20 text-center text-secondary">
+                            Aucun signalement trouvé.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Thread Modal -->
+<div *ngIf="showThreadModal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-fade-in-up">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+            <div>
+                <h3 class="text-xl font-bold text-main">Transcription de la discussion</h3>
+                <p class="text-xs text-secondary mt-1">Chat ID: {{ currentChatId }}</p>
+            </div>
+            <button (click)="showThreadModal = false" class="p-2 text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Media Gallery (Horizontal Scroll) -->
+            <div *ngIf="hasMedia()" class="p-4 bg-gray-50 border-b border-gray-100 flex gap-2 overflow-x-auto shrink-0">
+                <ng-container *ngFor="let msg of currentThread">
+                    <!-- Multiple Images -->
+                    <ng-container *ngIf="msg.type === 'IMAGE' && msg.images?.length">
+                        <div *ngFor="let img of msg.images"
+                            class="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-gray-200 cursor-pointer hover:opacity-90"
+                            (click)="openImage(img.url)">
+                            <img [src]="img.url" class="w-full h-full object-cover">
+                        </div>
+                    </ng-container>
+
+                    <!-- Single Legacy Image or File Image -->
+                    <div *ngIf="(msg.type === 'IMAGE' && !msg.images?.length) || (msg.type === 'FILE' && isImage(msg.fileUrl))"
+                        class="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-gray-200 cursor-pointer hover:opacity-90"
+                        (click)="openImage(msg.type === 'IMAGE' ? msg.content : msg.fileUrl)">
+                        <img [src]="msg.type === 'IMAGE' ? msg.content : msg.fileUrl"
+                            class="w-full h-full object-cover">
+                    </div>
+                </ng-container>
+            </div>
+
+            <!-- Messages List -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                <div *ngFor="let msg of currentThread" class="flex flex-col">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xs font-bold text-main">{{ msg.sender.firstName }} {{ msg.sender.lastName
+                            }}</span>
+                        <span class="text-[10px] text-secondary">{{ msg.createdAt | date:'HH:mm:ss' }}</span>
+                    </div>
+                    <div [ngClass]="msg.type === 'SYSTEM' ? 'bg-blue-50 text-blue-800 italic text-[10px]' : 'bg-gray-50 text-main'"
+                        class="p-3 rounded-lg text-sm border border-gray-100">
+
+                        <!-- Text Content -->
+                        <span *ngIf="msg.type === 'TEXT' || msg.type === 'SYSTEM'">{{ msg.content }}</span>
+
+                        <!-- Image Content -->
+                        <div *ngIf="msg.type === 'IMAGE'" class="mt-2 flex flex-wrap gap-2">
+                            <!-- New multi-image display -->
+                            <ng-container *ngIf="msg.images?.length; else legacyImage">
+                                <img *ngFor="let img of msg.images" [src]="img.url"
+                                    class="max-w-[200px] max-h-[200px] object-cover rounded-lg border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
+                                    (click)="openImage(img.url)">
+                            </ng-container>
+                            <!-- Legacy fallback -->
+                            <ng-template #legacyImage>
+                                <img [src]="msg.content"
+                                    class="max-w-[200px] rounded-lg border border-gray-200 cursor-pointer"
+                                    (click)="openImage(msg.content)">
+                            </ng-template>
+                        </div>
+
+                        <!-- File Content -->
+                        <div *ngIf="msg.type === 'FILE'" class="mt-2">
+                            <a [href]="msg.fileUrl" target="_blank"
+                                class="text-xs text-primary underline flex items-center gap-1">
+                                <i class="pi pi-paperclip"></i>
+                                Voir le fichier joint
+                            </a>
+                            <div *ngIf="isImage(msg.fileUrl)" class="mt-2">
+                                <img [src]="msg.fileUrl" class="max-w-[200px] rounded-lg border border-gray-200">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-gray-100 flex justify-end">
+            <button (click)="showThreadModal = false"
+                class="px-6 py-2 bg-gray-100 text-main font-bold rounded-xl hover:bg-gray-200 transition-all">
+                Fermer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div *ngIf="previewImageUrl"
+    class="fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 cursor-pointer"
+    (click)="previewImageUrl = null">
+    <img [src]="previewImageUrl" class="max-w-full max-h-full rounded-lg shadow-2xl">
+</div>
+
+<!-- Ban Modal -->
+<div *ngIf="showBanModal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[160] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl animate-fade-in-up overflow-hidden">
+        <!-- Step 1: Configuration -->
+        <div *ngIf="banStep === 1">
+            <div class="p-6 border-b border-gray-100">
+                <h3 class="text-xl font-bold text-red-600">Bannir l'utilisateur</h3>
+                <p class="text-sm text-secondary mt-1">Vous vous apprêtez à bannir <strong>{{
+                        selectedReport?.reportedUser.firstName }}</strong>.</p>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Modèle de
+                        sanction</label>
+                    <select [(ngModel)]="banReasonTemplate"
+                        class="w-full rounded-xl border-gray-200 focus:border-red-500 text-sm">
+                        <option *ngFor="let t of banTemplates" [value]="t.value">{{ t.label }}</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Note de
+                        l'administrateur (Optionnel)</label>
+                    <textarea [(ngModel)]="banAdminNote" placeholder="Précisions pour l'utilisateur..."
+                        class="w-full rounded-xl border-gray-200 focus:border-red-500 text-sm p-3 min-h-[100px] bg-gray-50"></textarea>
+                </div>
+
+                <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                    <p class="text-xs text-red-800 leading-relaxed italic">
+                        L'utilisateur recevra un email lui signifiant son bannissement pour <strong>{{ banReasonTemplate
+                            }}</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-gray-100 flex gap-3">
+                <button (click)="showBanModal = false"
+                    class="flex-1 py-3 bg-gray-100 text-main font-bold rounded-xl hover:bg-gray-200 transition-all">
+                    Annuler
+                </button>
+                <button (click)="banStep = 2"
+                    class="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100">
+                    Suivant
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Confirmation Final -->
+        <div *ngIf="banStep === 2" class="p-8 text-center animate-fade-in">
+            <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-main mb-4">Confirmer le bannissement ?</h3>
+            <p class="text-secondary mb-8">
+                Cette action désactivera immédiatement l'accès de l'utilisateur à la plateforme. Êtes-vous certain ?
+            </p>
+            <div class="flex gap-3">
+                <button (click)="banStep = 1"
+                    class="flex-1 py-3 bg-gray-100 text-main font-bold rounded-xl hover:bg-gray-200 transition-all">
+                    Retour
+                </button>
+                <button (click)="confirmBan()"
+                    class="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-200">
+                    Bannir définitivement
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

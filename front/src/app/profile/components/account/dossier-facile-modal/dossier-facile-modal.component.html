@@ -1,0 +1,165 @@
+<div *ngIf="isOpen" class="fixed inset-0 z-[100] overflow-hidden">
+
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-md animate-fade-in" (click)="onClose()"></div>
+
+    <!-- Layout Container -->
+    <div class="absolute inset-0 flex md:justify-end items-end md:items-stretch pointer-events-none">
+
+        <!-- Panel Content -->
+        <div class="pointer-events-auto relative w-full md:w-[500px] bg-white shadow-2xl z-[110] flex flex-col 
+                    panel-animation
+                    rounded-t-[2.5rem] md:rounded-none h-[90vh] md:h-full overflow-hidden">
+
+            <!-- Header -->
+            <div class="p-6 md:p-8 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+                        <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.826a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-main font-heading">
+                        {{ isEditing ? 'Modifier' : 'Lier' }} mon dossier
+                    </h3>
+                </div>
+                <button (click)="onClose()"
+                    class="p-2 text-gray-400 hover:text-gray-600 transition-all hover:bg-gray-100 rounded-full">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 scrollbar-hide">
+
+                <!-- Combined Intro & Security Info -->
+                <div class="bg-primary/5 rounded-3xl p-6 border border-primary/10">
+                    <div class="flex gap-4">
+                        <div
+                            class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm text-main leading-relaxed font-bold mb-1">
+                                Optimisez vos chances d'acceptation !
+                            </p>
+                            <p class="text-[13px] text-secondary leading-relaxed italic">
+                                Un dossier complet permet une validation plus rapide par les gestionnaires.
+                                <span
+                                    class="bg-primary/10 text-primary px-1.5 py-0.5 rounded-md font-black not-italic border border-primary/20 inline-block my-0.5">Reloke
+                                    ne stocke aucun document</span>,
+                                seul le lien certifié est utilisé pour rassurer vos futurs bailleurs.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Why Section -->
+                <div class="space-y-3 px-1">
+                    <h4 class="text-sm font-bold text-main">Pourquoi lier mon dossier ?</h4>
+                    <p class="text-xs text-secondary leading-relaxed">
+                        DossierFacile est le service numérique de l'État qui certifie vos pièces justificatives. En
+                        liant votre dossier :
+                    </p>
+                    <ul class="space-y-2">
+                        <li class="flex items-start gap-2 text-xs text-secondary">
+                            <div class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0"></div>
+                            <span>Vous inspirez une confiance immédiate aux bailleurs.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-xs text-secondary">
+                            <div class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0"></div>
+                            <span>Vous accélérez le processus de matching sur Reloke.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-xs text-secondary">
+                            <div class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0"></div>
+                            <span>Vous protégez vos données personnelles contre l'usurpation d'identité.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- compact Checklist Grid -->
+                <div class="bg-gray-50/80 rounded-3xl p-6 border border-gray-100">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-5 text-center">
+                        VÉRIFIEZ LES PIÈCES NÉCESSAIRES
+                    </p>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div *ngFor="let doc of requiredDocs" class="flex items-center gap-3 group">
+                            <div
+                                class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                                <svg class="w-3.5 h-3.5 text-primary" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <a [href]="doc.url" target="_blank" rel="noopener noreferrer"
+                                (click)="$event.stopPropagation()"
+                                class="inline-block text-sm text-secondary hover:text-primary transition-all decoration-primary/20 hover:underline underline-offset-4 font-bold truncate">
+                                {{ doc.label }}
+                            </a>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-gray-100 text-center">
+                            <a href="https://aide.dossierfacile.logement.gouv.fr/fr/category/justificatifs-ye12ln/"
+                                target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()"
+                                class="inline-block text-[11px] text-primary font-black hover:underline uppercase tracking-widest flex items-center justify-center gap-2 group">
+                                Consulter le guide officiel
+                                <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                    </path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <form [formGroup]="form" (ngSubmit)="onSubmit()" class="pb-2">
+                    <div class="space-y-4">
+                        <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 ml-1">URL DE VOTRE
+                            DOSSIER DOSSIERFACILE</label>
+                        <div class="relative">
+                            <input type="text" formControlName="url"
+                                placeholder="https://www.dossierfacile.logement.gouv.fr/..."
+                                class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none text-main placeholder-gray-300">
+                        </div>
+                    </div>
+
+                    <!-- Error Alert -->
+                    <div *ngIf="error || (form.get('url')?.touched && form.get('url')?.errors?.['pattern'])"
+                        class="mt-4">
+                        <app-alert type="error"
+                            [message]="error || 'Le lien doit provenir de www.dossierfacile.logement.gouv.fr'"
+                            [dismissible]="false">
+                        </app-alert>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="mt-6 flex flex-col sm:flex-row justify-end gap-3 pb-2">
+                        <button type="button" (click)="onClose()"
+                            class="order-2 sm:order-1 px-8 py-3.5 text-secondary hover:bg-gray-100 rounded-2xl transition-all font-bold text-sm active:scale-95">
+                            Annuler
+                        </button>
+                        <button type="button" (click)="onSubmit($event)" [disabled]="isSubmitting"
+                            class="order-1 sm:order-2 px-10 py-3.5 bg-primary text-white rounded-2xl hover:bg-primary-hover shadow-xl shadow-primary/20 transition-all font-black text-sm flex items-center justify-center gap-3 active:scale-95 disabled:opacity-70">
+                            <app-loading *ngIf="isSubmitting" size="sm"></app-loading>
+                            {{ isSubmitting ? (isEditing ? 'Modification...' : 'Validation...') : (isEditing ?
+                            'Enregistrer les modifications' : 'Enregistrer mon lien') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

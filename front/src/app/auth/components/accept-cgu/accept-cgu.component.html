@@ -1,0 +1,70 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 font-body">
+    <div
+        class="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl shadow-xl border border-gray-100 animate-fade-in-up">
+
+        <div class="text-center">
+            <div class="mb-6 inline-block p-4 bg-primary/5 rounded-2xl shadow-sm border border-primary/10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h2 class="mt-2 text-3xl font-heading font-extrabold text-gray-900">
+                Bienvenue, {{ firstName }} !
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+                Pour finaliser la création de votre compte, veuillez accepter nos conditions d'utilisation.
+            </p>
+        </div>
+
+        <form [formGroup]="form" (submit)="onSubmit()" class="mt-8 space-y-6">
+
+            <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 transition-all hover:border-primary/30">
+                <label class="flex items-start gap-4 cursor-pointer">
+                    <div class="flex items-center h-5 mt-1">
+                        <input type="checkbox" formControlName="acceptCgu"
+                            class="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary transition-all cursor-pointer">
+                    </div>
+                    <div class="text-sm text-gray-700">
+                        J'ai lu et j'accepte les
+                        <a routerLink="/legal/terms-and-conditions" target="_blank"
+                            class="font-bold text-primary hover:text-primary-dark underline decoration-2 decoration-primary/20 hover:decoration-primary">
+                            Conditions Générales d'Utilisation
+                        </a> et la
+                        <a routerLink="/legal/privacy-policy" target="_blank"
+                            class="font-bold text-primary hover:text-primary-dark underline decoration-2 decoration-primary/20 hover:decoration-primary">
+                            Politique de Confidentialité
+                        </a>.
+                    </div>
+                </label>
+
+                <div *ngIf="form.get('acceptCgu')?.invalid && form.get('acceptCgu')?.touched"
+                    class="mt-2 text-xs text-red-500 font-bold ml-9 animate-shake">
+                    Vous devez accepter les CGU pour continuer.
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="errorMessage"
+                class="p-4 rounded-xl bg-red-50 text-red-600 text-sm flex items-center gap-3 border border-red-100 font-medium animate-shake">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {{ errorMessage }}
+            </div>
+
+            <button type="submit" [disabled]="form.invalid || isLoading"
+                class="group relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary shadow-lg shadow-primary/30 transition-all transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed">
+
+                <span *ngIf="!isLoading">Créer mon compte</span>
+                <span *ngIf="isLoading" class="flex items-center">
+                    <app-loading size="sm" class="mr-2"></app-loading>
+                    Finalisation...
+                </span>
+            </button>
+        </form>
+    </div>
+</div>

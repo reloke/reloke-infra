@@ -1,0 +1,200 @@
+<app-navbar></app-navbar>
+
+<div class="min-h-screen p-4 sm:p-6 font-body pt-24 relative">
+  <div class="mx-auto w-full max-w-2xl mt-24 mb-12">
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl sm:text-4xl font-heading font-bold text-main mb-3">
+        Contactez-nous
+      </h1>
+      <p class="text-secondary text-base max-w-md mx-auto">
+        Une question ? Un problème ? Notre équipe vous répondra dans les plus brefs délais.
+      </p>
+    </div>
+
+    <!-- Success State -->
+    <div
+      *ngIf="submitted"
+      class="bg-card rounded-2xl shadow-card border border-border p-8 text-center"
+    >
+      <div
+        class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+      >
+        <i class="pi pi-check text-green-600 text-2xl"></i>
+      </div>
+      <h2 class="text-xl font-bold text-main mb-2">Message envoyé !</h2>
+      <p class="text-secondary mb-6">
+        Vous recevrez un email de confirmation à l'adresse indiquée.
+        Notre équipe vous répondra dans les plus brefs délais.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <button
+          type="button"
+          (click)="resetForm()"
+          class="px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-hover transition-colors cursor-pointer"
+        >
+          Nouveau message
+        </button>
+        <a
+          routerLink="/"
+          class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors cursor-pointer text-center"
+        >
+          Retour à l'accueil
+        </a>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form *ngIf="!submitted" [formGroup]="contactForm" class="space-y-6">
+
+      <!-- Error Alert -->
+      <div
+        *ngIf="error"
+        class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start"
+      >
+        <i class="pi pi-exclamation-circle text-red-500 mr-3 mt-0.5"></i>
+        <p class="text-red-700 text-sm">{{ error }}</p>
+      </div>
+
+      <!-- Email -->
+      <div class="bg-card rounded-2xl shadow-card border border-border p-6">
+        <label
+          class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1 block mb-3"
+        >
+          Votre adresse email <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="exemple@email.com"
+          class="w-full p-4 bg-white border border-border rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+          [class.border-red-300]="contactForm.get('email')?.touched && contactForm.get('email')?.invalid"
+        />
+        <p
+          *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.errors?.['required']"
+          class="text-red-500 text-xs mt-2 pl-1"
+        >
+          L'adresse email est requise
+        </p>
+        <p
+          *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.errors?.['email']"
+          class="text-red-500 text-xs mt-2 pl-1"
+        >
+          Veuillez entrer une adresse email valide
+        </p>
+      </div>
+
+      <!-- Topic Selection -->
+      <div class="bg-card rounded-2xl shadow-card border border-border p-6">
+        <label
+          class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1 block mb-3"
+        >
+          Sujet de votre demande <span class="text-red-500">*</span>
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            *ngFor="let topic of topics"
+            type="button"
+            (click)="selectTopic(topic.value)"
+            [ngClass]="
+              contactForm.get('topic')?.value === topic.value
+                ? 'border-primary bg-primary/5 text-primary ring-2 ring-primary/20'
+                : 'border-border bg-white text-gray-700 hover:border-gray-300'
+            "
+            class="p-4 rounded-xl border text-sm font-medium transition-all text-left flex items-center gap-3 cursor-pointer"
+          >
+            <i class="pi {{ topic.icon }} text-lg"></i>
+            <span>{{ topic.label }}</span>
+          </button>
+        </div>
+        <p
+          *ngIf="contactForm.get('topic')?.touched && contactForm.get('topic')?.errors?.['required']"
+          class="text-red-500 text-xs mt-2 pl-1"
+        >
+          Veuillez sélectionner un sujet
+        </p>
+      </div>
+
+      <!-- Description -->
+      <div class="bg-card rounded-2xl shadow-card border border-border p-6">
+        <label
+          class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1 block mb-3"
+        >
+          Votre message <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          formControlName="description"
+          rows="6"
+          placeholder="Décrivez votre demande ou question en détail..."
+          class="w-full p-4 bg-white border border-border rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm resize-none"
+          [class.border-red-300]="contactForm.get('description')?.touched && contactForm.get('description')?.invalid"
+        ></textarea>
+        <div class="flex justify-between items-center mt-2 px-1">
+          <div>
+            <p
+              *ngIf="contactForm.get('description')?.touched && contactForm.get('description')?.errors?.['required']"
+              class="text-red-500 text-xs"
+            >
+              Le message est requis
+            </p>
+            <p
+              *ngIf="contactForm.get('description')?.touched && contactForm.get('description')?.errors?.['minlength']"
+              class="text-red-500 text-xs"
+            >
+              Minimum 10 caractères
+            </p>
+          </div>
+          <p
+            class="text-xs text-gray-400"
+            [class.text-red-500]="descriptionLength > MAX_DESCRIPTION_LENGTH"
+          >
+            {{ descriptionLength }} / {{ MAX_DESCRIPTION_LENGTH }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Privacy Consent Checkbox -->
+      <div>
+        <label class="flex items-start gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            formControlName="acceptPrivacy"
+            class="mt-0.5 w-5 h-5 rounded border-border text-primary focus:ring-primary/20 cursor-pointer accent-primary"
+          />
+          <span class="text-sm text-secondary">
+            J'accepte que mes données soient utilisées pour traiter ma demande conformément à la
+            <a
+              routerLink="/legal/privacy-policy"
+              class="text-primary hover:underline cursor-pointer"
+              (click)="$event.stopPropagation()"
+            >
+              politique de confidentialité
+            </a>.
+          </span>
+        </label>
+        <p
+          *ngIf="contactForm.get('acceptPrivacy')?.touched && contactForm.get('acceptPrivacy')?.errors?.['required']"
+          class="text-red-500 text-xs mt-2 pl-8"
+        >
+          Vous devez accepter la politique de confidentialité
+        </p>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        [disabled]="contactForm.invalid || submitting"
+        (click)="onSubmit()"
+        class="w-full py-4 bg-primary text-white rounded-xl font-semibold shadow-md hover:bg-primary-hover hover:shadow-lg transform active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+      >
+        <i *ngIf="submitting" class="pi pi-spin pi-spinner"></i>
+        <span *ngIf="submitting">Envoi en cours...</span>
+        <span *ngIf="!submitting">Envoyer mon message</span>
+      </button>
+    </form>
+
+  </div>
+</div>
+
+<app-footer></app-footer>

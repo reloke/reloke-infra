@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+.card {
+  @apply bg-white rounded-2xl shadow-sm;
+}
+
+// Primary dark variant for hover
+.hover\:bg-primary-dark:hover {
+  background-color: #1a365d;
+}

@@ -1,0 +1,84 @@
+<div class="max-w-4xl mx-auto animate-fade-in-up p-4 md:p-8">
+
+    <div class="mb-8">
+        <h1 class="text-3xl font-heading font-bold text-main mb-2">Lancer la recherche</h1>
+        <p class="text-secondary">Configurez votre recherche pour trouver le logement idéal.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8">
+
+        <!-- Configuration Form -->
+        <div class="bg-bg-card p-8 rounded-3xl shadow-card border border-border">
+            <h2 class="text-xl font-bold text-main mb-6">Paramètres</h2>
+
+            <div class="space-y-6">
+
+                <!-- Duration -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-secondary uppercase tracking-wider">Durée de la
+                        recherche (jours)</label>
+                    <div class="relative">
+                        <input type="number" [(ngModel)]="duration" min="1"
+                            class="w-full p-4 bg-bg-main border border-border rounded-xl text-main focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-bold text-lg">
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-secondary font-medium">Jours
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matches -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-secondary uppercase tracking-wider">Nombre de matchs
+                        souhaités</label>
+                    <div class="relative">
+                        <input type="number" [(ngModel)]="matches" min="1" (ngModelChange)="updatePrice()"
+                            class="w-full p-4 bg-bg-main border border-border rounded-xl text-main focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-bold text-lg">
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-secondary font-medium">Matchs
+                        </div>
+                    </div>
+                    <p class="text-xs text-secondary mt-1">5€ par match supplémentaire.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Summary & Payment -->
+        <div class="bg-white p-8 rounded-3xl shadow-card border border-border h-fit sticky top-6">
+            <h2 class="text-xl font-bold text-main mb-6 border-b border-border pb-4">Récapitulatif</h2>
+
+            <div class="space-y-4 mb-6">
+                <div class="flex justify-between items-center">
+                    <span class="text-secondary">Durée</span>
+                    <span class="font-bold text-main">{{ duration }} jours</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-secondary">Matchs ({{ matches }} x 5€)</span>
+                    <span class="font-bold text-main">{{ matches * 5 }}€</span>
+                </div>
+                <div
+                    class="border-t border-border pt-4 flex justify-between items-center text-2xl font-bold text-primary">
+                    <span>Total</span>
+                    <span>{{ totalPrice }}€</span>
+                </div>
+            </div>
+
+            <!-- PayPal Button -->
+            <button (click)="payWithPayPal()" [disabled]="isLoading || totalPrice <= 0"
+                class="w-full py-4 bg-[#FFC439] hover:bg-[#F4BB29] text-black font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
+                <span *ngIf="isLoading" class="pi pi-spin pi-spinner"></span>
+                <i *ngIf="!isLoading" class="pi pi-paypal text-xl"></i>
+                {{ isLoading ? 'Traitement...' : 'Payer avec PayPal' }}
+            </button>
+
+            <p class="text-xs text-center text-secondary mt-4">
+                Paiement sécurisé. En cliquant, vous acceptez nos CGV.
+            </p>
+
+            <div *ngIf="message" class="mt-4 p-3 rounded-xl text-center text-sm font-medium"
+                [ngClass]="message.includes('réussi') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'">
+                {{ message }}
+            </div>
+
+        </div>
+
+    </div>
+</div>

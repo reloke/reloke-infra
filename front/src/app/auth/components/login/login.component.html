@@ -1,0 +1,371 @@
+<div class="min-h-screen flex bg-bg-main font-body">
+    <!-- Left Side: Visual (Hidden on mobile) -->
+    <div class="hidden lg:flex lg:w-1/2 bg-primary relative items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary to-primary-hover opacity-90 z-10"></div>
+        <img src="assets/images/design_ref_1.png" alt="Interior"
+            class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-50">
+
+        <!-- Animated Circles -->
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse delay-700">
+        </div>
+
+        <div class="relative z-20 text-center p-12 text-white max-w-lg flex flex-col items-center">
+            <div
+                class="mb-4 inline-block p-6 rounded-2xl group cursor-pointer transition-transform hover:scale-105 duration-300">
+                <img src="assets/images/logo/golden-reloke-logo.svg" alt="Reloke Key"
+                    class="h-32 w-auto  drop-shadow-lg transition-transform duration-700 ease-in-out group-hover:rotate-[360deg]">
+            </div>
+            <h1 class="text-6xl font-heading font-bold mb-6 font-canva">{{ common.appName }}</h1>
+            <p class="text-xl text-white/90 leading-relaxed">
+                {{ lang.auth.login.heroSubtitle }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Right Side: Form -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-10 bg-white relative overflow-y-auto">
+        <a routerLink="/"
+            class="absolute top-6 right-6 text-secondary hover:text-primary transition-colors flex items-center gap-2 group z-50">
+            <span class="text-sm font-medium">{{ lang.common.backToHome }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+        </a>
+
+        <div class="max-w-md w-full animate-fade-in-up">
+            <div class="text-center lg:text-left mb-6 mt-6 ">
+                <h2 class="text-2xl font-heading font-bold text-main mb-2">{{ lang.auth.login.title }}</h2>
+                <p class="text-secondary text-sm">{{ lang.auth.login.subtitle }}</p>
+            </div>
+
+            <!-- Login Form -->
+            <form *ngIf="!show2FA" [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+
+                <!-- Error Message -->
+                <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage" [dismissible]="true"
+                    (closed)="errorMessage = ''"></app-alert>
+
+                <!-- Email -->
+                <div class="space-y-2">
+                    <label for="email" class="text-xs font-semibold uppercase tracking-wider text-gray-500 pl-1">{{
+                        lang.auth.login.emailLabel }}</label>
+                    <div class="relative group">
+                        <div
+                            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <input type="email" id="email" formControlName="email" class="form-control pl-11"
+                            [placeholder]="lang.auth.login.emailPlaceholder"
+                            [ngClass]="{'border-primary shadow-sm shadow-primary/10': isGoogleUserDetected}">
+                    </div>
+                    <div *ngIf="isGoogleUserDetected"
+                        class="text-primary text-[10px] font-bold pl-1 animate-fade-in flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 48 48">
+                            <path fill="#4CAF50"
+                                d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4c11.045,0,20,8.955,20,20z" />
+                            <path fill="#fff"
+                                d="M34.586,14.586l-13.586,13.586l-5.586-5.586l-2.828,2.828l8.414,8.414l16.414-16.414z" />
+                        </svg>
+                        Compte lié à Google détecté
+                    </div>
+                    <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+                        class="text-red-500 text-xs pl-1">
+                        {{ lang.auth.login.emailRequired }}
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label for="password"
+                            class="text-xs font-semibold uppercase tracking-wider text-gray-500 pl-1">{{
+                            lang.auth.login.passwordLabel }}</label>
+                        <a routerLink="/auth/forgot-password"
+                            class="text-xs text-primary hover:text-primary-hover font-medium cursor-pointer">{{
+                            lang.auth.login.forgotPassword }}</a>
+                    </div>
+                    <div class="relative group">
+                        <div
+                            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"
+                            class="form-control pl-11 pr-10" [placeholder]="lang.auth.login.passwordPlaceholder">
+                        <button type="button" (click)="showPassword = !showPassword"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary focus:outline-none">
+                            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                        class="text-red-500 text-xs pl-1">
+                        {{ lang.auth.login.passwordRequired }}
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" [disabled]="loginForm.invalid || isLoading"
+                    class="btn btn-primary w-full py-3 text-base shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300"
+                    [ngClass]="{'bg-green-600 hover:bg-green-700': isCaptchaSuccess}">
+
+                    <!-- IDLE State -->
+                    <span *ngIf="!isLoading && !isCaptchaSuccess">{{ lang.auth.login.submitButton }}</span>
+
+                    <!-- LOADING State (Captcha or Login) -->
+                    <span *ngIf="isLoading && !isCaptchaSuccess" class="flex items-center justify-center">
+                        <app-loading size="sm" [white]="true" class="mr-3"></app-loading>
+                        <span *ngIf="isCaptchaLoading">Vérification du Captcha en cours...</span>
+                        <span *ngIf="!isCaptchaLoading">{{ lang.auth.login.submitButtonLoading }}</span>
+                    </span>
+
+                    <!-- SUCCESS State -->
+                    <span *ngIf="isCaptchaSuccess" class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Captcha Validé
+                    </span>
+                </button>
+
+                <!-- Divider -->
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-white text-gray-500">ou</span>
+                    </div>
+                </div>
+
+                <!-- Google Sign-In Button -->
+                <button type="button" (click)="signInWithGoogle()"
+                    class="w-full flex items-center justify-center gap-3 py-3 px-4 border rounded-xl bg-white hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md group relative overflow-hidden"
+                    [ngClass]="{
+                        'border-primary ring-4 ring-primary/10 scale-[1.02]': isGoogleUserDetected || showGoogleHint,
+                        'border-gray-300': !isGoogleUserDetected && !showGoogleHint
+                    }">
+                    <!-- Pulse effect if detected -->
+                    <div *ngIf="isGoogleUserDetected || showGoogleHint"
+                        class="absolute inset-0 bg-primary/5 animate-pulse"></div>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-5 h-5 relative z-10">
+                        <path fill="#FFC107"
+                            d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
+                        <path fill="#FF3D00"
+                            d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
+                        <path fill="#4CAF50"
+                            d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
+                        <path fill="#1976D2"
+                            d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
+                    </svg>
+                    <span class="font-bold text-gray-700 group-hover:text-gray-900 relative z-10">
+                        {{ isGoogleUserDetected ? 'Se connecter avec Google' : (isNewUserDetected ? 'S\'inscrire avec
+                        Google' : 'Continuer avec Google') }}
+                    </span>
+                </button>
+
+                <!-- Register Link -->
+                <div class="text-center mt-8 pt-8 border-t border-gray-100">
+                    <p class="text-secondary text-sm">
+                        {{ lang.auth.login.noAccount }}
+                        <a routerLink="/auth/register"
+                            class="text-primary font-bold hover:text-primary-hover transition-colors">
+                            {{ lang.auth.login.createAccount }}
+                        </a>
+                    </p>
+                </div>
+            </form>
+
+            <!-- 2FA Verification View -->
+            <div *ngIf="show2FA" class="space-y-8 animate-fade-in-up">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-heading font-bold text-main mb-2">Vérification de sécurité</h2>
+                    <p class="text-secondary max-w-sm mx-auto">
+                        Un code de vérification a été envoyé à <br>
+                        <span class="font-bold text-main">{{ displayEmail }}</span>
+                    </p>
+                </div>
+
+                <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage" [dismissible]="true"
+                    (closed)="errorMessage = ''"></app-alert>
+
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 pl-1">Code à 6
+                            chiffres</label>
+                        <input type="text" [(ngModel)]="otpCode" maxlength="6"
+                            class="form-control text-center text-2xl tracking-[1em] font-mono py-4" placeholder="000000"
+                            (keyup.enter)="verify2FACode()">
+                    </div>
+
+                    <button (click)="verify2FACode()" [disabled]="otpCode.length !== 6 || isLoading"
+                        class="btn btn-primary w-full py-4 text-lg shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300">
+                        <span *ngIf="!isLoading">Vérifier et se connecter</span>
+                        <app-loading *ngIf="isLoading" size="sm" [white]="true"></app-loading>
+                    </button>
+
+                    <button (click)="cancel2FA()"
+                        class="w-full text-center text-sm font-medium text-secondary hover:text-primary transition-colors">
+                        Retour à la connexion
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restore Account Modal -->
+    <div *ngIf="isRestoreModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4 border-t-4 border-primary animate-scale-in">
+            <h3 class="text-2xl font-bold mb-4 font-merriweather text-gray-900">Compte en cours de suppression</h3>
+
+            <div class="bg-blue-50 p-4 rounded-lg mb-6 text-blue-800 border border-blue-100">
+                <p class="mb-2">Votre compte est actuellement programmé pour suppression.</p>
+                <p>Souhaitez-vous annuler la procédure et réactiver votre compte immédiatement ?</p>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+                <button (click)="closeRestoreModal()"
+                    class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg font-medium">
+                    Non, laisser supprimer
+                </button>
+                <button (click)="confirmRestore()"
+                    class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-bold shadow-lg shadow-primary/20">
+                    Oui, réactiver mon compte
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Deletion Modal (Post-login) -->
+    <div *ngIf="showDeletionLoginModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+        <div
+            class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg mx-4 border-t-8 border-orange-500 animate-scale-in">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600">
+                    <i class="pi pi-exclamation-triangle text-3xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold font-heading text-gray-900">Suppression programmée</h3>
+                    <p class="text-secondary text-sm">Le processus est déjà en cours.</p>
+                </div>
+            </div>
+
+            <div class="bg-orange-50 p-6 rounded-2xl mb-8 border border-orange-100 text-orange-900 leading-relaxed">
+                Votre compte est programmé pour une anonymisation définitive.
+                Voulez-vous <span class="font-bold">réinitialiser</span> la procédure pour retrouver un accès complet,
+                ou continuer en <span class="font-bold">Accès Restreint</span> ?
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button (click)="confirmRestoreAccount()" [disabled]="isLoading"
+                    class="w-full py-4 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all flex items-center justify-center gap-2">
+                    <app-loading *ngIf="isLoading" size="sm" [white]="true"></app-loading>
+                    Réinitialiser la procédure (Accès complet)
+                </button>
+                <button (click)="continueWithRestrictedAccess()"
+                    class="w-full py-4 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-all">
+                    Continuer en Accès Restreint
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CGU Confirmation Modal -->
+    <div *ngIf="showCguModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-hidden animate-fade-in">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-main/60 backdrop-blur-md transition-opacity" (click)="cancelCgu()"></div>
+
+        <!-- Modal Content -->
+        <div
+            class="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-scale-in border border-gray-100">
+            <!-- Header -->
+            <div class="px-8 pt-8 pb-4 text-center">
+                <div
+                    class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-primary animate-bounce-subtle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-main font-heading mb-2">Acceptation des conditions</h3>
+                <p class="text-secondary">Pour continuer avec votre compte Google, veuillez confirmer votre accord avec
+                    nos conditions d'utilisation.</p>
+            </div>
+
+            <!-- Body -->
+            <div class="px-8 py-6">
+                <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 transition-all"
+                    [ngClass]="{'bg-primary/5 border-primary/20': hasAcceptedCgu}">
+                    <div class="flex items-start gap-4 cursor-pointer" (click)="hasAcceptedCgu = !hasAcceptedCgu">
+                        <div class="flex-shrink-0 pt-1">
+                            <div class="w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center"
+                                [ngClass]="{
+                                    'bg-primary border-primary shadow-sm shadow-primary/30': hasAcceptedCgu,
+                                    'bg-white border-gray-300': !hasAcceptedCgu
+                                }">
+                                <svg *ngIf="hasAcceptedCgu" xmlns="http://www.w3.org/2000/svg"
+                                    class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 leading-relaxed select-none">
+                            J'ai lu et j'accepte les
+                            <a routerLink="/legal/cgu" target="_blank"
+                                (click)="$event.stopPropagation(); hasViewedCgu = true"
+                                class="text-primary font-bold hover:underline">Conditions Générales d'Utilisation
+                                (CGU)</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-8 pb-8 pt-2 flex flex-col sm:flex-row gap-3">
+                <button type="button" (click)="cancelCgu()"
+                    class="w-full sm:w-1/3 py-4 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-50 transition-colors">
+                    Annuler
+                </button>
+                <button type="button" (click)="confirmCguAndGoogle()" [disabled]="!hasAcceptedCgu || !hasViewedCgu"
+                    class="w-full sm:w-2/3 py-4 bg-primary text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/20 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed hover:shadow-primary/40"
+                    [ngClass]="{'hover:-translate-y-0.5': hasAcceptedCgu && hasViewedCgu}">
+                    Accepter et continuer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

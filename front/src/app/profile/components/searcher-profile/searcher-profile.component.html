@@ -1,0 +1,509 @@
+<div class="min-h-screen bg-bg-main flex items-center justify-center p-4 sm:p-6 font-body">
+
+  <!-- Main Card -->
+  <div
+    class="w-full max-w-2xl bg-bg-card rounded-3xl shadow-card border border-border overflow-visible transition-all duration-500 ease-in-out relative">
+
+    <!-- Loading Overlay -->
+    <div *ngIf="isLoading" class="absolute inset-0 bg-white/80 flex items-center justify-center z-50 rounded-3xl">
+      <div class="flex flex-col items-center gap-3">
+        <app-loading size="lg"></app-loading>
+        <span class="text-secondary text-sm">Chargement...</span>
+      </div>
+    </div>
+
+    <!-- Header with Steps -->
+    <div class="bg-white/50 px-8 py-6 border-b border-border rounded-t-3xl">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl text-main font-heading font-bold tracking-tight">
+          {{ currentStep === 3 ? 'Recherche enregistrée' : 'Vos critères de recherche' }}
+        </h1>
+        <button *ngIf="currentStep !== 3" (click)="openCancelModal()"
+          class="text-gray-400 hover:text-gray-600 transition-colors p-2">
+          <i class="pi pi-times text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Progress Steps -->
+      <div *ngIf="currentStep !== 3" class="flex items-center gap-2">
+        <ng-container *ngFor="let step of steps; let i = index">
+          <div class="flex items-center gap-2">
+            <!-- Step Circle -->
+            <div [ngClass]="{
+                   'bg-primary text-white': currentStep >= step.number,
+                   'bg-gray-200 text-gray-400': currentStep < step.number
+                 }"
+              class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all cursor-pointer"
+              (click)="goToStep(step.number)">
+              <span *ngIf="currentStep <= step.number">{{ step.number }}</span>
+              <i *ngIf="currentStep > step.number" class="pi pi-check text-xs"></i>
+            </div>
+            <!-- Step Label -->
+            <span [ngClass]="{
+                    'text-primary font-medium': currentStep === step.number,
+                    'text-gray-400': currentStep !== step.number
+                  }" class="text-xs hidden sm:inline">
+              {{ step.label }}
+            </span>
+          </div>
+          <!-- Connector -->
+          <div *ngIf="i < steps.length - 1"
+            [ngClass]="{'bg-primary': currentStep > step.number, 'bg-gray-200': currentStep <= step.number}"
+            class="flex-1 h-0.5 mx-2 transition-all"></div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="p-8 relative">
+
+      <!-- ==================== STEP 1: Zones & Période ==================== -->
+      <ng-container *ngIf="currentStep === 1">
+        <form [formGroup]="searchForm" class="space-y-6">
+
+          <!-- Section: Zones géographiques -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-main uppercase tracking-wider">
+                <i class="pi pi-map-marker mr-2 text-primary"></i>
+                Zones de recherche
+              </h3>
+              <span [ngClass]="{'text-red-500': zones.length === 0, 'text-green-600': zones.length > 0}"
+                class="text-xs font-medium">
+                {{ zonesHelperText }}
+              </span>
+            </div>
+
+            <!-- Zone Input with Custom Autocomplete Dropdown -->
+            <div class="zone-autocomplete-container">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 z-10">
+                <i class="pi pi-search text-lg"></i>
+              </div>
+              <input type="text" #zoneInput [disabled]="!canAddMoreZones" (keydown)="onKeyDown($event)"
+                placeholder="Ville, quartier, région..." autocomplete="off"
+                class="w-full pl-11 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+
+              <!-- Loading indicator -->
+              <div *ngIf="isLoadingPredictions"
+                class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                <i class="pi pi-spin pi-spinner text-primary"></i>
+              </div>
+
+              <!-- Custom Predictions Dropdown -->
+              <div *ngIf="showPredictions && predictions.length > 0" class="zone-predictions-dropdown">
+                <ul class="py-2">
+                  <li *ngFor="let prediction of predictions; let i = index; trackBy: trackByPredictionId"
+                    (mousedown)="selectPrediction(prediction)"
+                    [class.zone-prediction-item--selected]="selectedPredictionIndex === i" class="zone-prediction-item">
+                    <div class="zone-prediction-icon">
+                      <i class="pi pi-map-marker"></i>
+                    </div>
+                    <div class="zone-prediction-content">
+                      <div class="zone-prediction-main">{{ prediction.mainText }}</div>
+                      <div class="zone-prediction-secondary">{{ prediction.secondaryText }}</div>
+                    </div>
+                  </li>
+                </ul>
+                <!-- Attribution Google (obligatoire) -->
+                <div class="zone-google-attribution">
+                  <img src="https://developers.google.com/maps/documentation/images/powered_by_google_on_white.png"
+                    alt="Powered by Google" class="h-4">
+                </div>
+              </div>
+            </div>
+
+            <!-- Zone Chips -->
+            <div *ngIf="zones.length > 0" class="flex flex-wrap gap-2">
+              <div *ngFor="let zone of zones; let i = index"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium group hover:bg-primary/20 transition-colors">
+                <i class="pi pi-map-marker text-xs"></i>
+                <span class="max-w-[200px] truncate">{{ zone.label }}</span>
+                <span class="text-xs opacity-70">({{ formatRadius(zone.radius) }})</span>
+                <button type="button" (click)="removeZone(i)"
+                  class="ml-1 w-5 h-5 flex items-center justify-center rounded-full bg-primary/20 hover:bg-red-500 hover:text-white transition-colors">
+                  <i class="pi pi-times text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <p *ngIf="getFieldError('zones')" class="text-red-500 text-xs pl-1">
+              {{ getFieldError('zones') }}
+            </p>
+          </div>
+
+          <!-- Section: Temporalité -->
+          <div class="space-y-4 pt-4 border-t border-gray-100">
+            <h3 class="text-sm font-bold text-main uppercase tracking-wider">
+              <i class="pi pi-calendar mr-2 text-primary"></i>
+              Période de recherche
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Start Date -->
+              <div class="space-y-2">
+                <label class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1">
+                  À partir de quand ? <span class="text-red-500">*</span>
+                </label>
+                <div class="relative date-picker-wrapper">
+                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary z-10">
+                    <i class="pi pi-calendar text-lg"></i>
+                  </div>
+                  <p-calendar formControlName="searchStartDate" [locale]="frLocale" [minDate]="minDateObj"
+                    [showIcon]="true" [iconDisplay]="'input'" [touchUI]="false" dateFormat="dd/mm/yy"
+                    placeholder="Sélectionner une date" [readonlyInput]="true" appendTo="body"
+                    styleClass="custom-calendar"
+                    inputStyleClass="w-full pl-11 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm cursor-pointer">
+                  </p-calendar>
+                </div>
+                <p *ngIf="getFieldError('searchStartDate')" class="text-red-500 text-xs pl-1">
+                  {{ getFieldError('searchStartDate') }}
+                </p>
+              </div>
+
+              <!-- End Date -->
+              <div class="space-y-2">
+                <label class="text-xs font-semibold uppercase tracking-wider text-gray-400 pl-1">
+                  Jusqu'à quand ? <span class="text-red-500">*</span>
+                </label>
+                <div class="relative date-picker-wrapper date-picker-end">
+                  <div
+                    class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-orange-500 z-10">
+                    <i class="pi pi-calendar-times text-lg"></i>
+                  </div>
+                  <p-calendar formControlName="searchEndDate" [locale]="frLocale"
+                    [minDate]="searchForm.get('searchStartDate')?.value || minDateObj" [showIcon]="true"
+                    [iconDisplay]="'input'" [touchUI]="false" dateFormat="dd/mm/yy" placeholder="Sélectionner une date"
+                    [readonlyInput]="true" appendTo="body" styleClass="custom-calendar custom-calendar-end"
+                    inputStyleClass="w-full pl-11 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm cursor-pointer">
+                  </p-calendar>
+                </div>
+                <p *ngIf="getFieldError('searchEndDate')" class="text-red-500 text-xs pl-1">
+                  {{ getFieldError('searchEndDate') }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Helper Text -->
+            <div class="bg-blue-50 rounded-xl p-4 text-sm text-blue-700">
+              <i class="pi pi-info-circle mr-2"></i>
+              Cette période correspond à la fenêtre pendant laquelle vous cherchez un nouveau logement. La recherche
+              restera active jusqu'à la date de fin indiquée.
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-6 flex gap-4">
+            <button type="button" (click)="openCancelModal()"
+              class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-xl font-semibold hover:bg-gray-200 transition-all">
+              Annuler
+            </button>
+            <button type="button" (click)="nextStep()" [disabled]="isLoading"
+              class="flex-1 py-4 bg-primary text-white rounded-xl font-semibold shadow-md hover:bg-primary-hover hover:shadow-lg transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+              <app-loading *ngIf="isLoading" size="sm" [white]="true"></app-loading>
+              Suivant
+              <i class="pi pi-arrow-right"></i>
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <!-- ==================== STEP 2: Critères ==================== -->
+      <ng-container *ngIf="currentStep === 2">
+        <div class="space-y-6" [formGroup]="searchForm">
+
+          <!-- Budget -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold text-main uppercase tracking-wider">
+              <i class="pi pi-euro mr-2 text-primary"></i>
+              Budget mensuel
+            </h3>
+            <div class="flex items-center gap-4">
+              <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  Min
+                </div>
+                <input type="number" formControlName="minRent" placeholder="Ex: 700"
+                  class="w-full pl-12 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
+              </div>
+              <span class="text-secondary">-</span>
+              <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  Max <span class="text-red-500">*</span>
+                </div>
+                <input type="number" formControlName="maxRent" placeholder="Ex: 1000"
+                  class="w-full pl-14 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
+              </div>
+            </div>
+            <p *ngIf="getFieldError('minRent') || getFieldError('maxRent')" class="text-red-500 text-xs pl-1">
+              {{ getFieldError('minRent') || getFieldError('maxRent') }}
+            </p>
+            <p class="text-xs text-gray-400 pl-1">
+              Le budget maximal est utilisé comme filtre principal.
+            </p>
+          </div>
+
+          <!-- Surface -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold text-main uppercase tracking-wider">
+              <i class="pi pi-arrows-alt mr-2 text-primary"></i>
+              Surface (m2)
+            </h3>
+            <div class="flex items-center gap-4">
+              <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  Min
+                </div>
+                <input type="number" formControlName="minRoomSurface" placeholder="Ex: 25"
+                  class="w-full pl-12 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
+              </div>
+              <span class="text-secondary">-</span>
+              <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  Max
+                </div>
+                <input type="number" formControlName="maxRoomSurface" placeholder="Ex: 60"
+                  class="w-full pl-12 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
+              </div>
+            </div>
+            <p *ngIf="getFieldError('minRoomSurface') || getFieldError('maxRoomSurface')"
+              class="text-red-500 text-xs pl-1">
+              {{ getFieldError('minRoomSurface') || getFieldError('maxRoomSurface') }}
+            </p>
+            <p class="text-xs text-gray-400 pl-1">
+              Indiquez une fourchette de surface si vous avez une préférence.
+            </p>
+          </div>
+
+          <!-- Rooms -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold text-main uppercase tracking-wider">
+              <i class="pi pi-th-large mr-2 text-primary"></i>
+              Nombre de pièces
+            </h3>
+            <div class="flex items-center gap-4">
+              <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  Min
+                </div>
+                <input type="number" formControlName="minRoomNb" placeholder="Ex: 2" min="1"
+                  class="w-full pl-12 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
+              </div>
+              <span class="text-secondary">-</span>
+              <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  Max
+                </div>
+                <input type="number" formControlName="maxRoomNb" placeholder="Ex: 4" min="1"
+                  class="w-full pl-12 pr-4 py-4 bg-white border border-border-light rounded-xl text-main placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
+              </div>
+            </div>
+            <p *ngIf="getFieldError('minRoomNb') || getFieldError('maxRoomNb')" class="text-red-500 text-xs pl-1">
+              {{ getFieldError('minRoomNb') || getFieldError('maxRoomNb') }}
+            </p>
+            <p class="text-xs text-gray-400 pl-1">
+              Incluez la pièce de vie dans le calcul.
+            </p>
+          </div>
+
+          <!-- Housing Types -->
+          <div class="space-y-4 pt-4 border-t border-gray-100">
+            <h3 class="text-sm font-bold text-main uppercase tracking-wider">
+              <i class="pi pi-home mr-2 text-primary"></i>
+              Types de logement
+            </h3>
+            <p class="text-xs text-gray-400">
+              Sélectionnez un ou plusieurs types de logement (optionnel).
+            </p>
+
+            <!-- Housing Type Grid -->
+            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+              <button type="button" *ngFor="let option of homeTypeOptions" (click)="toggleHomeType(option.value)"
+                [ngClass]="{
+                        'bg-primary text-white border-primary': isHomeTypeSelected(option.value),
+                        'bg-white text-gray-700 border-gray-200 hover:border-primary hover:text-primary': !isHomeTypeSelected(option.value)
+                      }"
+                class="relative px-3 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200 flex flex-col items-center gap-1">
+                <span>{{ option.label }}</span>
+                <span class="absolute top-2 right-2">
+                  <span class="relative group cursor-help" (click)="$event.stopPropagation()">
+                    <i class="pi pi-info-circle text-xs opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                    <span
+                      class="pointer-events-none absolute bottom-full right-0 mb-2 w-56 rounded-lg bg-white px-2 py-1 text-xs text-gray-900 opacity-0 shadow-xl ring-1 ring-black/5 transition-opacity group-hover:opacity-100 text-center whitespace-normal z-50">
+                      {{ option.description }}
+                    </span>
+                  </span>
+                </span>
+              </button>
+            </div>
+
+            <p class="text-xs text-gray-500 italic pl-1">
+              {{ getSelectedHomeTypesLabels() }}
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-6 flex gap-4">
+            <button type="button" (click)="previousStep()"
+              class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2">
+              <i class="pi pi-arrow-left"></i>
+              Retour
+            </button>
+            <button type="button" (click)="nextStep()" [disabled]="isLoading"
+              class="flex-1 py-4 bg-primary text-white rounded-xl font-semibold shadow-md hover:bg-primary-hover hover:shadow-lg transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+              <app-loading *ngIf="isLoading" size="sm" [white]="true"></app-loading>
+              Enregistrer
+              <i class="pi pi-check"></i>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ==================== STEP 3: Récapitulatif ==================== -->
+      <ng-container *ngIf="currentStep === 3">
+        <div class="flex flex-col items-center justify-center text-center animate-fade-in">
+
+          <!-- Success Message -->
+          <div *ngIf="showSuccessMessage" class="mb-6">
+            <div
+              class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 text-green-600 mx-auto">
+              <i class="pi pi-check-circle text-4xl"></i>
+            </div>
+            <h2 class="text-2xl text-main font-bold mb-2">Recherche enregistrée avec succès !</h2>
+            <p class="text-secondary mb-4 max-w-md">
+              Vous pouvez maintenant recevoir des propositions correspondant à vos critères.
+            </p>
+          </div>
+
+          <!-- Summary Card -->
+          <div class="w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-left">
+
+            <!-- Header Summary -->
+            <div class="p-5 bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100">
+              <p class="text-sm text-gray-600">
+                Vous cherchez à <strong class="text-primary">{{ getZonesSummary() }}</strong>,
+                <span *ngIf="getSelectedHomeTypesLabels() !== 'Tous types'">
+                  un <strong class="text-primary">{{ getSelectedHomeTypesLabels() }}</strong>,
+                </span>
+                max <strong class="text-primary">{{ searchForm.get('maxRent')?.value || '?' }} EUR</strong>,
+                à partir du <strong class="text-primary">{{ formatDate(searchForm.get('searchStartDate')?.value)
+                  }}</strong>.
+              </p>
+            </div>
+
+            <!-- Zones Summary -->
+            <div class="p-5 border-b border-gray-100">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i class="pi pi-map-marker text-primary"></i>
+                </div>
+                <div class="flex-1">
+                  <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Zones de recherche</span>
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    <span *ngFor="let zone of zones"
+                      class="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                      <i class="pi pi-map-marker text-xs text-primary"></i>
+                      {{ zone.label }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Period Summary -->
+            <div class="p-5 border-b border-gray-100">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i class="pi pi-calendar text-orange-500"></i>
+                </div>
+                <div>
+                  <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Période de recherche</span>
+                  <p class="text-main font-medium mt-1">{{ getPeriodSummary() }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Criteria Grid -->
+            <div class="grid grid-cols-3 divide-x divide-gray-100 border-b border-gray-100">
+              <div class="p-4 text-center">
+                <div class="flex items-center justify-center gap-2 text-gray-600 mb-1">
+                  <i class="pi pi-euro text-primary"></i>
+                </div>
+                <span class="text-lg font-semibold text-main block">{{ getBudgetSummary() }}</span>
+                <span class="text-xs text-gray-500">Budget</span>
+              </div>
+              <div class="p-4 text-center">
+                <div class="flex items-center justify-center gap-2 text-gray-600 mb-1">
+                  <i class="pi pi-arrows-alt text-primary"></i>
+                </div>
+                <span class="text-lg font-semibold text-main block">{{ getSurfaceSummary() }}</span>
+                <span class="text-xs text-gray-500">Surface</span>
+              </div>
+              <div class="p-4 text-center">
+                <div class="flex items-center justify-center gap-2 text-gray-600 mb-1">
+                  <i class="pi pi-th-large text-primary"></i>
+                </div>
+                <span class="text-lg font-semibold text-main block">{{ getRoomsSummary() }}</span>
+                <span class="text-xs text-gray-500">Pièces</span>
+              </div>
+            </div>
+
+            <!-- Housing Types Summary -->
+            <div class="p-5">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i class="pi pi-home text-blue-500"></i>
+                </div>
+                <div>
+                  <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Types de logement</span>
+                  <p class="text-main font-medium mt-1">{{ getSelectedHomeTypesLabels() }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 w-full mt-6">
+            <button type="button" (click)="modifyProfile()"
+              class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2">
+              <i class="pi pi-pencil"></i>
+              Modifier
+            </button>
+            <button type="button" (click)="goToDashboard()"
+              class="flex-1 py-4 bg-primary text-white rounded-xl font-semibold shadow-md hover:bg-primary-hover hover:shadow-lg transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2">
+              Voir le tableau de bord
+              <i class="pi pi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+
+  <!-- Cancel Modal -->
+  <div *ngIf="showCancelModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
+    style="z-index: 100;" (click)="closeCancelModal()">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl" (click)="$event.stopPropagation()">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="pi pi-exclamation-triangle text-3xl text-orange-500"></i>
+        </div>
+        <h3 class="text-xl font-bold text-main mb-2">Abandonner les modifications ?</h3>
+        <p class="text-secondary">
+          Les informations non sauvegardées seront perdues.
+        </p>
+      </div>
+      <div class="flex gap-3">
+        <button type="button" (click)="closeCancelModal()"
+          class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-semibold hover:bg-gray-200 transition-all">
+          Continuer l'édition
+        </button>
+        <button type="button" (click)="confirmCancel()"
+          class="flex-1 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 transition-all">
+          Abandonner
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

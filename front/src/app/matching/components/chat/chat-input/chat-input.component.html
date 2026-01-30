@@ -1,0 +1,444 @@
+<div class="p-4 bg-white border-t border-gray-200 sticky bottom-0" style="z-index: 10;" *ngIf="activeConversation">
+    <!-- Read Only Banner -->
+    <div *ngIf="activeConversation.status === 'READ_ONLY'"
+        class="mb-3 p-3 bg-orange-50 border border-orange-100 rounded-xl flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 15v2m0 0v2m0-2h2m-2 0H10m11 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span class="text-xs text-orange-700 font-medium">Cette conversation est en lecture seule. Vous êtes
+            sorti du flux.</span>
+    </div>
+
+    <!-- Mentions Dropdown -->
+    <div *ngIf="showMentionDropdown"
+        class="absolute bottom-full left-4 bg-white border border-gray-200 rounded-xl shadow-2xl mb-2 w-64 overflow-hidden z-[100] animate-slide-up">
+        <div class="p-2 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Membres du groupe</span>
+        </div>
+        <div class="max-h-48 overflow-y-auto">
+            <div *ngFor="let user of filteredParticipants" (click)="selectMention(user)"
+                class="px-4 py-3 hover:bg-primary/5 cursor-pointer flex items-center gap-3 transition-colors group">
+                <div
+                    class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold group-hover:bg-primary group-hover:text-white transition-colors">
+                    {{ user.firstName[0] }}{{ user.lastName[0] }}
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-main">{{ user.firstName }} {{ user.lastName }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reply Preview -->
+    <div *ngIf="replyingMessage"
+        class="mb-2 p-3 bg-gray-50 border-l-4 border-primary rounded-r-xl flex items-center gap-3 animate-slide-up">
+        <div class="flex-1 min-w-0">
+            <p class="text-[10px] font-bold text-primary uppercase">{{ replyingMessage.sender.firstName }}</p>
+            <p class="text-xs text-secondary truncate italic">{{ replyingMessage.content }}</p>
+        </div>
+        <button (click)="cancelReply.emit()" class="text-gray-400 hover:text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Edit Indicator -->
+    <div *ngIf="editingMessage"
+        class="mb-2 p-3 bg-primary/5 border-l-4 border-primary rounded-r-xl flex items-center gap-3 animate-slide-up">
+        <div class="flex-1 min-w-0">
+            <p class="text-[10px] font-bold text-primary uppercase tracking-wider">Modification du message</p>
+            <p class="text-xs text-secondary truncate">{{ editingMessage.content }}</p>
+        </div>
+        <button (click)="cancelEdit.emit(); newMessage = ''" class="text-gray-400 hover:text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Active Input Bar -->
+    <div class="flex items-center gap-2" *ngIf="activeConversation.status !== 'READ_ONLY'">
+        <!-- Mobile Action Menu Button -->
+        <div class="relative md:hidden">
+            <button (click)="toggleMobileMenu()"
+                class="w-11 h-11 flex items-center justify-center text-gray-500 hover:text-primary transition-colors bg-gray-50 rounded-full shrink-0 active:scale-95 border border-gray-100 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform duration-300"
+                    [class.rotate-45]="showMobileMenu" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div *ngIf="showMobileMenu"
+                class="absolute bottom-full left-0 mb-3 bg-white border border-gray-100 rounded-2xl shadow-xl w-56 overflow-hidden animate-slide-up origin-bottom-left z-[50]">
+                <div class="p-1 space-y-1">
+                    <button (click)="toggleAttachmentModal()"
+                        [disabled]="!(connectivityService.isOnline$ | async) || !!quotaStatus?.isBlocked"
+                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-xl flex items-center gap-3 transition-colors disabled:opacity-50">
+                        <div
+                            class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-bold text-gray-700">Fichiers & Photos</span>
+                    </button>
+
+                    <button (click)="openMailTemplate()" [disabled]="!(connectivityService.isOnline$ | async)"
+                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-xl flex items-center gap-3 transition-colors disabled:opacity-50">
+                        <div
+                            class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-bold text-gray-700">Template Mail</span>
+                    </button>
+
+                    <button (click)="toggleContactModal()"
+                        [disabled]="!(connectivityService.isOnline$ | async) || !!quotaStatus?.isBlocked"
+                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-xl flex items-center gap-3 transition-colors disabled:opacity-50">
+                        <div
+                            class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-bold text-gray-700">Partager Contact</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Action Buttons (Hidden on Mobile) -->
+        <div class="hidden md:flex items-center gap-2">
+            <button (click)="toggleAttachmentModal()"
+                [disabled]="!(connectivityService.isOnline$ | async) || !!quotaStatus?.isBlocked"
+                class="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-full shrink-0 disabled:opacity-20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+            </button>
+
+            <!-- Template Mail Button -->
+            <button (click)="openMailTemplate()" [disabled]="!(connectivityService.isOnline$ | async)"
+                class="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-full shrink-0 disabled:opacity-20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            </button>
+
+            <!-- Share Contact Gestionnaire Button -->
+            <button (click)="toggleContactModal()"
+                [disabled]="!(connectivityService.isOnline$ | async) || !!quotaStatus?.isBlocked"
+                class="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-emerald-600 transition-colors hover:bg-emerald-50 rounded-full shrink-0 disabled:opacity-20"
+                title="Partager un contact gestionnaire">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+            </button>
+        </div>
+
+        <textarea #messageInput rows="1"
+            [disabled]="!(connectivityService.isOnline$ | async) || !!quotaStatus?.isBlocked"
+            class="flex-1 form-control rounded-2xl bg-gray-100 border-transparent focus:bg-white resize-none py-3 px-4 transition-all duration-200 min-h-[44px] max-h-[120px] overflow-y-auto disabled:opacity-50"
+            [placeholder]="!(connectivityService.isOnline$ | async) ? 'Vous êtes hors connexion' : (quotaStatus?.isBlocked ? 'Limite de 5 messages atteinte. Attendez une réponse pour continuer.' : 'Écrivez votre message...')"
+            (keydown)="handleKeyDown($event)" [(ngModel)]="newMessage" (input)="onInput($event)"></textarea>
+        <button (click)="sendMessage()"
+            [disabled]="!newMessage.trim() || !(connectivityService.isOnline$ | async) || !!quotaStatus?.isBlocked"
+            class="p-3 bg-primary text-white rounded-full hover:bg-primary-dark transition-colors 
+            shadow-lg disabled:opacity-50 transform rotate-90 center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+        </button>
+    </div>
+
+    <div class="mt-2 flex justify-center">
+        <button (click)="toggleConductModal()"
+            class="text-[10px] text-primary hover:underline font-medium opacity-70 hover:opacity-100 transition-opacity">
+            Charte de bonne conduite
+        </button>
+    </div>
+</div>
+
+<!-- Immersive Attachment Modal (Extracted from ChatComponent) -->
+<div *ngIf="showAttachmentModal" (click)="toggleAttachmentModal()"
+    class="fixed inset-0 bg-black z-[99999] transition-all duration-500 overflow-hidden flex flex-col p-0">
+
+    <!-- Close Button -->
+    <button (click)="toggleAttachmentModal()"
+        class="absolute top-6 left-6 w-12 h-12 bg-black/40 text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-all z-[10001] backdrop-blur-md border border-white/10 group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:scale-110 transition-transform" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+
+    <!-- Camera Viewport -->
+    <div (click)="$event.stopPropagation()"
+        class="relative w-full h-full mx-auto bg-[#0A0A0A] overflow-hidden shadow-2xl flex flex-col group/viewport">
+
+        <!-- Video Preview -->
+        <div class="absolute inset-0 bg-black flex items-center justify-center">
+            <video *ngIf="isCameraActive" #videoElement autoplay playsinline class="w-full h-full object-cover"></video>
+
+            <!-- Loading State -->
+            <div *ngIf="!isCameraActive" class="flex flex-col items-center text-white/5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-40 w-40" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 012 2H5a2 2 0 01-2-2V9z" />
+                    <circle cx="12" cy="13" r="3" stroke-width="1" />
+                </svg>
+            </div>
+
+            <!-- Flash Overlay -->
+            <div *ngIf="isCaptured" class="absolute inset-0 bg-white animate-flash z-50 pointer-events-none"></div>
+        </div>
+
+        <!-- Error Banner -->
+        <div *ngIf="cameraError"
+            class="absolute top-24 left-1/2 -translate-x-1/2 w-[80%] bg-red-500 text-white p-4 rounded-2xl text-xs font-bold backdrop-blur-md animate-slide-up text-center z-[100] shadow-xl border border-white/20">
+            {{ cameraError }}
+        </div>
+
+        <!-- Controls Area -->
+        <div class="absolute inset-0 pointer-events-none z-40 flex flex-col items-center justify-end p-6 md:p-12">
+            <!-- Filmstrip -->
+            <div *ngIf="selectedFiles.length > 0"
+                class="w-full max-w-xl bg-black/30 backdrop-blur-2xl p-4 rounded-[2.5rem] border border-white/10 flex items-center gap-4 overflow-x-auto scrollbar-hide shadow-2xl pointer-events-auto mb-6 animate-slide-up">
+                <div *ngFor="let preview of filePreviews; let i = index" class="relative group/thumb shrink-0">
+                    <div
+                        class="w-16 h-16 rounded-2xl overflow-hidden ring-2 ring-white/20 transition-all hover:ring-primary/60 shadow-lg">
+                        <img [src]="preview | imageUrl" class="w-full h-full object-cover">
+                    </div>
+                    <button (click)="removeSelectedFile(i)"
+                        class="absolute -top-1.5 -right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg border-2 border-black/80 transition-transform active:scale-75 group-hover/thumb:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Add more -->
+                <button (click)="fileInput.click()"
+                    class="w-16 h-16 rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center text-white/20 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Action Bar -->
+            <div
+                class="md:fixed md:right-8 md:inset-y-0 md:my-auto md:h-fit md:flex-col w-full max-w-lg md:w-20 bg-black/40 backdrop-blur-[40px] px-8 py-5 md:px-0 md:py-8 rounded-[3rem] border border-white/10 flex items-center md:justify-center justify-between shadow-[0_40px_100px_rgba(0,0,0,0.8)] pointer-events-auto md:gap-10 animate-fade-in-up">
+
+                <!-- Gallery Button -->
+                <button (click)="fileInput.click()"
+                    class="w-12 h-12 bg-white/5 text-white/60 rounded-full flex items-center justify-center hover:bg-white/10 hover:text-white transition-all active:scale-90 group/gallery">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-all group-hover/gallery:-rotate-6"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </button>
+
+                <!-- Capture Button -->
+                <div class="relative group/shutter">
+                    <div
+                        class="absolute -inset-2 rounded-full border border-white/10 transition-transform group-hover/shutter:scale-110">
+                    </div>
+                    <button *ngIf="isCameraActive" (click)="capturePhoto()"
+                        class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all active:scale-90 relative z-10 overflow-hidden">
+                        <div class="w-8 h-8 rounded-full border-4 border-black/5"></div>
+                    </button>
+                    <button *ngIf="!isCameraActive" (click)="startCamera()"
+                        class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(255,108,103,0.3)] transition-all active:scale-90 relative z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 012 2H5a2 2 0 01-2-2V9z" />
+                            <circle cx="12" cy="13" r="3" stroke-width="2" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Send Button -->
+                <button (click)="sendAttachment()" [disabled]="isSending || selectedFiles.length === 0"
+                    class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center hover:brightness-110 disabled:opacity-20 transition-all active:scale-90 shadow-lg shadow-primary/20 group/send">
+                    <div *ngIf="isSending"
+                        class="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                    <svg *ngIf="!isSending" xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6 group-hover/send:translate-x-0.5 group-hover/send:-translate-y-0.5 transition-transform"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Canvas and Inputs -->
+        <canvas #canvasElement class="hidden"></canvas>
+        <input #fileInput type="file" (change)="onFileSelected($event)" class="hidden"
+            accept="image/png,image/jpeg,image/jpg" multiple>
+    </div>
+</div>
+
+<!-- Contact Gestionnaire Modal -->
+<div *ngIf="showContactModal"
+    class="fixed inset-0 bg-black/60 flex items-center justify-center z-[110] p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl animate-fade-in-up overflow-hidden flex flex-col max-h-[90vh]"
+        (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-emerald-50 to-teal-50">
+            <div class="flex items-center gap-4">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-xl font-heading font-bold text-gray-900">Partager un contact</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Informations du gestionnaire/bailleur</p>
+                </div>
+                <button (click)="toggleContactModal()"
+                    class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-white rounded-full transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Body -->
+        <div class="p-6 space-y-5 overflow-y-auto custom-scrollbar flex-1">
+            <!-- Target User Selection (Triangle only) -->
+            <div *ngIf="isTriangleChat()" class="space-y-2">
+                <label class="block text-sm font-bold text-gray-700">
+                    Ce contact est destiné à
+                    <span class="text-red-500">*</span>
+                </label>
+                <div class="grid grid-cols-1 gap-2">
+                    <div *ngFor="let user of getOtherParticipants()" (click)="contactForm.targetUserId = user.id"
+                        class="flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all"
+                        [class.border-emerald-500]="contactForm.targetUserId === user.id"
+                        [class.bg-emerald-50]="contactForm.targetUserId === user.id"
+                        [class.border-gray-200]="contactForm.targetUserId !== user.id"
+                        [class.hover:border-gray-300]="contactForm.targetUserId !== user.id">
+                        <div
+                            class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                            {{ user.firstName[0] }}{{ user.lastName[0] }}
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-semibold text-gray-900">{{ user.firstName }} {{ user.lastName }}</p>
+                        </div>
+                        <div *ngIf="contactForm.targetUserId === user.id" class="text-emerald-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Name Field -->
+            <div class="space-y-1.5">
+                <label class="block text-sm font-bold text-gray-700">
+                    Nom complet du gestionnaire
+                    <span class="text-red-500">*</span>
+                </label>
+                <input type="text" [(ngModel)]="contactForm.name"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-0 transition-colors"
+                    [class.border-red-300]="contactFormErrors.name" placeholder="Ex: Jean Dupont">
+                <p *ngIf="contactFormErrors.name" class="text-xs text-red-500 mt-1">{{ contactFormErrors.name }}</p>
+            </div>
+
+            <!-- Email Field -->
+            <div class="space-y-1.5">
+                <label class="block text-sm font-bold text-gray-700">
+                    Email
+                </label>
+                <input type="email" [(ngModel)]="contactForm.email"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-0 transition-colors"
+                    [class.border-red-300]="contactFormErrors.email" placeholder="gestionnaire@example.com">
+                <p *ngIf="contactFormErrors.email" class="text-xs text-red-500 mt-1">{{ contactFormErrors.email }}</p>
+            </div>
+
+            <!-- Phone Field -->
+            <div class="space-y-1.5">
+                <label class="block text-sm font-bold text-gray-700">
+                    Téléphone
+                </label>
+                <input type="tel" [(ngModel)]="contactForm.phone"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-0 transition-colors"
+                    [class.border-red-300]="contactFormErrors.phone" placeholder="06 12 34 56 78">
+                <p *ngIf="contactFormErrors.phone" class="text-xs text-red-500 mt-1">{{ contactFormErrors.phone }}</p>
+            </div>
+
+            <!-- Info Box -->
+            <div class="p-4 bg-blue-50 border border-blue-100 rounded-xl flex gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 shrink-0 mt-0.5" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-xs text-blue-700 leading-relaxed">
+                    Ces informations seront partagées avec les membres de la conversation. Vous pourrez les modifier
+                    ultérieurement.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="p-6 bg-gray-50 border-t border-gray-100 flex gap-3">
+            <button (click)="toggleContactModal()"
+                class="flex-1 py-3 px-4 bg-white text-gray-700 rounded-xl font-bold border border-gray-200 hover:bg-gray-100 transition-all">
+                Annuler
+            </button>
+            <button (click)="sendContactMessage()"
+                [disabled]="isSendingContact || (isTriangleChat() && !contactForm.targetUserId)"
+                class="flex-1 py-3 px-4 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 disabled:opacity-50 flex items-center justify-center gap-2">
+                <div *ngIf="isSendingContact"
+                    class="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                <svg *ngIf="!isSendingContact" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rotate-90" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+                {{ isSendingContact ? 'Envoi...' : 'Partager' }}
+            </button>
+        </div>
+    </div>
+</div>

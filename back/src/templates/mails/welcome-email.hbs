@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Bienvenue chez Reloke</title>
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+        /* Reset styles */
+        body,
+        table,
+        td,
+        a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table,
+        td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            outline: none;
+            text-decoration: none;
+        }
+
+        /* General */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            background-color: #F8F6F3;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            color: #1F1B17;
+        }
+
+        .cta-button:hover {
+            background-color: #A64D38 !important;
+            transform: translateY(-1px);
+        }
+
+        /* Mobile styles */
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .content-padding {
+                padding: 30px 20px !important;
+            }
+
+            .hero-image {
+                height: 200px !important;
+            }
+
+            .step-card {
+                padding: 20px 15px !important;
+            }
+        }
+    </style>
+</head>
+
+<body style="margin: 0; padding: 0; background-color: #F8F6F3;">
+
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+        style="background-color: #F8F6F3;">
+        <tr>
+            <td align="center" style="padding: 40px 10px;">
+
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" class="container"
+                    style="background-color: #ffffff; max-width: 600px; margin: 0 auto; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(194, 94, 70, 0.12); border-top: 6px solid #C25E46;">
+
+                    {{!-- Hero Image Section --}}
+                    <tr>
+                        <td style="padding: 0px 44px 0px 44px;">
+                            <img src="https://reloke.s3.eu-west-3.amazonaws.com/general/welcome.png"
+                                alt="Bienvenue chez Reloke" width="600" class="hero-image"
+                                style="display: block; width: 100%; max-width: 600px; height: auto; border: 0;">
+                        </td>
+                    </tr>
+
+                    {{!-- Header with Logo --}}
+                    {{> email-header}}
+
+                    {{!-- Main Content --}}
+                    <tr>
+                        <td class="content-padding" style="padding: 45px 50px 50px 50px;">
+
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+                                {{!-- Title --}}
+                                <tr>
+                                    <td align="center" style="padding-bottom: 18px;">
+                                        <h1
+                                            style="margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 32px; color: #1F1B17; font-weight: 700; line-height: 1.2; letter-spacing: -0.5px;">
+                                            Bienvenue sur Reloke
+                                        </h1>
+                                    </td>
+                                </tr>
+
+                                {{!-- Intro Text --}}
+                                <tr>
+                                    <td align="center" style="padding-bottom: 40px;">
+                                        <p
+                                            style="margin: 0; font-size: 17px; line-height: 1.6; color: #5A5550; font-weight: 400;">
+                                            Bonjour <strong
+                                                style="color: #1F1B17; font-weight: 600;">{{userName}}</strong>,
+                                        </p>
+                                        <p
+                                            style="margin: 14px 0 0 0; font-size: 17px; line-height: 1.6; color: #5A5550; font-weight: 400;">
+                                            Reloke accélère votre recherche de <strong
+                                                style="color:#1F1B17; font-weight:600;">location longue durée</strong>
+                                            grâce au matching entre <strong
+                                                style="color:#1F1B17; font-weight:600;">locataires sortants</strong> et
+                                            <strong style="color:#1F1B17; font-weight:600;">locataires</strong> ayant un
+                                            projet de mobilité compatible.
+                                            <br>
+                                            <span style="color:#7B746E;">Ici, pas de listes à vendre : vous définissez
+                                                vos critères, Reloke met en relation.</span>
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                {{!-- Divider --}}
+                                <tr>
+                                    <td style="padding-bottom: 35px;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0"
+                                            width="100%">
+                                            <tr>
+                                                <td height="1"
+                                                    style="background: linear-gradient(90deg, rgba(194,94,70,0) 0%, rgba(194,94,70,0.22) 50%, rgba(194,94,70,0) 100%);">
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                {{!-- Section Title --}}
+                                <tr>
+                                    <td align="center" style="padding-bottom: 30px;">
+                                        <h2
+                                            style="margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 24px; color: #1F1B17; font-weight: 600; letter-spacing: -0.3px;">
+                                            Démarrer en 3 étapes
+                                        </h2>
+                                    </td>
+                                </tr>
+
+                                {{!-- Steps Cards --}}
+                                <tr>
+                                    <td style="padding-bottom: 15px;">
+
+                                        {{!-- Step 1 --}}
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0"
+                                            width="100%" class="step-card"
+                                            style="background: linear-gradient(135deg, #FFF9F5 0%, #FFFFFF 100%); border-radius: 16px; padding: 25px 25px; margin-bottom: 15px; border: 1px solid #F5EDE6;">
+                                            <tr>
+                                                <td width="60" valign="top" style="padding-right: 20px;">
+                                                    <table role="presentation" cellpadding="0" cellspacing="0"
+                                                        border="0">
+                                                        <tr>
+                                                            <td width="48" height="48" align="center" valign="middle"
+                                                                style="width: 48px; height: 48px; background: linear-gradient(135deg, #C25E46 0%, #D97A61 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(194, 94, 70, 0.25);">
+                                                                <img src="https://reloke.s3.eu-west-3.amazonaws.com/general/home-email.png"
+                                                                    alt="Logement sortant" width="24" height="24"
+                                                                    style="display:block; margin:0 auto; border:0; outline:none; text-decoration:none;">
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td style="vertical-align: top;">
+                                                    <h3
+                                                        style="margin: 0 0 8px 0; font-size: 18px; color: #1F1B17; font-weight: 600; letter-spacing: -0.2px;">
+                                                        Renseignez votre logement sortant
+                                                    </h3>
+                                                    <p
+                                                        style="margin: 0; font-size: 15px; color: #5A5550; line-height: 1.5;">
+                                                        Ajoutez des informations claires et des photos. Un dossier
+                                                        complet améliore la qualité des matchs et la confiance.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        {{!-- Step 2 --}}
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0"
+                                            width="100%" class="step-card"
+                                            style="background: linear-gradient(135deg, #F5F9FF 0%, #FFFFFF 100%); border-radius: 16px; padding: 25px 25px; margin-bottom: 15px; border: 1px solid #E8F1FC;">
+                                            <tr>
+                                                <td width="60" valign="top" style="padding-right: 20px;">
+                                                    <table role="presentation" cellpadding="0" cellspacing="0"
+                                                        border="0">
+                                                        <tr>
+                                                            <td width="48" height="48" align="center" valign="middle"
+                                                                style="width: 48px; height: 48px; background: linear-gradient(135deg, #4A90E2 0%, #6BA7EC 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(74, 144, 226, 0.25);">
+                                                                <img src="https://reloke.s3.eu-west-3.amazonaws.com/general/search-email.png"
+                                                                    alt="Critères de recherche" width="24" height="24"
+                                                                    style="display:block; margin:0 auto; border:0; outline:none; text-decoration:none;">
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td style="vertical-align: top;">
+                                                    <h3
+                                                        style="margin: 0 0 8px 0; font-size: 18px; color: #1F1B17; font-weight: 600; letter-spacing: -0.2px;">
+                                                        Définissez vos critères
+                                                    </h3>
+                                                    <p
+                                                        style="margin: 0; font-size: 15px; color: #5A5550; line-height: 1.5;">
+                                                        Indiquez zones, budget, type de logement et période. Vous
+                                                        précisez ce que vous cherchez, Reloke fait le matching.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        {{!-- Step 3 --}}
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0"
+                                            width="100%" class="step-card"
+                                            style="background: linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 100%); border-radius: 16px; padding: 25px 25px; border: 1px solid #E6F7ED;">
+                                            <tr>
+                                                <td width="60" valign="top" style="padding-right: 20px;">
+                                                    <table role="presentation" cellpadding="0" cellspacing="0"
+                                                        border="0">
+                                                        <tr>
+                                                            <td width="48" height="48" align="center" valign="middle"
+                                                                style="width: 48px; height: 48px; background: linear-gradient(135deg, #10B981 0%, #34D399 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                                                                <img src="https://reloke.s3.eu-west-3.amazonaws.com/general/link-email.png"
+                                                                    alt="Mise en relation" width="24" height="24"
+                                                                    style="display:block; margin:0 auto; border:0; outline:none; text-decoration:none;">
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td style="vertical-align: top;">
+                                                    <h3
+                                                        style="margin: 0 0 8px 0; font-size: 18px; color: #1F1B17; font-weight: 600; letter-spacing: -0.2px;">
+                                                        Recevez des mises en relation
+                                                    </h3>
+                                                    <p
+                                                        style="margin: 0; font-size: 15px; color: #5A5550; line-height: 1.5;">
+                                                        Dès qu’un profil compatible apparaît, vous pouvez échanger via
+                                                        la messagerie pour avancer rapidement.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </td>
+                                </tr>
+
+
+                                {{!-- CTA Button --}}
+                                <tr>
+                                    <td align="center" style="padding-top: 25px;">
+                                        <a href="{{frontendUrl}}" class="cta-button"
+                                            style="display: inline-block; background: linear-gradient(135deg, #C25E46 0%, #D97A61 100%); color: #ffffff !important; padding: 18px 48px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 17px; font-family: 'Inter', -apple-system, sans-serif; text-align: center; box-shadow: 0 8px 24px rgba(194, 94, 70, 0.30); transition: all 0.3s ease;">
+                                            Accéder à mon espace
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                {{!-- Final Message --}}
+                                <tr>
+                                    <td align="center" style="padding-top: 30px;">
+                                        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #8B8580;">
+                                            Besoin d’aide ? Répondez à cet email : on vous répond rapidement.
+                                        </p>
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                        </td>
+                    </tr>
+
+                    {{!-- Footer --}}
+                    {{> email-footer}}
+
+                </table>
+
+                {{!-- Spacer --}}
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                        <td height="40" style="font-size: 40px; line-height: 40px;">&nbsp;</td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

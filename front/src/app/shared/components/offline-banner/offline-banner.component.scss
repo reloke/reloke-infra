@@ -1,0 +1,60 @@
+.offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    background: #ef4444; // red-500
+    color: white;
+    padding: 12px 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slide-down 0.3s ease-out;
+
+    .banner-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .icon-wrapper {
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+    }
+
+    .text-wrapper {
+        .title {
+            font-weight: 700;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            margin: 0;
+            opacity: 0.9;
+        }
+    }
+}
+
+@keyframes slide-down {
+    from {
+        transform: translateY(-100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}

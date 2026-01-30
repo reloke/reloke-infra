@@ -1,0 +1,194 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="card p-6">
+    <div class="flex items-center justify-center py-4">
+        <div class="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
+    </div>
+</div>
+
+<!-- Content -->
+<div *ngIf="!isLoading"
+    class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 flex flex-col h-full relative overflow-hidden">
+
+    <!-- Background Decoration -->
+    <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none">
+    </div>
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8 relative z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <i class="pi pi-bolt text-lg"></i>
+            </div>
+            <h3 class="text-xl font-bold text-main">Mes crédits</h3>
+        </div>
+        <button (click)="buyMoreMatches()"
+            class="text-sm bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2">
+            <i class="pi pi-plus text-xs"></i>
+            Recharger
+        </button>
+    </div>
+
+    <!-- No credits state (Empty State) -->
+    <div *ngIf="!hasCredits"
+        class="flex-1 flex flex-col items-center justify-center py-8 text-center animate-fade-in relative z-10">
+        <div class="w-20 h-20 mb-6 rounded-full bg-gray-50 flex items-center justify-center relative">
+            <div class="absolute inset-0 bg-primary/5 rounded-full animate-pulse"></div>
+            <i class="pi pi-receipt text-3xl text-gray-300"></i>
+        </div>
+        <h4 class="text-lg font-bold text-main mb-2">Aucun crédit disponible</h4>
+        <p class="text-secondary text-sm mb-6 max-w-xs mx-auto">
+            Pour être mis en relation avec des locataires sortants et recevoir des matchs, vous avez besoin de crédits.
+
+        </p>
+        <button (click)="buyMoreMatches()"
+            class="bg-primary text-white shadow-md shadow-primary/20 hover:bg-primary-hover hover:shadow-lg px-6 py-3 rounded-xl font-semibold transition-all duration-200 transform active:scale-[0.98]">
+            Voir les packs disponibles
+        </button>
+    </div>
+
+    <!-- Credits display -->
+    <div *ngIf="hasCredits" class="relative z-10">
+        <!-- Progress Section -->
+        <div class="mb-8">
+            <div class="flex justify-between items-end mb-3">
+                <span class="text-sm font-medium text-gray-500">Consommation</span>
+                <div class="text-right">
+                    <span class="text-3xl font-bold text-primary">{{ creditsRemaining }}</span>
+                    <span class="text-sm text-gray-400 font-medium ml-1">restants</span>
+                </div>
+            </div>
+
+            <div class="relative h-4 w-full bg-gray-100 rounded-full overflow-hidden">
+                <!-- Background pattern/gradient for empty part -->
+                <div class="absolute inset-0 opacity-50"></div>
+                <!-- Active Progress -->
+                <div class="h-full bg-gradient-to-r from-primary to-indigo-500 rounded-full transition-all duration-1000 ease-out relative"
+                    [style.width.%]="progressPercent">
+                    <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+                </div>
+            </div>
+            <p class="text-xs text-secondary mt-2 text-right">
+                {{ creditsUsed }} utilisés sur {{ totalNetMatches }}
+            </p>
+        </div>
+
+        <!-- Mini Stats Cards -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <!-- Remaining -->
+            <div
+                class="p-4 rounded-2xl bg-green-50 border border-green-100 flex flex-col items-center justify-center text-center transition-transform hover:scale-105 duration-200">
+                <span class="text-xs font-semibold text-green-500 uppercase tracking-wider mb-1">Dispo</span>
+                <span class="text-xl font-bold text-green-600">{{ creditsRemaining }}</span>
+            </div>
+
+            <!-- Used -->
+            <div
+                class="p-4 rounded-2xl bg-orange-50 border border-orange-100 flex flex-col items-center justify-center text-center transition-transform hover:scale-105 duration-200">
+                <span class="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-1">Utilisés</span>
+                <span class="text-xl font-bold text-orange-600">{{ creditsUsed }}</span>
+            </div>
+        </div>
+
+        <!-- Cooldown Alert (shown when user is in 14-day cooldown after refund) -->
+        <div *ngIf="isCooldownActive && cooldownDisplay"
+            class="bg-amber-50 rounded-2xl p-4 border border-amber-200 mb-4 transition-opacity duration-300">
+            <div class="flex items-start gap-3">
+                <div
+                    class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0">
+                    <i class="pi pi-clock text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-amber-600 font-semibold uppercase tracking-wide mb-1">Période de cooldown</p>
+                    <p class="text-sm text-amber-800">
+                        Suite à votre remboursement, vous pourrez acheter un nouveau pack dans
+                        <span class="font-bold">{{ cooldownDisplay }}</span>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matching in Progress Alert -->
+        <div *ngIf="summary?.isRefundBlockedByMatching"
+            class="bg-blue-50 rounded-2xl p-4 border border-blue-200 mb-4 transition-opacity duration-300">
+            <div class="flex items-start gap-3">
+                <div
+                    class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
+                    <i class="pi pi-sync pi-spin text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-blue-600 font-semibold uppercase tracking-wide mb-1">Matching en cours</p>
+                    <p class="text-sm text-blue-800">
+                        Un traitement de matching est en cours. Le remboursement sera disponible dans quelques minutes.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Refund Alert -->
+        <div *ngIf="summary && summary.refundEligible && summary.refundAmount > 0 && !summary.isRefundBlockedByMatching"
+            class="bg-gray-100 rounded-2xl p-4 border border-gray-100 flex items-center justify-between transition-opacity duration-300">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                    <i class="pi pi-wallet text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 font-semibold uppercase tracking-wide">Remboursement</p>
+                    <p class="text-sm font-bold text-gray-900">{{ formatPrice(summary.refundAmount) }} € disponibles</p>
+                </div>
+            </div>
+            <button (click)="openRefundConfirm()"
+                class="text-xs bg-white text-gray-600 px-3 py-1.5 rounded-lg border border-gray-200 font-semibold hover:bg-gray-50 transition-colors">
+                Réclamer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Refund Confirmation Modal -->
+<div *ngIf="showRefundConfirm" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50" (click)="closeRefundConfirm()"></div>
+    <div class="relative bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl">
+        <h4 class="text-xl font-bold text-main mb-4">Confirmer le remboursement</h4>
+        <p class="text-secondary mb-4">
+            Êtes-vous sûr de vouloir demander un remboursement de
+            <span class="font-semibold text-main">{{ formatPrice(summary?.refundAmount || 0) }} €</span>
+            pour vos matchs non utilisés ?
+        </p>
+        <p class="text-sm text-secondary mb-4">
+            Cette action annulera tous vos crédits de match restants et mettra en pause votre recherche.
+        </p>
+
+        <!-- 14-day Cooldown Warning -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+            <div class="flex items-start gap-3">
+                <i class="pi pi-exclamation-triangle text-amber-600 mt-0.5"></i>
+                <div>
+                    <p class="text-sm font-semibold text-amber-800 mb-1">Important</p>
+                    <p class="text-xs text-amber-700">
+                        Après un remboursement, vous ne pourrez pas acheter un nouveau pack pendant
+                        <span class="font-bold">14 jours</span>. Cette période de réflexion est obligatoire.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-3">
+            <button (click)="closeRefundConfirm()" class="px-4 py-2 text-secondary hover:text-main transition-colors"
+                [disabled]="isRefunding">
+                Annuler
+            </button>
+            <button (click)="confirmRefund()"
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center"
+                [disabled]="isRefunding">
+                <svg *ngIf="isRefunding" class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                {{ isRefunding ? 'Remboursement...' : 'Confirmer le remboursement' }}
+            </button>
+        </div>
+    </div>
+</div>

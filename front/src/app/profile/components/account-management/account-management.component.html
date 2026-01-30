@@ -1,0 +1,79 @@
+<div class="space-y-6">
+    <div class="border-b border-gray-100 pb-4">
+        <h2 class="text-2xl font-bold text-gray-900 font-merriweather">Gestion du compte</h2>
+        <p class="text-gray-500 text-sm mt-1">Gérez ici les informations liés à votre compte.</p>
+    </div>
+
+</div>
+
+<div class="account-management-container">
+    <!-- Tabs Navigation -->
+    <!-- Tabs Navigation -->
+    <nav class="tabs-nav mb-8">
+        <!-- Desktop Tabs (Hidden on Mobile) -->
+        <ul class="hidden md:flex border-b border-gray-200 w-full gap-8">
+            <li *ngFor="let item of tabItemsAccountManagement" class="pb-3 relative">
+                <a [routerLink]="[item.link]" routerLinkActive="text-primary active-tab-indicator"
+                    (click)="selectTab(item.label)"
+                    class="flex items-center gap-2 text-gray-500 hover:text-gray-800 transition-colors py-2 text-sm font-medium relative group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.svgPath" />
+                    </svg>
+                    {{ item.label }}
+                    <!-- Active Indicator Line (Desktop) handled by routerLinkActive helper class or custom styles, 
+                         but let's make it simpler via border-b-2 on the parent li or routerLinkActive class adding border -->
+                </a>
+            </li>
+        </ul>
+
+        <!-- Mobile Menu (Toggleable) -->
+        <div class="md:hidden relative">
+            <button (click)="toggleMobileMenu()"
+                class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 flex items-center justify-between text-left shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                <span class="flex items-center gap-2 font-medium text-gray-800">
+                    <span class="text-primary">
+                        <!-- Find current icon -->
+                        <ng-container *ngFor="let item of tabItemsAccountManagement">
+                            <svg *ngIf="item.label === currentTabLabel" xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    [attr.d]="item.svgPath" />
+                            </svg>
+                        </ng-container>
+                    </span>
+                    {{ currentTabLabel }}
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 transition-transform duration-200"
+                    [ngClass]="{'rotate-180': isMobileMenuOpen}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+
+            <!-- Dropdown List -->
+            <div *ngIf="isMobileMenuOpen"
+                class="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden animate-fade-in-up">
+                <ul class="divide-y divide-gray-50">
+                    <li *ngFor="let item of tabItemsAccountManagement">
+                        <a [routerLink]="[item.link]" (click)="selectTab(item.label)"
+                            class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-sm text-gray-700"
+                            [ngClass]="{'bg-primary/5 text-primary font-medium': item.label === currentTabLabel}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                [ngClass]="item.label === currentTabLabel ? 'text-primary' : 'text-gray-400'"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    [attr.d]="item.svgPath" />
+                            </svg>
+                            {{ item.label }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- The content of the selected tab will render here -->
+    <div class="tab-content">
+        <router-outlet></router-outlet>
+    </div>
+</div>

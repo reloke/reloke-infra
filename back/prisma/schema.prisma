@@ -1,0 +1,1150 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://prisly.ly/cli/accelerate-init
+
+// Fichier: prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js" // Utilisez "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Enums ---
+
+enum HomeType {
+  CHAMBRE
+  STUDIO
+  T1
+  T1_BIS
+  T2
+  T2_BIS
+  T3
+  T3_BIS
+  T4
+  T5
+  T6_PLUS
+}
+
+enum MatchStatus {
+  NEW
+  IN_PROGRESS
+  NOT_INTERESTED
+  ARCHIVED
+}
+
+// Type of match: STANDARD (direct A<->B exchange) or TRIANGLE (A->B->C->A cycle)
+enum MatchType {
+  STANDARD
+  TRIANGLE
+}
+
+enum KycStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+  REQUIRES_INPUT
+  CANCELED
+  MANUAL_REVIEW
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  SYSTEM
+  CONTACT // Contact gestionnaire share
+}
+
+enum ReportStatus {
+  PENDING
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+  ARCHIVED
+}
+
+// --- Modèles de Données (Tables) ---
+
+// 1. User
+model User {
+  id                    Int             @id @default(autoincrement())
+  uid                   String          @unique @default(uuid()) // Public UID to prevent enumeration attacks
+  firstName             String          @db.VarChar(50)
+  lastName              String          @db.VarChar(50)
+  mail                  String          @unique @db.VarChar(255)
+  dateLastConnection    DateTime        @updatedAt
+  isLocked              Boolean         @default(false)
+  isActif               Boolean         @default(false)
+  isKycVerified         Boolean         @default(false)
+  kycStatus             KycStatus       @default(UNVERIFIED)
+  kycReason             String?         // Reason for KYC rejection
+  kycAttempts           Int             @default(0) // [ADDED] Count of failed attempts
+  kycLastError          String?         // [ADDED] Last error message (log)
+  accountValidatedAt    DateTime?       // Date of KYC success
+  status                String
+  role                  Role            @default(USER) // [UPDATED] Enum Role
+  paypaldId             String?
+  password              String          // [ADDED] For Auth
+  lastPasswordUpdate    DateTime        @default(now()) // [ADDED] Password Age Calculation
+  isEmailVerified       Boolean         @default(false) // [ADDED]
+  resetPasswordToken    String?         // [ADDED] Forgot Password
+  resetPasswordExpires  DateTime?       // [ADDED] Forgot Password
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  deletedAt             DateTime?       // [ADDED] Soft Delete
+  
+  // CGU / Consent
+  cguAccepted           Boolean         @default(false)
+  cguAcceptedAt         DateTime?
+  cguVersion            String?
+
+  // deletionScheduledAt : removed/cleaned up here to avoid duplicates if merged below, keeping logic in one block
+
+  // Google OAuth
+  googleId              String?         @unique  // Google Account ID for OAuth
+  profilePicture        String?         // Profile picture URL (from Google or upload)
+
+  // Banning
+  isBanned              Boolean         @default(false)
+  banReason             String?
+  banMessage            String?
+  bannedAt              DateTime?
+  flowCooldownUntil     DateTime?       // [ADDED] Cooldown after leaving flow
+
+  // KYC / Identity Verification (Didit)
+  diditSessionId          String?     // Didit verification session ID
+  
+  // Stripe (Payments only)
+  stripeCustomerId        String?
+
+  usedPromoCodeId       Int?
+  influencerId          Int?
+  
+  // Relations
+  connectionLogs        ConnectionLog[] // [ADDED]
+  metadata              UserMetadata?   
+  identityProofs        IdentityProof[] 
+  intents               Intent[]
+  searches              Search[]
+  payments              Payment[]
+  transactions          Transaction[]
+  messages              Message[]
+  homeImages            HomeImg[]       // OK: Le champ opposé est dans HomeImg
+  usedPromoCode         PromoCode?      @relation("UserPromoUsage", fields: [usedPromoCodeId], references: [id])
+  influencer            Influencer?     @relation("InfluencerReferral", fields: [influencerId], references: [id])
+
+  home                  Home?           // CORRECTION 1.2: Champ opposé pour la relation User:Home
+  chatParticipants      ChatParticipant[]
+  
+  reportsMade           Report[]        @relation("Reporter")
+  reportsReceived       Report[]        @relation("ReportedUser")
+  notifications         Notification[]
+  pushSubscriptions     PushSubscription[]
+
+  // Help/Support requests
+  helpRequests          HelpRequest[]   @relation("HelpRequestUser")
+  helpRequestsClaimed   HelpRequest[]   @relation("HelpRequestClaimer")
+
+  // Contact gestionnaire messages targeting this user
+  contactTargetMessages Message[]       @relation("ContactTargetUser")
+
+  // DossierFacile V1 (External Link)
+  dossierFacileUrl      String?
+  isDossierValid        Boolean             @default(false)
+  lastDossierCheckAt    DateTime?
+  dossierFacileLink     DossierFacileLink?  // [ADDED] Relation One-to-One
+
+  // --- GDDP / Lifecycle ---
+  lastActivityAt        DateTime            @default(now()) // Pour calcul inactivité 2 ans
+  anonymizedAt          DateTime?           // Date d'anonymisation effective
+  deletionRequestedAt   DateTime?           // Date demande utilisateur
+  deletionScheduledAt   DateTime?           // Date prévue purge (J+90) (remplace champ précédent si doublon, sinon update existant)
+  deletedReason         String?             // USER_REQUEST | INACTIVITY | LEGAL_FORCE
+  isDeletionFinalized   Boolean             @default(false)
+
+  // Relation LegalCase
+  legalCases            LegalCase[]
+
+  // --- GDDP / Notifications & Auth ---
+  marketingConsent      Boolean             @default(true)
+  pushEnabled           Boolean             @default(true)
+  tokenVersion          Int                 @default(0)
+}
+
+model Influencer {
+  id              Int          @id @default(autoincrement())
+  firstName       String
+  lastName        String
+  email           String       @unique
+  influencerHash  String?      @unique // [ADDED] Unique hash for affiliate links
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  deletedAt       DateTime?    // Soft Delete
+  promoCodes      PromoCode[]
+  referredUsers   User[]       @relation("InfluencerReferral")
+}
+
+model PromoCode {
+  id                 Int         @id @default(autoincrement())
+  code               String      @unique // Uppercase enforced in app/db
+  discountPercentage Int
+  validUntil         DateTime
+  isActive           Boolean     @default(true)
+  
+  // Usage Constraints
+  usageLimit         Int?        // Nullable = Unlimited
+  currentUsageCount  Int         @default(0)
+  
+  // Relations
+  influencerId       Int
+  influencer         Influencer  @relation(fields: [influencerId], references: [id])
+  users              User[]      @relation("UserPromoUsage")
+
+  // Audit
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  deletedAt          DateTime?   // Soft Delete
+
+  @@index([code])
+}
+
+
+
+// 2. UserMetadata
+model UserMetadata {
+  id                    Int         @id @default(autoincrement())
+  inscriptionDate       DateTime
+  birthDate             DateTime
+
+  userId                Int         @unique
+  user                  User        @relation(fields: [userId], references: [id])
+}
+
+// [ADDED] ConnectionLog
+model ConnectionLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  ip        String
+  loginDate DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// 3. IdentityProof
+model IdentityProof {
+  id                    Int         @id @default(autoincrement())
+  url                   String
+
+  userId                Int
+  user                  User        @relation(fields: [userId], references: [id])
+}
+
+// 4. Home
+model Home {
+  id                    Int         @id @default(autoincrement())
+  userId                Int         @unique // Un utilisateur = un seul home sortant
+
+  // Adresse
+  addressFormatted      String?
+  addressPlaceId        String?
+  lat                   Float?
+  lng                   Float?
+
+  // Caractéristiques
+  homeType              HomeType?
+  nbRooms               Int?
+  surface               Int?        // en m²
+  rent                  Int?        // en euros
+
+  // Description
+  description           String?     @db.Text
+
+  // PostGIS geometry column (managed via raw SQL, not by Prisma)
+  geom                  Unsupported("geometry(Point, 4326)")?
+
+  // Relations
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  intentId              Int?        @unique // Clé étrangère One-to-One
+  intent                Intent?     // CORRECTION 2.1: Champ de relation sans 'fields'/'references'
+  images                HomeImg[]
+
+  // Relations Match (homes targeted by matches)
+  matchesAsTarget       Match[]     @relation("MatchTargetHome")
+
+  // Indexes for geo-queries
+  @@index([lat, lng])
+  @@map("Home")
+}
+
+// 5. HomeImg
+model HomeImg {
+  id                    Int         @id @default(autoincrement())
+  url                   String      // S3 object key uniquement (pas l'URL complète)
+  homeId                Int
+  userId                Int
+  order                 Int         @default(0) // Pour ordonner les images
+
+
+
+  // Relations
+  home                  Home        @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("home_images")
+}
+
+// 6. Intent
+model Intent {
+  id                    Int         @id @default(autoincrement())
+  intentPeriod          Int?
+  intentPrice           Float?
+  numberOfMatch         Int         @default(0) // Legacy field - kept for compatibility
+  isInFlow              Boolean     @default(false)
+
+  // === MATCH CREDIT STATE ===
+  totalMatchesPurchased Int         @default(0)  // Lifetime total purchased
+  totalMatchesUsed      Int         @default(0)  // Lifetime total consumed
+  totalMatchesRemaining Int         @default(0)  // Current available balance
+  // Last time the user viewed their matches list (front-driven)
+  lastMatchesSeenAt     DateTime?
+
+  // === MATCHING PROCESSING STATE (for multi-VM scalability) ===
+  // When matchingProcessingUntil > now(), the intent is being processed by a worker.
+  // This prevents concurrent processing and blocks refunds during matching.
+  matchingProcessingUntil DateTime?
+  // Identifier of the worker processing this intent (hostname/pid)
+  matchingProcessingBy    String?
+  // Timestamp of last enqueue to prevent too-frequent re-enqueuing
+  lastMatchingEnqueuedAt  DateTime?
+  // Timestamp of last successful matching run
+  lastMatchingProcessedAt DateTime?
+
+  // === REFUND COOLDOWN ===
+  // After a refund, user cannot buy a new pack until this date (14 days default)
+  refundCooldownUntil     DateTime?
+  // Date of the last refund (for audit/support)
+  lastRefundAt            DateTime?
+
+  // === SEARCH ACTIVITY STATE ===
+  // Whether user is actively searching (independent of isInFlow)
+  // Set to false when user clicks "Je ne cherche plus"
+  isActivelySearching       Boolean   @default(true)
+  // When user explicitly stops the search ("Je ne cherche plus")
+  searchStoppedAt           DateTime?
+  // Date of last "in-period but no credits" email (anti-spam)
+  lastSearchNudgeEmailAt    DateTime?
+  // Date of last "search period expired" email (anti-spam)
+  lastSearchExpiredEmailAt  DateTime?
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Relations
+  homeId                Int?        @unique
+  home                  Home?       @relation(fields: [homeId], references: [id])
+
+  userId                Int
+  user                  User        @relation(fields: [userId], references: [id])
+  searchId              Int?        @unique
+  search                Search?     @relation(fields: [searchId], references: [id])
+
+  payments              Payment[]
+
+  // Relations Match (bidirectional matching)
+  matchesAsSeeker       Match[]     @relation("MatchSeeker")
+  matchesAsTarget       Match[]     @relation("MatchTarget")
+
+  // Relations IntentEdge (for triangle matching graph)
+  edgesFrom             IntentEdge[] @relation("EdgeFrom")
+  edgesTo               IntentEdge[] @relation("EdgeTo")
+
+  // Relations MatchingTask (job queue)
+  matchingTasks         MatchingTask[]
+
+  // Performance indexes for matching cron
+  @@index([isInFlow, totalMatchesRemaining])
+  @@index([homeId])
+  @@index([searchId])
+  // Index for matching processing state (to find/release locked intents)
+  @@index([matchingProcessingUntil])
+  // Index for sweep query (find intents needing re-matching)
+  @@index([lastMatchingProcessedAt])
+  // Index for refund cooldown checks
+  @@index([refundCooldownUntil])
+  // Indexes for search email cron queries
+  @@index([isActivelySearching, totalMatchesRemaining])
+  @@index([lastSearchNudgeEmailAt])
+  @@index([lastSearchExpiredEmailAt])
+  @@index([userId])
+}
+
+// 7. Search
+model Search {
+  id                    Int         @id @default(autoincrement())
+  minRent               Float?
+  maxRent               Float?
+  minRoomSurface        Int?
+  maxRoomSurface        Int?
+  minRoomNb             Int?
+  maxRoomNb             Int?
+
+  /// JSON array of housing type codes using HomeType enum values, e.g. ["T2","T2_BIS","T3"]
+  homeType              Json?
+
+  /// Date from which the user is ready to move ("Dispo le ...")
+  searchStartDate       DateTime?
+
+  /// Date until which the search should be considered active
+  searchEndDate         DateTime?
+
+  // Relations
+  intents               Intent?
+  userId                Int
+  user                  User        @relation(fields: [userId], references: [id])
+  searchAdresses        SearchAdress[]
+
+  // Indexes for search email cron queries
+  @@index([searchEndDate])
+  @@index([searchStartDate])
+}
+
+// 8. SearchAdress
+model SearchAdress {
+  id                    Int         @id @default(autoincrement())
+  longitude             Float?
+  latitude              Float?
+  radius                Float?
+
+  /// Human readable label like "Lyon, France"
+  label                 String?
+
+  // PostGIS geometry column (managed via raw SQL, not by Prisma)
+  geom                  Unsupported("geometry(Point, 4326)")?
+
+  // Relations
+  searchId              Int
+  search                Search      @relation(fields: [searchId], references: [id], onDelete: Cascade)
+
+  // Index for FK join performance in matching queries
+  @@index([searchId])
+}
+
+// 9. Payment - Stripe payment for match packs
+model Payment {
+  id                      Int           @id @default(autoincrement())
+
+  // === STRIPE IDENTIFIERS ===
+  stripeCheckoutSessionId String        @unique    // "cs_..." from Stripe Checkout
+  stripePaymentIntentId   String?                  // "pi_..." optional but useful for tracking
+  stripeChargeId          String?                  // "ch_..." needed for refunds
+  stripeRefundId          String?                  // "re_..." when refunded
+
+  // === PACK INFORMATION ===
+  planType                String                   // "PACK_DISCOVERY", "PACK_STANDARD", "PACK_PRO"
+  matchesInitial          Int                      // Number of matches in the pack (e.g., 5)
+  matchesUsed             Int           @default(0) // How many consumed from this specific pack
+
+  // === FINANCIALS (user pays Stripe fees) ===
+  amountBase              Float                    // Base price in euros (e.g., 20.00)
+  amountFees              Float                    // Stripe fees charged to user (e.g., 0.95)
+  amountTotal             Float                    // Total charged (base + fees)
+  pricePerMatch           Float                    // Derived: amountBase / matchesInitial
+  currency                String        @default("eur")
+  matchesRefunded         Int           @default(0)
+
+  // === STATUS ===
+  // "PENDING", "SUCCEEDED", "FAILED", "PARTIALLY_REFUNDED", "REFUNDED"
+  status                  String        @default("PENDING")
+
+  // === DATES ===
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  succeededAt             DateTime?                // When payment was confirmed
+  refundedAt              DateTime?                // When refund was processed
+
+  // === RELATIONS ===
+  userId                  Int
+  user                    User          @relation(fields: [userId], references: [id])
+  intentId                Int
+  intent                  Intent        @relation(fields: [intentId], references: [id])
+  transactions            Transaction[]
+  legalCases              LegalCase[]
+
+  @@index([userId])
+  @@index([intentId])
+  @@index([status])
+}
+
+// 9b. Transaction - Audit log for all Stripe operations
+model Transaction {
+  id                      Int           @id @default(autoincrement())
+
+  // === OPERATION TYPE ===
+  // "PAYMENT_CREATED", "PAYMENT_SUCCEEDED", "PAYMENT_FAILED",
+  // "REFUND_REQUESTED", "REFUND_SUCCEEDED", "REFUND_FAILED"
+  type                    String
+
+  // === STATUS AT THIS EVENT ===
+  // "PENDING", "SUCCEEDED", "FAILED"
+  status                  String
+
+  // === STRIPE REFERENCES ===
+  stripeEventId           String?       @unique    // "evt_..." for webhook idempotency
+  stripeObjectId          String?                  // "cs_...", "pi_...", "re_..." etc.
+
+  // === FINANCIAL SNAPSHOT (for audit) ===
+  amountBase              Float?
+  amountFees              Float?
+  amountTotal             Float?
+  currency                String?       @default("eur")
+
+  // === METADATA ===
+  metadata                Json?                    // Additional context data
+
+  // === TIMESTAMPS ===
+  occurredAt              DateTime      @default(now())
+
+  // === RELATIONS ===
+  paymentId               Int?
+  payment                 Payment?      @relation(fields: [paymentId], references: [id])
+  userId                  Int
+  user                    User          @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([paymentId])
+  @@index([type])
+  @@index([stripeEventId])
+  // Composite index for pagination: ORDER BY occurredAt DESC, id DESC WHERE userId = ?
+  @@index([userId, occurredAt(sort: Desc), id(sort: Desc)])
+}
+
+// 10. Chat
+model Chat {
+  id                    Int         @id @default(autoincrement())
+  matchGroupId          String?     @unique // Linked to Match.groupId
+  type                  MatchType   @default(STANDARD)
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  lastMessageAt         DateTime?
+  status                String      @default("ACTIVE") // ACTIVE, READ_ONLY, CLOSED
+
+  participants          ChatParticipant[]
+  messages              Message[]
+  reports               Report[]
+  legalCases            LegalCase[]
+
+  @@index([lastMessageAt])
+  @@index([createdAt])
+}
+
+// 10b. ChatParticipant
+model ChatParticipant {
+  id               Int      @id @default(autoincrement())
+  chatId           Int
+  chat             Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  userId           Int
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  lastSeenAt       DateTime @default(now())
+  joinedAt         DateTime @default(now())
+
+  @@unique([chatId, userId])
+}
+
+// 11. Message
+model Message {
+  id                    Int         @id @default(autoincrement())
+  content               String      @db.Text
+  type                  MessageType @default(TEXT)
+  createdAt             DateTime    @default(now())
+  isEdited              Boolean     @default(false)
+  editedAt              DateTime?
+
+  // File attachments
+  fileUrl               String?
+  fileType              String?
+
+  // Contact gestionnaire metadata (for CONTACT type)
+  contactName           String?
+  contactEmail          String?
+  contactPhone          String?
+
+  contactTargetUserId   Int?        // In triangle: who should contact this gestionnaire
+  contactTargetUser     User?       @relation("ContactTargetUser", fields: [contactTargetUserId], references: [id])
+
+  // --- Lifecycle / RGPD ---
+  deletedAt             DateTime?
+  isDeleted             Boolean     @default(false)
+  redactedAt            DateTime?
+  redactionReason       String?     // USER_DELETE | MODERATION | LEGAL_HOLD
+
+  // Replies
+  replyToId             Int?
+  replyTo               Message?    @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies               Message[]   @relation("MessageReplies")
+
+  // Relations
+  chatId                Int
+  chat                  Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  senderId              Int
+  sender                User        @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  images                MessageImg[]
+  reports               Report[]
+
+  @@index([replyToId])
+  @@index([contactTargetUserId])
+}
+
+
+// 12. MessageImg
+model MessageImg {
+  id                    Int         @id @default(autoincrement())
+  url                   String
+
+  //Relations
+  messageId             Int
+  message               Message     @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+// 13. Report
+model Report {
+  id              Int           @id @default(autoincrement())
+  reason          String?       @db.Text // Category of report
+  description     String?       @db.Text // User's personal message
+  status          ReportStatus  @default(PENDING)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // The user who reported
+  reporterId      Int
+  reporter        User          @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  // The user being reported
+  reportedUserId  Int
+  reportedUser    User          @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: Cascade)
+
+  // --- Lifecycle / Clôture ---
+  resolvedAt      DateTime?
+  closedAt        DateTime?     // Point de départ des 5 ans d'archivage
+  handledByAdminId Int?
+  resolutionNote  String?       @db.Text
+  legalCases      LegalCase[]
+
+  // The chat where it happened
+  chatId          Int
+  chat            Chat          @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  // Optional: linked message
+  messageId       Int?
+  message         Message?      @relation(fields: [messageId], references: [id])
+
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([chatId])
+}
+
+// 13. Match - Reciprocal matching between users
+// Each match is stored from "seeker" perspective: seeker sees targetHome
+// STANDARD matches: When A and B match reciprocally, TWO rows are created:
+//   - Row 1: seekerIntentId=A, targetIntentId=B, targetHomeId=B.homeId
+//   - Row 2: seekerIntentId=B, targetIntentId=A, targetHomeId=A.homeId
+// TRIANGLE matches: When A,B,C form a cycle, THREE rows are created with same groupId:
+//   - Row 1: seekerIntentId=A, targetIntentId=B, targetHomeId=B.homeId (A gets B's home)
+//   - Row 2: seekerIntentId=B, targetIntentId=C, targetHomeId=C.homeId (B gets C's home)
+//   - Row 3: seekerIntentId=C, targetIntentId=A, targetHomeId=A.homeId (C gets A's home)
+model Match {
+  id                    Int           @id @default(autoincrement())
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  snapshot              Json?
+  snapshotVersion       Int           @default(1)
+
+  // === PUBLIC UID ===
+  // Used in URLs instead of auto-increment ID to prevent enumeration attacks
+  // Generated as UUID at creation time
+  uid                   String        @unique @default(uuid())
+
+  // Status: NEW (just matched), IN_PROGRESS (discussing), NOT_INTERESTED (rejected)
+  status                MatchStatus   @default(NEW)
+  statusBeforeArchive   MatchStatus?
+  archivedAt            DateTime?
+
+  // === MATCH TYPE ===
+  // STANDARD = direct A<->B exchange
+  // TRIANGLE = A->B->C->A cycle (3 participants)
+  type                  MatchType     @default(STANDARD)
+
+  // groupId: UUID shared by all Match rows of a triangle (null for STANDARD)
+  // Allows fetching all 3 participants of a triangle match
+  groupId               String?
+
+  // Seeker perspective - the user who "owns" this match entry
+  seekerIntentId        Int
+  seekerIntent          Intent        @relation("MatchSeeker", fields: [seekerIntentId], references: [id], onDelete: Cascade)
+
+  // Target perspective - the other user in the match
+  targetIntentId        Int
+  targetIntent          Intent        @relation("MatchTarget", fields: [targetIntentId], references: [id], onDelete: Cascade)
+
+  // The home being shown to the seeker (belongs to targetIntent's user)
+  targetHomeId          Int
+  targetHome            Home          @relation("MatchTargetHome", fields: [targetHomeId], references: [id], onDelete: Cascade)
+
+  // Unique constraint: a seeker cannot match the same targetHome twice (prevents duplicates across types)
+  @@unique([seekerIntentId, targetHomeId])
+
+  // Indexes for efficient queries
+  @@index([seekerIntentId, status])
+  @@index([seekerIntentId, createdAt(sort: Desc)])
+  @@index([targetIntentId])
+  @@index([type])
+  @@index([groupId])
+  @@index([groupId, type])
+  @@index([groupId, status])
+  @@index([status, archivedAt])
+  @@index([uid])
+}
+
+enum AuditEntityType {
+  Home
+  Search
+  Intent
+  SearchAdress
+  User
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum AuditSource {
+  http
+  cron
+  system
+}
+
+model AuditLog {
+  id            Int             @id @default(autoincrement())
+  entityType    AuditEntityType
+  entityId      Int
+  userId        Int?
+  action        AuditAction
+  changedFields Json
+  before        Json?
+  after         Json?
+  requestId     String?
+  source        AuditSource     @default(system)
+  createdAt     DateTime        @default(now())
+
+  @@index([entityType, entityId, createdAt])
+  @@index([userId, createdAt])
+}
+
+// 15. IntentEdge - Directed compatibility graph for triangle matching
+// An edge fromIntent -> toIntent means:
+//   "toIntent's home satisfies fromIntent's search criteria"
+// Used to find triangle cycles A->B->C->A efficiently via SQL joins
+model IntentEdge {
+  id              Int       @id @default(autoincrement())
+
+  // The intent doing the search (wants a home)
+  fromIntentId    Int
+  fromIntent      Intent    @relation("EdgeFrom", fields: [fromIntentId], references: [id], onDelete: Cascade)
+
+  // The intent whose home matches the search
+  toIntentId      Int
+  toIntent        Intent    @relation("EdgeTo", fields: [toIntentId], references: [id], onDelete: Cascade)
+
+  // Optional score for ranking (rent closeness, distance, etc.)
+  // Higher score = better match
+  score           Float?
+
+  // When this edge was computed (for cache invalidation)
+  computedAt      DateTime  @default(now())
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Unique: only one edge per directed pair
+  @@unique([fromIntentId, toIntentId])
+
+  // Index for outgoing edges: find all B where A->B
+  @@index([fromIntentId])
+
+  // Index for incoming edges: find all A where A->B (i.e., who wants my home)
+  @@index([toIntentId])
+
+  // Index for ordered retrieval by score (best matches first)
+  @@index([fromIntentId, score(sort: Desc)])
+}
+
+// 16. MatchingTask - Job queue for distributed matching across multiple VMs
+// Uses Postgres as a reliable job queue with SKIP LOCKED for concurrency.
+// Each VM runs N workers that claim tasks atomically without Redis.
+//
+// WHY SKIP LOCKED:
+// When multiple workers execute SELECT ... FOR UPDATE SKIP LOCKED simultaneously,
+// each worker gets a DIFFERENT set of rows. Rows already locked by another worker
+// are simply skipped (not waited for). This enables true parallel processing
+// without any external coordination (Redis, ZooKeeper, etc.).
+//
+// LIFECYCLE:
+// 1. PENDING: Task created, waiting to be claimed
+// 2. RUNNING: Worker claimed the task, processing in progress
+// 3. DONE: Task completed successfully
+// 4. FAILED: Task failed after max attempts
+model MatchingTask {
+  id           Int       @id @default(autoincrement())
+
+  // The intent to process matching for
+  intentId     Int
+  intent       Intent    @relation(fields: [intentId], references: [id], onDelete: Cascade)
+
+  // Task type (extensible for future task types like CLEANUP, NOTIFICATION, etc.)
+  type         String    @default("MATCHING")
+
+  // Task status: PENDING -> RUNNING -> DONE|FAILED
+  status       String    @default("PENDING")
+
+  // Execution tracking
+  runId        String?   // UUID for this execution attempt (for log correlation)
+  lockedAt     DateTime? // When the worker claimed this task
+  lockedBy     String?   // Worker identifier (hostname/pid) for debugging
+
+  // Retry scheduling: task won't be picked up until availableAt <= now()
+  // Used for exponential backoff on failures
+  availableAt  DateTime  @default(now())
+
+  // Attempt tracking
+  attempts     Int       @default(0)
+  maxAttempts  Int       @default(5)
+  lastError    String?   @db.Text // Last error message for debugging
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // UNIQUE constraint: only ONE active task (PENDING or RUNNING) per intent+type
+  // This prevents duplicate processing. When task is DONE or FAILED,
+  // a new task can be created for the same intent.
+  @@unique([intentId, type], map: "unique_active_task_idx")
+                                          // Note: using explicit map name if index already exists or condition needed
+}
+
+// 17. DossierFacileLink (GDPR / Lifecycle)
+model DossierFacileLink {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  uuid          String   @unique
+  dossierFacileUrl String? // URL complète fournie par l'utilisateur (pour re-vérification cron)
+  status        String   @default("UNKNOWN") // OK | KO | UNKNOWN
+  lastCheckedAt DateTime?
+
+  lastHttpCode  Int?
+  lastError     String? // Pour debug technique uniquement, pas de PII
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+}
+
+// 18. LegalCase (Legal Hold / Litiges)
+model LegalCase {
+  id           Int      @id @default(autoincrement())
+  type         String   // FRAUD | HARASSMENT | CHARGEBACK | DISPUTE | OTHER
+  status       String   @default("OPEN") // OPEN | CLOSED
+  
+  openedAt     DateTime @default(now())
+  closedAt     DateTime?
+  
+  // Date jusqu'à laquelle les données sont gelées (ex: closedAt + 5 ans)
+  holdUntil    DateTime?  
+
+  internalNotes String?   @db.Text // Notes admin internes
+
+  // Utilisateur principal concerné (l'accusé ou le demandeur selon contexte)
+  userId       Int?
+  user         User?    @relation(fields: [userId], references: [id]) 
+  // Note: On ne met pas onDelete: Cascade car le but est justement de garder le cas même si user "supprimé"
+
+  // Liens optionnels vers les objets du litige
+  reportId     Int?
+  report       Report?  @relation(fields: [reportId], references: [id])
+  
+  paymentId    Int?
+  payment      Payment? @relation(fields: [paymentId], references: [id])
+  
+  chatId       Int?
+  chat         Chat?    @relation(fields: [chatId], references: [id])
+  
+  matchGroupId String?    // Lien souple vers un groupe de match
+
+  // Snapshots de données (JSON) pour archivage figé si les originaux sont purgés
+  evidenceSnapshot Json?
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([status])
+  @@index([holdUntil])
+  @@index([userId])
+}
+
+
+// 17. NotificationLog - Prevents spam by tracking sent notifications
+// Used to ensure we don't send multiple "matches found" emails for the same run
+model NotificationLog {
+  id           Int       @id @default(autoincrement())
+
+  // User who received the notification
+  userId       Int
+
+  // Type of notification
+  type         String    // MATCHES_FOUND, REFUND_CONFIRMED, etc.
+
+  // Run identifier to prevent duplicates within same matching run
+  runId        String?
+
+  // Reference to related entity (intentId, matchId, etc.)
+  referenceId  Int?
+
+  // Notification metadata
+  metadata     Json?
+
+  createdAt    DateTime  @default(now())
+
+  // Prevent duplicate notifications for same user+type+runId
+  @@unique([userId, type, runId])
+
+  // Index for cleanup of old logs
+  @@index([createdAt])
+  @@index([userId, type])
+}
+
+// 18. MatchNotificationOutbox - Transactional outbox for reliable email delivery
+// Decouples matching writes from email sending for crash-safety and multi-VM idempotency.
+//
+// LIFECYCLE:
+// 1. Matching transaction writes outbox records for ALL affected users atomically
+// 2. Outbox sender claims records using SKIP LOCKED (multi-VM safe)
+// 3. Aggregates per user within same runId: "X nouveaux matchs"
+// 4. Sends ONE email per user, marks processedAt
+// 5. On failure: increment attempts, set availableAt for retry with backoff
+model MatchNotificationOutbox {
+  id           Int       @id @default(autoincrement())
+
+  // Matching run identifier (UUID) - for grouping/aggregation
+  runId        String
+
+  // User to notify (the match recipient)
+  userId       Int
+
+  // Intent that was matched (for reference)
+  intentId     Int
+
+  // Type of notification event
+  type         String    @default("MATCHES_FOUND")  // MATCHES_FOUND, etc.
+
+  // Number of new matches for this user in this event
+  // For STANDARD match: 1 (user sees 1 new match despite 2 rows)
+  // For TRIANGLE match: 1 (user sees 1 new triangle despite 3 rows)
+  matchCountDelta  Int   @default(1)
+
+  // Match type for reporting purposes
+  matchType    MatchType @default(STANDARD)
+
+  // Optional: store match UIDs for deep links in email
+  matchUids    Json?     // Array of match UIDs: ["uuid1", "uuid2"]
+
+  // Processing state
+  processedAt  DateTime? // When email was sent (null = pending)
+  attempts     Int       @default(0)
+  maxAttempts  Int       @default(5)
+  lastError    String?   @db.Text
+  availableAt  DateTime  @default(now()) // For retry backoff
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // UNIQUE per user+runId+intentId to prevent duplicate outbox entries
+  // within the same matching run for the same intent
+  @@unique([runId, userId, intentId])
+
+  // Index for claim query: WHERE processedAt IS NULL AND availableAt <= NOW()
+  @@index([processedAt, availableAt])
+
+  // Index for aggregation query: group by userId within runId
+  @@index([runId, userId])
+
+  // Index for cleanup of old processed records
+  @@index([processedAt, createdAt])
+
+  // Index for looking up by user
+  @@index([userId])
+}
+// 16. Notification - User alerts and notifications
+model Notification {
+  id          Int              @id @default(autoincrement())
+  userId      Int
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  content     String
+  metadata    Json?            // e.g., { matchGroupId: "uuid" }
+  isRead      Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+}
+
+// 17. PushSubscription - Browser web-push tokens
+model PushSubscription {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+enum NotificationType {
+  MESSAGE
+  MATCH
+  SYSTEM
+}
+
+// === HELP/SUPPORT REQUEST SYSTEM ===
+
+enum HelpTopic {
+  HOME
+  SEARCH
+  SEARCH_CRITERIA
+  MATCHES
+  PAYMENTS
+  OTHER
+}
+
+enum HelpRequestStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+// 19. HelpRequest - User support requests
+model HelpRequest {
+  id              Int                     @id @default(autoincrement())
+  uid             String                  @unique @default(uuid())
+  topic           HelpTopic
+  description     String                  @db.Text
+  status          HelpRequestStatus       @default(OPEN)
+
+  // User who created the request
+  userId          Int
+  user            User                    @relation("HelpRequestUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Admin who claimed the request (nullable until claimed)
+  claimedById     Int?
+  claimedBy       User?                   @relation("HelpRequestClaimer", fields: [claimedById], references: [id])
+  claimedAt       DateTime?
+
+  // Resolution
+  resolvedAt      DateTime?
+  resolutionNote  String?                 @db.Text
+
+  // Timestamps
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  // Relations
+  attachments     HelpRequestAttachment[]
+
+  // Indexes
+  @@index([userId])
+  @@index([status])
+  @@index([claimedById])
+  @@index([createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+}
+
+// 20. HelpRequestAttachment - Images attached to help requests
+model HelpRequestAttachment {
+  id              Int         @id @default(autoincrement())
+  url             String      // S3 object key
+  order           Int         @default(0)
+
+  // Relation
+  helpRequestId   Int
+  helpRequest     HelpRequest @relation(fields: [helpRequestId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime    @default(now())
+
+  @@index([helpRequestId])
+}
+
+// === ADMIN AUDIT LOGGING ===
+
+enum AdminAuditAction {
+  VIEW_USER_CONTEXT
+  VIEW_TRANSACTION
+  BAN_USER
+  UNBAN_USER
+  CLAIM_HELP_REQUEST
+  RESOLVE_HELP_REQUEST
+  RELEASE_HELP_REQUEST
+  VIEW_HELP_REQUEST
+  EXPORT_DATA
+  OTHER
+}
+
+// 21. AdminAuditLog - Track all admin actions for security and compliance
+model AdminAuditLog {
+  id              Int               @id @default(autoincrement())
+
+  // Admin who performed the action
+  adminId         Int
+  adminEmail      String            // Denormalized for quick lookup even if admin deleted
+
+  // Action performed
+  action          AdminAuditAction
+
+  // Target user (if applicable)
+  targetUserId    Int?
+  targetUserUid   String?           // Denormalized for audit trail
+
+  // Request context
+  ipAddress       String?
+  userAgent       String?
+  requestId       String?           // Correlation ID for tracing
+
+  // Additional details
+  metadata        Json?             // Extra context (transactionId, etc.)
+
+  // Timestamp
+  createdAt       DateTime          @default(now())
+
+  // Indexes for queries
+  @@index([adminId, createdAt(sort: Desc)])
+  @@index([targetUserId, createdAt(sort: Desc)])
+  @@index([action, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+}

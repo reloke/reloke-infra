@@ -1,0 +1,201 @@
+<div class="space-y-8 animate-fade-in-up">
+    <!-- Header -->
+    <div class="border-b border-gray-100 pb-6">
+        <h2 class="text-3xl font-bold text-main font-heading">Sécurité</h2>
+        <p class="text-secondary text-base mt-2">Gérez les paramètres de sécurité de votre compte et votre mot de
+            passe.</p>
+    </div>
+
+    <!-- Top Section: Info Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Last Connection Card -->
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Dernière connexion
+                    </h3>
+                    <p class="text-xl font-bold text-main capitalize">
+                        {{ currentUser?.dateLastConnection | date:'dd MMMM yyyy \'à\' HH:mm':'':'fr-FR' }}
+                    </p>
+                    <p class="text-xs text-secondary mt-1 capitalize">
+                        {{ currentUser?.dateLastConnection | date:'EEEE':'':'fr-FR' }}
+                    </p>
+                </div>
+                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password Age Card -->
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Âge du mot de passe
+                    </h3>
+                    <p class="text-xl font-bold text-main">{{ passwordAgeDays }}</p>
+                    <p class="text-xs text-secondary mt-1">
+                        {{ currentUser?.lastPasswordUpdate | date:'dd MMMM yyyy \'à\' HH:mm':'':'fr-FR' }}
+                    </p>
+                    <p class="text-xs {{ passwordAgeDaysColor }} mt-1 font-medium">
+                        {{ passwordAgeDaysText }}
+                    </p>
+                </div>
+                <div class="p-3 bg-orange-50 text-orange-600 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Section: Action Row -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <!-- Clickable Row: Ensure full width/height hit area -->
+        <div class="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer group relative"
+            (click)="openModal()">
+            <div class="flex items-center gap-4">
+                <div
+                    class="p-3 bg-gray-100 text-gray-600 rounded-full group-hover:bg-primary group-hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="text-base font-bold text-main">Mot de passe</h4>
+                    <p class="text-sm text-secondary">{{ hasPassword ? 'Vous pouvez mettre à jour votre mot de passe
+                        ici' : 'Vous pouvez créer votre mot de passe ici' }}</p>
+                </div>
+            </div>
+            <!-- Button is visual only if parent has click -->
+            <button class="p-2 text-gray-400 hover:text-primary transition-colors pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div *ngIf="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity" (click)="closeModal()"></div>
+
+        <!-- Modal Content -->
+        <div class="relative w-full max-w-lg mx-auto my-6 z-50">
+            <div
+                class="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden flex flex-col max-h-[90vh]">
+
+                <!-- Success State -->
+                <div *ngIf="successMessage"
+                    class="p-12 flex flex-col items-center justify-center text-center space-y-4 animate-fade-in-up">
+                    <div
+                        class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-main">{{ hasPassword ? 'Mot de passe modifié !' : 'Mot de passe
+                        créé !' }}</h3>
+                    <p class="text-secondary text-sm">{{ hasPassword ? 'Votre mot de passe a été mis à jour avec
+                        succès.' : 'Votre mot de passe a été créé avec succès.' }}<br>Vous allez
+                        être
+                        déconnecté...</p>
+                    <div class="w-full bg-gray-100 h-1 mt-4 rounded-full overflow-hidden">
+                        <div class="bg-primary h-full animate-progress rounded-full"></div>
+                    </div>
+                </div>
+
+                <!-- Form State -->
+                <ng-container *ngIf="!successMessage">
+                    <div class="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                        <h3 class="text-lg font-bold text-main">{{ hasPassword ? 'Modifier le mot de passe' : 'Créer un
+                            mot de passe' }}</h3>
+                        <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="p-6 overflow-y-auto">
+                        <!-- Error Alert -->
+                        <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage" [dismissible]="true"
+                            (closed)="errorMessage = ''" class="mb-4 block"></app-alert>
+
+                        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="space-y-5">
+                            <!-- Current Password -->
+                            <app-password-strength-field *ngIf="hasPassword" [parentForm]="passwordForm"
+                                controlName="currentPassword" label="Mot de passe actuel" placeholder="••••••••"
+                                [showStrengthBar]="false" [enforceStrength]="false">
+                            </app-password-strength-field>
+
+                            <div *ngIf="!hasPassword"
+                                class="p-4 bg-blue-50 text-blue-800 rounded-xl border border-blue-100 text-sm flex gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>Comme vous utilisez <strong>Google</strong>, vous n'avez pas encore de mot de
+                                    passe local. En en créant un, vous pourrez vous connecter avec les deux
+                                    méthodes.</span>
+                            </div>
+
+                            <!-- New Password (Reusable Component) -->
+                            <app-password-strength-field [parentForm]="passwordForm" controlName="newPassword"
+                                label="Nouveau mot de passe" placeholder="Entrez votre nouveau mot de passe"
+                                [showStrengthBar]="true">
+                            </app-password-strength-field>
+
+                            <!-- Confirm Password -->
+                            <app-password-strength-field [parentForm]="passwordForm" controlName="confirmPassword"
+                                label="Confirmer le mot de passe" placeholder="Confirmez le nouveau mot de passe"
+                                [showStrengthBar]="false" [enforceStrength]="false">
+                            </app-password-strength-field>
+
+                            <p *ngIf="passwordForm.errors?.['mismatch'] && passwordForm.get('confirmPassword')?.touched"
+                                class="text-xs text-red-500 mt-1 pl-1">
+                                Les mots de passe ne correspondent pas.
+                            </p>
+                        </form>
+                    </div>
+
+                    <div class="p-6 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3">
+                        <button type="button" (click)="closeModal()"
+                            class="px-4 py-2 text-sm font-bold text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+                            Annuler
+                        </button>
+                        <button type="button" (click)="changePassword()"
+                            [disabled]="passwordForm.invalid || isSubmitting"
+                            class="btn btn-primary px-6 py-2 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 flex items-center">
+                            <span *ngIf="isSubmitting" class="mr-2">
+                                <app-loading size="sm"></app-loading>
+                            </span>
+                            {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer' }}
+                        </button>
+                    </div>
+                    <!-- Debug: remove after fix -->
+                    <div class="px-6 pb-4 text-[10px] text-gray-400 text-right italic" *ngIf="passwordForm.invalid">
+                        Formulaire invalide (match: {{ !passwordForm.errors?.['mismatch'] }}, current: {{
+                        passwordForm.get('currentPassword')?.valid }}, new: {{ passwordForm.get('newPassword')?.valid
+                        }}, confirm: {{ passwordForm.get('confirmPassword')?.valid }})
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>

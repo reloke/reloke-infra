@@ -1,0 +1,33 @@
+<div class="max-w-6xl mx-auto">
+    <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div id="onboarding-feed-header">
+            <h1 class="text-3xl font-heading font-bold text-main mb-2">Matching</h1>
+            <p class="text-secondary">Gérez vos opportunités d'échange.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div id="onboarding-feed-tabs" class="flex bg-gray-100 p-1 rounded-xl w-fit">
+            <button (click)="switchTab('potential')" class="px-6 py-2 rounded-lg text-sm font-bold transition-all"
+                [ngClass]="activeTab === 'potential' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'">
+                Dernières trouvailles
+            </button>
+            <button (click)="switchTab('confirmed')" class="px-6 py-2 rounded-lg text-sm font-bold transition-all"
+                [ngClass]="activeTab === 'confirmed' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'">
+                Mes Matchs validés
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabs Content -->
+    <div class="mt-6">
+        <!-- Potential Matches List -->
+        <div *ngIf="activeTab === 'potential'">
+            <app-match-list mode="potential" [showHeader]="false"></app-match-list>
+        </div>
+
+        <!-- Confirmed Matches List -->
+        <div *ngIf="activeTab === 'confirmed'">
+            <app-match-list mode="confirmed" [showHeader]="false"></app-match-list>
+        </div>
+    </div>
+</div>

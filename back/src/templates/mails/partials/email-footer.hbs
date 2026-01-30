@@ -1,0 +1,89 @@
+{{!--
+  Email Footer Partial
+  Variables: frontendUrl, brandName, companyAddress, supportEmail, year
+  Social icons: facebookIconUrl, instagramIconUrl, twitterIconUrl, youtubeIconUrl
+  Social links: facebookUrl, instagramUrl, twitterUrl, youtubeUrl
+--}}
+<tr>
+    <td style="background-color: #F9F8F6; padding: 40px 30px; border-top: 1px solid #EAE5D9;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+
+            <!-- Navigation Links -->
+            <tr>
+                <td align="center" style="padding-bottom: 30px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td style="padding: 0 15px;">
+                                <a href="{{frontendUrl}}/dashboard" style="text-decoration: none; color: #2C2825; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Mon Compte</a>
+                            </td>
+                            <td style="padding: 0 15px; border-left: 1px solid #D6D3CC;">
+                                <a href="{{frontendUrl}}/help" style="text-decoration: none; color: #2C2825; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Aide</a>
+                            </td>
+                            <td style="padding: 0 15px; border-left: 1px solid #D6D3CC;">
+                                <a href="{{frontendUrl}}/contact" style="text-decoration: none; color: #2C2825; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Support</a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- Social Icons -->
+            <tr>
+                <td align="center" style="padding-bottom: 30px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td style="padding: 0 10px;">
+                                <a href="{{facebookUrl}}" style="opacity: 0.7;"><img src="{{facebookIconUrl}}" width="16" alt="Facebook" style="display:block; border:0;"></a>
+                            </td>
+                            <td style="padding: 0 10px;">
+                                <a href="{{instagramUrl}}" style="opacity: 0.7;"><img src="{{instagramIconUrl}}" width="24" alt="Instagram" style="display:block; border:0;"></a>
+                            </td>
+                            <td style="padding: 0 10px;">
+                                <a href="{{twitterUrl}}" style="opacity: 0.7;"><img src="{{twitterIconUrl}}" width="24" alt="X" style="display:block; border:0;"></a>
+                            </td>
+                            <td style="padding: 0 10px;">
+                                <a href="{{youtubeUrl}}" style="opacity: 0.7;"><img src="{{youtubeIconUrl}}" width="28" alt="YouTube" style="display:block; border:0;"></a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- Separator -->
+            <tr>
+                <td style="border-top: 1px solid #EAE5D9; font-size: 1px; line-height: 1px; height: 1px;">&nbsp;</td>
+            </tr>
+
+            <!-- Legal Text -->
+            <tr>
+                <td align="center" style="padding-top: 30px; padding-bottom: 20px;">
+                    {{#if userEmail}}
+                    <p style="margin: 0 0 10px 0; font-size: 13px; color: #6B665F; line-height: 1.6; max-width: 480px;">
+                        Cet email a ete envoye a <strong>{{userName}}</strong> ({{userEmail}}) suite a une action sur votre compte {{brandName}}.
+                    </p>
+                    {{/if}}
+                    <p style="margin: 0; font-size: 12px; color: #BDB8AE;">
+                        {{brandName}} Inc. &bull; {{companyAddress}}
+                    </p>
+                </td>
+            </tr>
+
+            <!-- Legal Links -->
+            <tr>
+                <td align="center">
+                    <p style="margin: 0; font-size: 11px; color: #BDB8AE; line-height: 1.5;">
+                        <a href="{{frontendUrl}}/legal/privacy-policy" style="color: #8C867D; text-decoration: underline;">Politique de confidentialite</a>
+                        &nbsp;&nbsp;|&nbsp;&nbsp;
+                        <a href="{{frontendUrl}}/legal/terms-and-conditions" style="color: #8C867D; text-decoration: underline;">Conditions generales</a>
+                        &nbsp;&nbsp;|&nbsp;&nbsp;
+                        <a href="{{frontendUrl}}/contact" style="color: #8C867D; text-decoration: underline;">Contact</a>
+                    </p>
+                    <p style="margin: 15px 0 0 0; font-size: 11px; color: #D6D3CC;">
+                        &copy; {{year}} {{brandName}}. Tous droits reserves.
+                    </p>
+                </td>
+            </tr>
+
+        </table>
+    </td>
+</tr>

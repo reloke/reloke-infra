@@ -1,0 +1,300 @@
+# 🏗️ Backend NestJS – Prisma – PostgreSQL (Spatial / PostGIS)
+
+Ce backend est basé sur :
+
+* **Node.js : 24.11.1**
+* **NestJS : 11.0.12**
+* **Prisma ORM**
+* **PostgreSQL**
+* **PostGIS** (ajout manuel pour disposer des types spatiaux)
+* Base générée depuis `schema.prisma` fourni ci-dessous
+
+Ce README permet aux développeurs de mettre à jour leurs environnements, d’installer PostGIS en local et de transformer la base créée par Prisma en base spatiale.
+
+---
+
+# 📦 1. Installation & Mise à jour de l'environnement
+
+## 1.1 Installer / vérifier Node.js (24.11.1)
+
+Vérifier votre version :
+
+```
+node -v
+```
+
+Si vous n’avez pas la bonne version :
+
+### Avec NVM
+
+```
+nvm install 24.11.1
+nvm use 24.11.1
+```
+
+### Ou via nodejs.org
+
+[https://nodejs.org](https://nodejs.org)
+
+---
+
+## 1.2 Installer Nest CLI
+
+```
+npm i -g @nestjs/cli
+```
+
+Vérifier :
+
+```
+nest --version
+```
+
+---
+
+## 1.3 Installer les dépendances du projet
+
+```
+npm install
+```
+
+---
+
+# 🗄️ 2. Base de données PostgreSQL + PostGIS
+
+Ce projet nécessite PostgreSQL avec l’extension **PostGIS**. Vous pouvez installer PostgreSQL de plusieurs manières.
+
+---
+
+## 2.1 Installation PostgreSQL
+
+**Option 1 – Classique (avec pgAdmin)**
+Téléchargement : [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
+Suivez les instructions pour votre OS (Windows / macOS / Linux).
+
+**Option 2 – StackBuilder (Windows / macOS)**
+StackBuilder est fourni avec l’installateur PostgreSQL officiel. Il permet d’installer **PostGIS et d’autres extensions** facilement.
+
+1. Téléchargez PostgreSQL : [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
+2. Lors de l’installation, cochez **“StackBuilder”** pour l’installer également
+3. Après l’installation, lancez StackBuilder
+4. Sélectionnez votre serveur PostgreSQL et cliquez sur **Next**
+5. Dans la liste des extensions disponibles, sélectionnez :
+
+   * `PostGIS`
+   * `PostGIS Topology` (optionnel mais recommandé)
+6. Suivez l’assistant pour installer les extensions
+7. Redémarrez votre serveur PostgreSQL si nécessaire
+
+---
+
+## 2.2 Activation PostGIS dans la base
+
+Après création de la base via Prisma ou manuellement, activez PostGIS :
+
+**Via psql :**
+
+```sql
+CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS postgis_topology;
+```
+
+**Via pgAdmin :**
+
+1. Ouvrir votre base
+2. Aller dans **Extensions** → Clic droit → **Create**
+3. Sélectionner `postgis` et `postgis_topology`
+
+✔ Votre base est maintenant prête pour gérer des types spatiaux.
+
+---
+
+# 🧩 3. Configuration Prisma
+
+## 3.1 Installation Prisma
+
+```
+npm install prisma --save-dev
+npm install @prisma/client
+```
+
+## 3.2 Génération du client
+
+```
+npx prisma generate
+```
+
+## 3.3 Création ou mise à jour de la base
+
+```
+   * old: npx prisma migrate dev
+   * new: npm run migrate:geo
+```
+
+Ou si vous ne souhaitez pas gérer les migrations :
+
+```
+npx prisma db push
+```
+
+---
+
+# 🌍 4. Transformation de la BDD Prisma → PostGIS
+
+Prisma **ne supporte pas PostGIS**.
+Les champs spatiaux doivent être gérés **manuellement après la création de la base**.
+
+Dans ton `schema.prisma`, les champs spatiaux potentiels sont :
+
+| Table            | Champs               | Type Prisma |
+| ---------------- | -------------------- | ----------- |
+| **Home**         | latitude / longitude | Float?      |
+| **SearchAdress** | latitude / longitude | Float?      |
+
+---
+
+# 🛰️ 5. Scripts SQL pour convertir la BDD en spatiale (PostGIS)
+
+## 5.1 Conversion de la table **Home**
+
+### Ajouter la colonne spatiale
+
+```sql
+ALTER TABLE "Home"
+ADD COLUMN geom geometry(Point, 4326);
+```
+
+### Remplir geom à partir latitude/longitude
+
+```sql
+UPDATE "Home"
+SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)
+WHERE longitude IS NOT NULL
+  AND latitude IS NOT NULL;
+```
+
+### Supprimer les anciennes colonnes (optionnel)
+
+```sql
+ALTER TABLE "Home"
+DROP COLUMN longitude,
+DROP COLUMN latitude;
+```
+
+---
+
+## 5.2 Conversion de la table **SearchAdress**
+
+### Ajouter colonne géométrique
+
+```sql
+ALTER TABLE "SearchAdress"
+ADD COLUMN geom geometry(Point, 4326);
+```
+
+### Remplir geom
+
+```sql
+UPDATE "SearchAdress"
+SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)
+WHERE longitude IS NOT NULL
+  AND latitude IS NOT NULL;
+```
+
+### Supprimer latitude/longitude (optionnel)
+
+```sql
+ALTER TABLE "SearchAdress"
+DROP COLUMN longitude,
+DROP COLUMN latitude;
+```
+
+---
+
+# 🔁 6. Après chaque migration Prisma
+
+Prisma peut recréer ou modifier des colonnes classiques — mais **n’a pas de support PostGIS**.
+
+* Recréez les colonnes `geom` si nécessaire
+* Re-remplissez `geom`
+* Les scipts sont dans le folder `sql/spatial/` à la racine du projet
+* Pour exécuter les scripts soit le faire 
+    * sur pgAdmin
+    * Via fichier les fichiers .sql puis depuis un terminal :
+        * Ajouter psql à ton PATH (Windows)
+          Localise le binaire psql.exe. Par défaut, il se trouve ici :
+         C:\Program Files\PostgreSQL\<version>\bin\psql.exe
+         Copie le chemin du dossier bin (...PostgreSQL\<version>\bin\)
+         Ouvre les Paramètres système → Variables d’environnement → PATH
+         Ajoute le chemin du dossier bin
+         Redémarre ton terminal VSCode et teste :
+         psql --version
+        * ---
+        * 1- psql -U ton_user -d nom_de_la_base -f addGeoColumns.sql 
+        * 2- psql -U ton_user -d nom_de_la_base -f fillGeoColumns.sql 
+        * ---
+
+
+# ▶️ 7. Lancer le projet
+
+## Dev :
+
+```
+npm run start:dev
+```
+
+## Prod :
+
+```
+npm run build
+npm run start:prod
+```
+
+---
+
+# 🧪 8. Outils utiles
+
+### Ouvrir Prisma Studio :
+
+```
+npx prisma studio
+```
+
+### Vérifier le schéma :
+
+```
+npx prisma validate
+```
+
+### Réinitialiser la base (⚠ destructive) :
+
+```
+npx prisma migrate reset
+```
+
+---
+
+# 🤝 9. Workflow recommandé pour les collègues
+
+1. Cloner le repo
+2. Installer Node 24.11.1
+3. Installer NestJS CLI
+4. `npm install`
+5. Configurer `.env`
+6. Installer PostgreSQL + PostGIS (via StackBuilder ou pgAdmin/psql)
+7. Créer la base
+8. Lancer Prisma :
+
+   * `npx prisma generate`
+   * `npx prisma migrate dev`
+9. Exécuter les scripts PostGIS :
+
+   * Extensions
+   * Colonnes `geom` pour Home & SearchAdress
+10. Lancer API : `npm run start:dev`
+
+---
+
+# 🗃️ 10. Référence du schéma (schema.prisma)
+
+*(Facultatif : tu peux l’ajouter ici s'il doit apparaître dans le README du repo.)*

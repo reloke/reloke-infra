@@ -1,0 +1,496 @@
+<div
+    class="landing-container min-h-screen font-sans bg-main text-main overflow-x-hidden selection:bg-primary selection:text-white">
+
+    <!-- --- NAVBAR --- -->
+    <app-navbar></app-navbar>
+
+    <!-- --- HERO SECTION --- -->
+    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-6 overflow-hidden">
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <span
+                    class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-border/50 text-secondary border border-border mb-6 backdrop-blur-sm">
+                    Mise en relation directe
+                </span>
+            </div>
+
+            <h1
+                class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.1] mb-12 text-main tracking-tight animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
+                Accélérez votre
+                <br class="hidden md:block" />
+                <span class="relative inline-block">
+                    recherche de logement.
+                    <svg class="absolute w-full h-20 -bottom-10 left-0 text-primary/20 -z-10" viewBox="0 0 100 10"
+                        preserveAspectRatio="none">
+                        <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
+                    </svg>
+                </span>
+            </h1>
+
+            <p
+                class="text-lg md:text-xl text-secondary mb-12 mt-8 max-w-2xl mx-auto leading-relaxed font-light animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+                Reloke vous met en relation avec des locataires sortants qui quittent le logement que vous recherchez.
+                Une solution
+                simple et directe pour accéder à des opportunités avant tout le monde.
+            </p>
+
+            <div
+                class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+                <button
+                    class="btn-landing-primary w-full sm:w-auto px-10 py-5 text-lg group rounded-full flex items-center justify-center gap-3">
+                    Accélérer ma recherche
+                    <i class="pi pi-chevron-right text-sm transition-transform group-hover:translate-x-1"></i>
+                </button>
+                <button
+                    class="btn-landing-outline w-full sm:w-auto px-10 py-5 text-lg rounded-full shadow-sm hover:bg-card">
+                    Découvrir le concept
+                </button>
+            </div>
+
+            <!-- Social Proof élégante (REMPLACÉE PAR BADGES DE QUALITÉ) -->
+            <div class="mt-16 flex flex-wrap justify-center gap-4 md:gap-6 animate-in fade-in duration-1000 delay-500">
+                <div
+                    class="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-border shadow-sm text-sm text-secondary">
+                    <i class="pi pi-shield text-primary text-base"></i>
+                    <span class="font-medium">Profils 100% Vérifiés</span>
+                </div>
+                <div
+                    class="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-border shadow-sm text-sm text-secondary">
+                    <i class="pi pi-check-circle text-success-text text-base"></i>
+                    <span class="font-medium">Dossiers Validés</span>
+                </div>
+                <div
+                    class="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-border shadow-sm text-sm text-secondary">
+                    <i class="pi pi-star-fill text-yellow-500 text-base"></i>
+                    <span class="font-medium">Expérience Premium</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Background Gradients Soft -->
+        <div
+            class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-primary/5 rounded-full blur-[120px] pointer-events-none mix-blend-multiply">
+        </div>
+        <div
+            class="fixed bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-header-gradient-soft rounded-full blur-[100px] pointer-events-none mix-blend-multiply">
+        </div>
+    </header>
+
+    <!-- --- EMPATHY SECTION (Visuel Amélioré) --- -->
+    <section class="py-20 md:py-32 px-6 max-w-7xl mx-auto relative">
+        <div
+            class="bg-card rounded-[2.5rem] p-8 md:p-12 lg:p-20 shadow-xl shadow-primary/5 border border-white/50 relative overflow-hidden">
+            <div class="grid lg:grid-cols-2 gap-16 items-center relative z-10">
+                <div class="order-2 lg:order-1 relative">
+                    <!-- Image Composition -->
+                    <div
+                        class="relative rounded-2xl overflow-hidden shadow-2xl rotate-1 transition-transform duration-700 hover:rotate-0">
+                        <img src="https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?q=80&w=1200&auto=format&fit=crop"
+                            alt="Intérieur" class="w-full h-auto object-cover" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
+                    <!-- Floating Card -->
+                    <div
+                        class="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] border border-border max-w-xs animate-[float_4s_ease-in-out_infinite]">
+                        <div class="flex items-center gap-4 mb-3">
+                            <div
+                                class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-success-text">
+                                <i class="pi pi-face-smile text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold uppercase tracking-wider text-placeholder">Statut</p>
+                                <p class="font-serif font-bold text-lg text-main">Mise en relation</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-secondary leading-snug">
+                            "J'ai pu discuter avec le locataire sortant avant même que l'annonce soit publique."
+                        </p>
+                    </div>
+                </div>
+
+                <div class="order-1 lg:order-2">
+                    <h2 class="font-serif text-3xl md:text-5xl font-bold mb-8 text-main leading-tight">
+                        Ciblez les <span class="text-primary italic">bonnes</span> opportunités.
+                    </h2>
+                    <p class="text-secondary text-lg mb-6 leading-relaxed">
+                        La recherche classique sur les portails d'annonces est un parcours du combattant. Reloke change
+                        la donne en créant un espace de confiance.
+                    </p>
+                    <p class="text-secondary text-lg mb-10 leading-relaxed">
+                        Ici, pas de compétition aveugle. Vous accédez à un flux de personnes qui quittent un logement
+                        compatible avec ce que vous cherchez.
+                        C'est simple, c'est humain, c'est Reloke.
+                    </p>
+
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <div
+                            class="bg-main p-6 rounded-2xl border border-border/50 hover:border-primary/30 transition-colors">
+                            <i class="pi pi-users text-primary text-3xl mb-4 block"></i>
+                            <h4 class="font-bold text-main mb-2">Communauté Vérifiée</h4>
+                            <p class="text-sm text-secondary">Identités validées pour des échanges sereins.</p>
+                        </div>
+                        <div
+                            class="bg-main p-6 rounded-2xl border border-border/50 hover:border-primary/30 transition-colors">
+                            <i class="pi pi-bolt text-primary text-3xl mb-4 block"></i>
+                            <h4 class="font-bold text-main mb-2">Fluidité & Gain de temps</h4>
+                            <p class="text-sm text-secondary">L'information circule directement entre locataires.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Background Texture -->
+            <div
+                class="absolute top-0 right-0 w-full h-full opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] z-0 pointer-events-none">
+            </div>
+        </div>
+    </section>
+
+    <!-- --- STEPS SIMPLIFIED --- -->
+    <section id="process" class="py-20 md:py-32 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-20">
+            <h2 class="font-serif text-3xl md:text-5xl font-bold text-main mb-6">Comment ça marche ?</h2>
+            <p class="text-secondary text-lg">Trois étapes vers votre prochain chez-vous.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-12 relative">
+            <div
+                class="hidden md:block absolute top-16 left-[20%] right-[20%] h-[2px] bg-gradient-to-r from-transparent via-border to-transparent -z-10">
+            </div>
+
+            <div class="flex flex-col items-center text-center group">
+                <div
+                    class="w-32 h-32 rounded-full bg-white border border-border shadow-lg flex items-center justify-center mb-8 relative transition-transform duration-500 group-hover:scale-105 group-hover:border-primary">
+                    <div
+                        class="absolute inset-2 rounded-full border border-dashed border-[#BDB8AE] group-hover:rotate-90 transition-transform duration-700">
+                    </div>
+                    <i class="pi pi-users text-primary text-4xl"></i>
+                    <div
+                        class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-[#2C2825] text-white flex items-center justify-center font-bold font-serif text-sm border-4 border-main">
+                        1</div>
+                </div>
+                <h3 class="text-xl font-bold mb-3 font-serif">1. Renseignez vos critères</h3>
+                <p class="text-secondary leading-relaxed px-4">Indiquez votre logement actuel et vos attentes. Vous ne
+                    cherchez plus, notre système travaille déjà pour vous.</p>
+            </div>
+
+            <div class="flex flex-col items-center text-center group">
+                <div
+                    class="w-32 h-32 rounded-full bg-white border border-border shadow-lg flex items-center justify-center mb-8 relative transition-transform duration-500 group-hover:scale-105 group-hover:border-primary">
+                    <div
+                        class="absolute inset-2 rounded-full border border-dashed border-[#BDB8AE] group-hover:rotate-90 transition-transform duration-700">
+                    </div>
+                    <i class="pi pi-heart-fill text-primary text-4xl"></i>
+                    <div
+                        class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-[#2C2825] text-white flex items-center justify-center font-bold font-serif text-sm border-4 border-main">
+                        2</div>
+                </div>
+                <h3 class="text-xl font-bold mb-3 font-serif">2. Débloquez l'exclusivité</h3>
+                <p class="text-secondary leading-relaxed px-4">Notre algorithme identifie les locataires sortants aux
+                    projets
+                    complémentaires au votre.</p>
+            </div>
+
+            <div class="flex flex-col items-center text-center group">
+                <div
+                    class="w-32 h-32 rounded-full bg-white border border-border shadow-lg flex items-center justify-center mb-8 relative transition-transform duration-500 group-hover:scale-105 group-hover:border-primary">
+                    <div
+                        class="absolute inset-2 rounded-full border border-dashed border-[#BDB8AE] group-hover:rotate-90 transition-transform duration-700">
+                    </div>
+                    <i class="pi pi-comments text-primary text-4xl"></i>
+                    <div
+                        class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-[#2C2825] text-white flex items-center justify-center font-bold font-serif text-sm border-4 border-main">
+                        3</div>
+                </div>
+                <h3 class="text-xl font-bold mb-3 font-serif">3. Initiez le relais</h3>
+                <p class="text-secondary leading-relaxed px-4">Échangez, visitez et organisez la reprise du logement.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- --- SECTION CONFIANCE (Green) --- -->
+    <section class="max-w-7xl mx-auto px-6 !py-0 mb-20 md:mb-32">
+        <div
+            class="bg-[#2E5C38] rounded-[3rem] px-8 py-20 md:px-20 md:py-24 text-white relative overflow-hidden shadow-2xl">
+            <div class="relative z-10 max-w-2xl">
+                <div
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur text-sm font-semibold mb-8 border border-white/10">
+                    <i class="pi pi-shield text-green-300"></i>
+                    <span>Environnement sécurisé</span>
+                </div>
+                <h2 class="font-serif text-3xl md:text-5xl font-bold mb-8 leading-tight">
+                    La confiance est la clé de la communauté.
+                </h2>
+                <p class="text-green-100 text-lg mb-10 leading-relaxed opacity-90">
+                    Pour protéger la communauté, Reloke vérifie l’identité de chaque utilisateur via un partenaire
+                    sécurisé (18+).
+                    Nous vous encourageons à préparer un dossier de location solide sur
+                    <a href="https://www.dossierfacile.logement.gouv.fr/" target="_blank" rel="noopener noreferrer"
+                        class="font-semibold">
+                        DossierFacile
+                    </a>, afin d’augmenter vos chances d’obtenir le logement que vous visez.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-6">
+                    <div class="flex items-center gap-3 bg-white/5 px-6 py-4 rounded-xl border border-white/10">
+                        <i class="pi pi-check-circle text-green-300 text-xl"></i>
+                        <span class="font-medium">Identité vérifiée</span>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white/5 px-6 py-4 rounded-xl border border-white/10">
+                        <i class="pi pi-check-circle text-green-300 text-xl"></i>
+                        <span class="font-medium">Dossier Validé</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decorative Pattern -->
+            <div
+                class="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-x-1/4 translate-y-1/4">
+                <i class="pi pi-shield" style="font-size: 600px;"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- --- PRICING REDESIGNED --- -->
+    <section id="tarifs" class="pt-20 md:pt-32 pb-40 md:pb-52 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-20">
+            <h2 class="font-serif text-3xl md:text-5xl font-bold text-main mb-6">Budget maîtrisé, esprit libre.
+            </h2>
+            <p class="text-secondary max-w-2xl mx-auto mb-8 text-lg">
+                Achetez des crédits de mise en relation. <br />
+                <span class="font-semibold text-primary">Vous n'êtes débité que si vous matchez.</span>
+            </p>
+            <div
+                class="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-sm text-sm text-main font-medium border border-border">
+                <i class="pi pi-refresh text-primary"></i> Satisfait ou remboursé (crédits restants)
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-16 md:gap-8 items-start max-w-6xl mx-auto">
+            <div *ngFor="let pack of MATCH_PACKS"
+                [class]="'relative group bg-white rounded-[2rem] p-8 border transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 flex flex-col h-full ' + (pack.isRecommended ? 'border-primary shadow-xl scale-105 z-10' : 'border-border shadow-sm')">
+
+                <div *ngIf="pack.isRecommended" class="absolute -top-5 left-0 right-0 flex justify-center">
+                    <span
+                        class="bg-primary text-white px-6 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase shadow-lg">Le
+                        plus populaire</span>
+                </div>
+
+                <div class="mb-8 text-center border-b border-main pb-8">
+                    <h3 class="font-serif text-2xl font-bold text-main mb-2">{{pack.label}}</h3>
+                    <p class="text-secondary text-sm">{{pack.description}}</p>
+                </div>
+
+                <div class="text-center mb-8">
+                    <div class="flex items-center justify-center gap-1">
+                        <span class="text-5xl font-bold text-main">{{pack.baseAmount}}€</span>
+                    </div>
+                    <div class="mt-4 bg-main rounded-xl py-3 px-4 inline-block w-full">
+                        <p class="font-bold text-primary text-lg">{{pack.credits}} <span
+                                class="text-sm font-normal text-secondary">Crédits de matchs</span></p>
+                        <p class="text-xs text-placeholder mt-1">{{pack.pricePerMatch}}</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-10 flex-grow px-2">
+                    <div *ngFor="let feat of COMMON_FEATURES" class="flex items-start gap-3 text-sm text-secondary">
+                        <i class="pi pi-check-circle text-primary text-sm shrink-0 mt-0.5"></i>
+                        <span>{{feat}}</span>
+                    </div>
+                </div>
+
+                <button
+                    [class]="pack.isRecommended ? 'btn-landing-primary w-full text-sm py-4 rounded-xl' : 'btn-landing-outline w-full text-sm py-4 rounded-xl'">
+                    Choisir ce pack
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- --- THE MAGNIFICENT CONCLUSION (MAP) --- -->
+    <section class="relative py-20 md:py-40 overflow-hidden max-w-7xl mx-auto px-6">
+        <div class="relative max-w-6xl mx-auto min-h-[auto] md:min-h-[600px] flex flex-col items-center justify-start">
+
+            <!-- 1. Large Subtle Map Background (Responsive) -->
+            <div
+                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[150%] md:w-max pointer-events-none z-0 opacity-100">
+                <img src="assets/images/france-map.svg" alt="France Map"
+                    class="w-full md:w-[65rem] text-primary max-w-none">
+            </div>
+
+            <!-- 2. Title Section -->
+            <div class="relative z-10 text-center mb-12 md:mb-24 max-w-3xl">
+                <h2 class="font-serif text-4xl md:text-7xl font-bold text-main leading-tight">
+                    La recherche de logement <br />
+                    <span class="text-white relative inline-block mt-2">
+                        simplifiée.
+                        <!-- Curved White Underline -->
+                        <svg class="absolute w-full h-12 md:h-20 -bottom-6 md:-bottom-10 left-0 text-white/80 -z-10"
+                            viewBox="0 0 100 10" preserveAspectRatio="none">
+                            <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
+                        </svg>
+                    </span>
+                </h2>
+            </div>
+
+            <!-- 3. MOBILE: Stacked Layout (< md) -->
+            <div class="md:hidden flex flex-col items-center gap-8 w-full relative z-10">
+                <!-- Profile A -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-border flex items-center gap-4 w-full">
+                    <img src="https://i.pravatar.cc/150?img=32" alt="Sarah"
+                        class="w-16 h-16 rounded-full object-cover" />
+                    <div>
+                        <p class="font-bold text-main">Sarah, Paris</p>
+                        <p class="text-xs text-secondary">Quitte son T2</p>
+                        <p class="text-xs text-secondary">Cherche un T1 à Lyon</p>
+                    </div>
+                </div>
+
+                <!-- Connection Icon -->
+                <div class="flex items-center gap-12 opacity-60">
+                    <i class="pi pi-arrow-down text-white text-2xl animate-bounce"></i>
+                    <i class="pi pi-arrow-up text-white text-2xl animate-bounce" style="animation-delay: 0.5s"></i>
+                </div>
+
+                <!-- Match Badge -->
+                <div class="bg-white px-6 py-3 rounded-full shadow-xl border border-primary/20">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span class="font-serif font-bold text-primary">Projets Compatibles !</span>
+                    </div>
+                </div>
+
+                <!-- Connection Icon -->
+                <div class="flex items-center gap-12 opacity-60">
+                    <i class="pi pi-arrow-down text-white text-2xl animate-bounce"></i>
+                    <i class="pi pi-arrow-up text-white text-2xl animate-bounce" style="animation-delay: 0.5s"></i>
+                </div>
+
+                <!-- Profile B -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-border flex items-center gap-4 w-full">
+                    <img src="https://i.pravatar.cc/150?img=11" alt="Thomas"
+                        class="w-16 h-16 rounded-full object-cover" />
+                    <div>
+                        <p class="font-bold text-main">Thomas, Lyon</p>
+                        <p class="text-xs text-secondary">Quitte son T1</p>
+                        <p class="text-xs text-secondary">Cherche un T2 à Paris</p>
+                    </div>
+                </div>
+
+                <button
+                    class="btn-landing-primary w-full py-5 text-lg rounded-full mt-4 shadow-lg flex items-center justify-center gap-2">
+                    Accélérer ma recherche
+                    <i class="pi pi-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- 4. DESKTOP: Animation Layout (>= md) -->
+            <div class="hidden md:block absolute top-[200px] w-full max-w-4xl h-[400px] pointer-events-none">
+
+                <!-- Connecting Lines - Bidirectional -->
+                <svg class="absolute inset-0 w-full h-full overflow-visible">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#fff" opacity="0.6" />
+                        </marker>
+                    </defs>
+
+                    <!-- Path 1: Sarah -> Thomas -->
+                    <path d="M 180 120 Q 450 60, 720 220" fill="none" stroke="white" stroke-width="2"
+                        stroke-dasharray="8,8" class="opacity-40" />
+
+                    <!-- Animated Dot 1 -->
+                    <circle r="4" fill="white">
+                        <animateMotion dur="3s" repeatCount="indefinite" path="M 180 120 Q 450 60, 720 220"
+                            keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
+                    </circle>
+
+                    <!-- Path 2: Thomas -> Sarah (Different curve) -->
+                    <path d="M 720 220 Q 450 300, 180 120" fill="none" stroke="white" stroke-width="2"
+                        stroke-dasharray="8,8" class="opacity-40" />
+
+                    <!-- Animated Dot 2 -->
+                    <circle r="4" fill="white">
+                        <animateMotion dur="3.5s" repeatCount="indefinite" path="M 720 220 Q 450 300, 180 120"
+                            keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
+                    </circle>
+                </svg>
+
+                <!-- Profile A - Floating Slow -->
+                <div class="absolute left-[10%] top-[80px] flex flex-col items-center float-slow z-20">
+                    <div class="w-20 h-20 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
+                        <img src="https://i.pravatar.cc/150?img=32" alt="Sarah" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="bg-white px-4 py-2 rounded-full shadow-md mt-4 border border-border">
+                        <p class="text-sm font-bold text-main">Sarah, Paris</p>
+                        <p class="text-xs text-secondary">Quitte son T2</p>
+                        <p class="text-xs text-secondary">Cherche un T1 à Lyon</p>
+                    </div>
+                </div>
+
+                <!-- Profile B - Floating Delayed -->
+                <div class="absolute right-[10%] top-[180px] flex flex-col items-center float-delayed z-20">
+                    <div class="w-20 h-20 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
+                        <img src="https://i.pravatar.cc/150?img=11" alt="Thomas" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="bg-white px-4 py-2 rounded-full shadow-md mt-4 border border-border">
+                        <p class="text-sm font-bold text-main">Thomas, Lyon</p>
+                        <p class="text-xs text-secondary">Quitte son T1</p>
+                        <p class="text-xs text-secondary">Cherche un T2 à Paris</p>
+                    </div>
+                </div>
+
+                <!-- Match Badge - Center -->
+                <div
+                    class="absolute top-[140px] left-1/2 transform -translate-x-1/2 bg-white px-6 py-3 rounded-2xl shadow-xl border border-primary/20 animate-in zoom-in duration-700 delay-1000 z-30">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span class="font-serif font-bold text-primary text-lg">Projets Compatibles !</span>
+                    </div>
+                </div>
+            </div>
+
+            <button
+                class="hidden md:flex btn-landing-primary mt-[450px] relative z-20 text-xl px-12 py-6 shadow-2xl hover:scale-105 transform transition-transform rounded-full items-center justify-center">
+                Accélérer ma recherche
+            </button>
+        </div>
+    </section>
+
+    <!-- --- FAQ SECTION --- -->
+    <section id="faq" class="py-20 md:py-32 px-6 max-w-4xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="font-serif text-3xl md:text-5xl font-bold text-main mb-6">Foire Aux Questions
+            </h2>
+            <p class="text-secondary text-lg">Tout ce que vous devez savoir pour échanger en toute sérénité.
+            </p>
+        </div>
+
+        <div class="space-y-4">
+            <div *ngFor="let item of faqItems; let i = index"
+                class="bg-white relative rounded-2xl border border-border shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer"
+                (click)="toggleFaq(i)">
+
+                <div class="p-6 md:p-8 flex justify-between items-center bg-card">
+                    <h3 class="text-lg md:text-xl font-bold font-serif text-main pr-8 select-none">
+                        {{item.question}}
+                    </h3>
+                    <div class="flex-shrink-0">
+                        <i class="pi" [ngClass]="item.isOpen ? 'pi-minus text-primary' : 'pi-plus text-main'"></i>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden transition-all duration-300 ease-in-out"
+                    [style.max-height]="item.isOpen ? '200px' : '0'" [style.opacity]="item.isOpen ? '1' : '0'">
+                    <div class="p-6 md:p-8 pt-0 text-secondary leading-relaxed border-t border-border/50 bg-white">
+                        <div class="mt-4">{{item.answer}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- --- FOOTER --- -->
+    <app-footer></app-footer>
+</div>

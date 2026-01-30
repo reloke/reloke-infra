@@ -1,0 +1,240 @@
+<div class="space-y-8 relative">
+    <!-- Alerts Toast Container -->
+    <div class="fixed top-24 right-4 z-[100] flex flex-col items-end gap-2 pointer-events-none">
+        <div *ngFor="let alert of alerts" class="pointer-events-auto max-w-lg max-w-full">
+            <app-alert [type]="alert.type" [message]="alert.message" [duration]="5000" (closed)="removeAlert(alert.id)">
+            </app-alert>
+        </div>
+    </div>
+
+    <!-- Section Header -->
+    <div class="border-stone-100 pb-4">
+        <h2 class="text-2xl font-bold text-stone-800 font-merriweather">Données & Confidentialité</h2>
+        <p class="text-stone-500 text-sm mt-1">Gérez vos données personnelles conformément au RGPD.</p>
+    </div>
+
+    <!-- Export Data Card -->
+    <div
+        class="bg-white border border-stone-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-start gap-4 flex-1 min-w-[300px] group">
+                <div
+                    class="p-3 bg-gray-100 text-gray-600 rounded-full group-hover:bg-green-500 group-hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-stone-800 text-lg mb-1">Exporter mes données</h3>
+                    <p class="text-stone-500 text-sm">Téléchargez l'ensemble de vos informations personnelles sous le
+                        format de votre choix (PDF ou Excel).</p>
+                </div>
+            </div>
+
+            <div class="relative group">
+                <button [disabled]="isExporting"
+                    class="px-5 py-2.5 border border-stone-200 text-stone-700 rounded-xl hover:bg-stone-50 font-semibold transition-all shadow-sm flex items-center gap-2 disabled:opacity-50 min-w-[160px] justify-between">
+                    <div class="flex items-center gap-2">
+                        <app-loading *ngIf="isExporting" size="sm"></app-loading>
+                        {{ isExporting ? 'Génération...' : 'Télécharger' }}
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4 text-stone-400 group-hover:rotate-180 transition-transform duration-300"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <!-- Dropdown menu visible on hover -->
+                <div
+                    class="absolute right-0 mt-2 w-52 bg-white border border-stone-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[60] overflow-hidden translate-y-2 group-hover:translate-y-0 selection:bg-transparent">
+                    <div class="py-1">
+                        <button (click)="exportData('pdf')"
+                            class="w-full text-left px-4 py-3 text-sm text-stone-700 hover:bg-stone-50 flex items-center gap-3 transition-colors">
+                            <span
+                                class="w-10 text-center py-1 bg-red-50 text-red-600 rounded text-[10px] font-bold">PDF</span>
+                            <span class="font-medium">Document PDF</span>
+                        </button>
+                        <button (click)="exportData('xlsx')"
+                            class="w-full text-left px-4 py-3 text-sm text-stone-700 hover:bg-stone-50 flex items-center gap-3 transition-colors border-t border-stone-50">
+                            <span
+                                class="w-10 text-center py-1 bg-green-50 text-green-600 rounded text-[10px] font-bold">XLSX</span>
+                            <span class="font-medium">Tableur Excel</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Closure Card (Fermeture du compte) -->
+    <div [class]="isDeletionScheduled() ? 'bg-orange-50/50 border-stone-200 border-l-4 border-l-orange-400' : 'bg-white border-stone-100'"
+        class="border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-start gap-4 flex-1 min-w-[300px] group">
+                <div
+                    [class]="isDeletionScheduled() ? 'p-3 bg-white text-orange-500 rounded-full shadow-sm' : 'p-3 bg-stone-50 text-stone-400 rounded-full shadow-inner group-hover:bg-red-500 group-hover:text-white transition-colors'">
+                    <svg *ngIf="!isDeletionScheduled()" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <svg *ngIf="isDeletionScheduled()" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-stone-800 text-lg mb-1">Fermeture du compte</h3>
+
+                    <ng-container *ngIf="isDeletionScheduled(); else normalClosure">
+                        <p class="text-orange-700 font-bold text-xs uppercase tracking-widest mb-1">Suppression
+                            programmée</p>
+                        <p class="text-stone-600 text-sm">
+                            Votre compte sera anonymisé dans <strong class="text-stone-800">{{ getRemainingTimeText()
+                                }}</strong>.
+                        </p>
+                    </ng-container>
+
+                    <ng-template #normalClosure>
+                        <p class="text-stone-500 text-sm">Prévoyez la suppression de votre compte. Une période de 30
+                            jours vous permettra de changer d'avis.</p>
+                    </ng-template>
+                </div>
+            </div>
+
+            <!-- Conditional Actions -->
+            <button *ngIf="!isDeletionScheduled()" (click)="openDeleteModal()" [disabled]="isCheckingDeletion"
+                class="px-4 py-2 text-stone-400 border border-stone-200 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all font-semibold text-sm flex items-center gap-2">
+                <app-loading *ngIf="isCheckingDeletion" size="sm"></app-loading>
+                {{ isCheckingDeletion ? 'Vérification...' : 'Supprimer mon compte' }}
+            </button>
+
+            <button *ngIf="isDeletionScheduled()" (click)="openCancelConfirmation()" [disabled]="isLoading"
+                class="px-6 py-2.5 bg-white border border-stone-300 text-stone-700 rounded-xl hover:bg-stone-50 font-semibold transition-all shadow-sm flex items-center gap-2">
+                <app-loading *ngIf="isLoading" size="sm"></app-loading>
+                Annuler la suppression
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 1: Request Deletion Modal (Validation Email) -->
+    <!-- Delete Confirmation Modal -->
+    <div *ngIf="isDeleteModalOpen"
+        class="fixed inset-0 z-50 flex items-start justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none py-6 sm:py-12">
+
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity" (click)="closeDeleteModal()">
+        </div>
+
+        <div class="relative w-full max-w-2xl mx-auto z-50">
+            <div
+                class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-[calc(100%-2rem)] mx-auto border-t-4 border-red-500 animate-scale-in">
+                <h3 class="text-xl md:text-2xl font-bold mb-4 font-merriweather text-gray-900">Programmer la suppression
+                </h3>
+
+                <!-- Info Sections Grid -->
+                <div class="grid grid-cols-1 gap-4 mb-6 transition-all duration-500 ease-in-out"
+                    [class.md:grid-cols-2]="deletionPrecheck.isInFlow || deletionPrecheck.hasCredits">
+
+                    <!-- Grace Period Box (Information Générale) -->
+                    <div class="bg-orange-50/60 p-5 rounded-2xl text-[13px] md:text-sm text-orange-900 border border-orange-100 flex flex-col h-full transform transition-all duration-300 hover:bg-orange-50/80 shadow-sm"
+                        [class.md:col-span-2]="!(deletionPrecheck.isInFlow || deletionPrecheck.hasCredits)">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="p-1.5 bg-orange-100 rounded-lg shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-orange-600" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <p class="font-bold text-sm">Délai de réflexion (30j)</p>
+                        </div>
+                        <ul class="space-y-1 opacity-95 leading-relaxed flex-1">
+                            <li class="flex items-start gap-2">
+                                <span class="text-orange-400 mt-1">•</span>
+                                <span>Anonymisation planifiée dans 30 jours calendaires.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-orange-400 mt-1">•</span>
+                                <span>Annulable à tout moment par simple connexion à votre compte.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-orange-400 mt-1">•</span>
+                                <span>Passé ce délai, vos données seront irrémédiablement supprimées.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Impact Box (Conditionnelle) -->
+                    <div *ngIf="deletionPrecheck.isInFlow || deletionPrecheck.hasCredits"
+                        class="bg-blue-50/60 p-5 rounded-2xl text-[13px] md:text-sm text-blue-900 border border-blue-100 flex flex-col h-full animate-fade-in transition-all duration-300 hover:bg-blue-50/80 shadow-sm">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="p-1.5 bg-blue-100 rounded-lg shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <p class="font-bold text-sm">Impact sur votre activité</p>
+                        </div>
+                        <ul class="space-y-1 opacity-95 leading-relaxed flex-1">
+                            <li *ngIf="deletionPrecheck.isInFlow" class="flex items-start gap-2">
+                                <span class="text-blue-400 mt-1">•</span>
+                                <span>Arrêt immédiat de vos recherches en cours.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-blue-400 mt-1">•</span>
+                                <span>Délai de carence de 14j avant toute nouvelle tentative de recherche.</span>
+                            </li>
+                            <li *ngIf="deletionPrecheck.hasCredits" class="flex items-start gap-2">
+                                <span class="text-blue-400 mt-1">•</span>
+                                <span>Remboursement automatique de <strong
+                                        class="text-blue-700 underline decoration-blue-200 underline-offset-2">{{
+                                        deletionPrecheck.remainingCredits }} crédits</strong>.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <form [formGroup]="deleteForm" (ngSubmit)="deleteAccount()">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Confirmez en saisissant votre email <strong>{{ currentUserEmail }}</strong> :
+                        </label>
+                        <input type="email" formControlName="emailConfirmation" placeholder="votre@email.com"
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all placeholder:text-gray-300">
+                    </div>
+
+                    <div class="flex flex-col-reverse sm:flex-row justify-end gap-3">
+                        <button type="button" (click)="closeDeleteModal()"
+                            class="px-6 py-3 text-gray-500 hover:bg-gray-50 rounded-xl font-semibold transition-colors">
+                            Annuler
+                        </button>
+                        <button type="button" (click)="deleteAccount()" [disabled]="deleteForm.invalid || isLoading"
+                            class="px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-lg shadow-red-500/20 flex items-center justify-center">
+                            <app-loading *ngIf="isLoading" size="sm" class="mr-2"></app-loading>
+                            Planifier la suppression
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Confirmation Modal for Deletion -->
+    <app-confirmation-modal [isOpen]="isConfirmationOpen" title="Plannifier l'anonymisation ?"
+        message="Votre compte restera accessible pendant 30 jours. Passé ce délai, vos données seront irrémédiablement anonymisées."
+        confirmText="Confirmer la planification" cancelText="Retour" (confirm)="onDeleteConfirmed()"
+        (cancel)="onDeleteCancelled()">
+    </app-confirmation-modal>
+
+    <!-- Cancellation Confirmation Modal -->
+    <app-confirmation-modal [isOpen]="isCancelConfirmationOpen" title="Annuler la suppression ?"
+        message="Votre compte redeviendra pleinement actif et aucune donnée ne sera supprimée."
+        confirmText="Oui, garder mon compte" cancelText="Non, laisser en suppression" (confirm)="onCancelConfirmed()"
+        (cancel)="closeCancelConfirmation()">
+    </app-confirmation-modal>

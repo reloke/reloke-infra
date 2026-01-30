@@ -1,0 +1,37 @@
+// Colors
+$color-bg-main: #F2F0E9;
+$color-bg-card: #FDFBF7;
+$color-primary: #C25E46;
+$color-primary-hover: #A04530;
+$color-text-main: #2C2825;
+$color-text-secondary: #6B665F;
+$color-text-placeholder: #BDB8AE;
+$color-border: #EAE5D9;
+$color-border-light: #E6E2D6;
+$color-success-bg: #D8Ead6;
+$color-success-text: #2E5C38;
+$color-icon-neutral: #A39E93;
+$color-white: #FFFFFF;
+
+// Typography
+$font-family-body: 'Inter', sans-serif;
+$font-family-heading: 'Merriweather', serif;
+
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 1.875rem;
+
+// Spacing & Radius
+$border-radius-sm: 0.5rem;
+$border-radius-md: 0.75rem;
+$border-radius-lg: 1rem;
+$border-radius-xl: 1.5rem;
+$border-radius-2xl: 2rem; // Added for larger cards
+
+$shadow-card: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);

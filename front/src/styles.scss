@@ -1,0 +1,160 @@
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'styles/reset';
+@import 'styles/utilities';
+
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+@font-face {
+    font-family: "Canva Sans";
+    src: url("https://db.onlinewebfonts.com/t/01173970b5502c1798305c455826f043.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+}
+
+.font-canva {
+    font-family: 'Canva Sans', 'Inter', sans-serif !important;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #F2F0E9;
+    color: #2C2825;
+    position: relative;
+    overflow-x: hidden;
+
+    &::before {
+        content: '';
+        position: fixed;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background-image: url('/assets/images/reloke.png');
+        background-repeat: repeat;
+        background-size: 80px;
+        opacity: 0.04;
+        pointer-events: none;
+        z-index: 0;
+        transform: rotate(-12deg);
+    }
+}
+
+.grecaptcha-badge {
+    visibility: hidden;
+}
+
+// Google Places Autocomplete dropdown - ensure it's always visible above other elements
+.pac-container {
+    z-index: 10000 !important;
+}
+
+@keyframes logo-complex-spin {
+    0% {
+        transform: rotate(6deg);
+    }
+
+    40% {
+        transform: rotate(366deg);
+    }
+
+    60% {
+        transform: rotate(366deg) rotateY(180deg);
+    }
+
+    80% {
+        transform: rotate(366deg) rotateY(360deg);
+    }
+
+    100% {
+        transform: rotate(6deg);
+    }
+}
+
+.group:hover .animate-complex-logo {
+    animation: logo-complex-spin 1.2s ease-in-out forwards;
+}
+
+/* Scrollbar Utils */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+
+    &::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari and Opera */
+    }
+}
+
+/* Snackbar Styles */
+.custom-snackbar-success {
+    --mdc-snackbar-container-color: #10b981 !important;
+    --mdc-snackbar-supporting-text-color: white !important;
+    font-weight: 600;
+}
+
+.custom-snackbar-error {
+    --mdc-snackbar-container-color: #ef4444 !important;
+    --mdc-snackbar-supporting-text-color: white !important;
+    font-weight: 600;
+}
+
+.custom-snackbar-success .mat-mdc-snack-bar-action,
+.custom-snackbar-error .mat-mdc-snack-bar-action {
+    color: white !important;
+}
+
+/* Global Button Styles */
+.btn-landing-primary {
+    background-color: #C25E46;
+    color: white;
+    box-shadow: 0 10px 20px -10px rgba(194, 94, 70, 0.4);
+    transition: all 0.5s;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #A04530;
+        box-shadow: 0 20px 30px -10px rgba(194, 94, 70, 0.5);
+        transform: translateY(-4px);
+    }
+}
+
+.btn-landing-outline {
+    background-color: white;
+    color: #2C2825;
+    border: 1px solid #EAE5D9;
+    transition: all 0.5s ease;
+    cursor: pointer;
+
+    &:hover {
+        border-color: #C25E46;
+        color: #C25E46;
+    }
+}
+
+@keyframes pulse-subtle {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.85;
+    }
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

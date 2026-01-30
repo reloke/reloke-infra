@@ -1,0 +1,135 @@
+<div class="space-y-6">
+    <div class="border-b border-gray-100 pb-4">
+        <h2 class="text-2xl font-bold text-gray-900 font-heading">Vérification d'Identité</h2>
+        <p class="text-gray-500 text-sm mt-1">Vérifiez votre identité pour débloquer toutes les fonctionnalités
+            d'échange.</p>
+    </div>
+
+    <!-- Error Alert -->
+    <app-alert *ngIf="error" [type]="'error'" [message]="error" [dismissible]="true" (closed)="dismissError()">
+    </app-alert>
+
+    <!-- Success Alert -->
+    <app-alert *ngIf="successMessage" [type]="'success'" [message]="successMessage" [dismissible]="true"
+        (closed)="dismissSuccess()">
+    </app-alert>
+
+    <!-- Status Banner -->
+    <div [ngClass]="{
+        'bg-yellow-50 border-yellow-200 text-yellow-800': status === 'PROCESSING',
+        'bg-green-50 border-green-200 text-green-800': status === 'VERIFIED',
+        'bg-gray-50 border-gray-200 text-gray-800': status === 'UNVERIFIED',
+        'bg-orange-50 border-orange-200 text-orange-800': status === 'REQUIRES_INPUT',
+        'bg-red-50 border-red-200 text-red-800': status === 'CANCELED' || status === 'DECLINED'
+    }" class="p-6 rounded-2xl border flex items-start gap-4">
+
+        <!-- Status Icon -->
+        <div class="shrink-0">
+            <div *ngIf="status === 'PROCESSING'"
+                class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                <app-loading size="sm"></app-loading>
+            </div>
+            <div *ngIf="status === 'VERIFIED'"
+                class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div *ngIf="status === 'UNVERIFIED'"
+                class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div *ngIf="status === 'REQUIRES_INPUT'"
+                class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <div *ngIf="status === 'CANCELED' || status === 'DECLINED'"
+                class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Status Content -->
+        <div class="flex-1">
+            <h3 class="font-bold text-lg mb-1">{{ getStatusText() }}</h3>
+            <p class="text-sm opacity-80">{{ getStatusDescription() }}</p>
+
+            <!-- Verified At Date -->
+            <p *ngIf="status === 'VERIFIED' && verifiedAt" class="text-xs mt-2 opacity-60">
+                Vérifié le {{ verifiedAt | date:'dd/MM/yyyy à HH:mm' }}
+            </p>
+        </div>
+
+        <!-- Verified Badge -->
+        <div *ngIf="status === 'VERIFIED'"
+            class="shrink-0 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
+            ✓ Vérifié
+        </div>
+    </div>
+
+    <!-- Action Section -->
+    <div *ngIf="canRetry()" class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h3 class="font-bold text-lg text-gray-900 mb-1">Lancer la vérification</h3>
+                <p class="text-gray-500 text-sm">
+                    Vous serez redirigé vers notre partenaire de vérification d'identité.
+                    Munissez-vous d'une pièce d'identité valide.
+                </p>
+            </div>
+            <button (click)="startVerification()" [disabled]="isLoading"
+                class="px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20 flex items-center justify-center gap-2 shrink-0">
+                <app-loading *ngIf="isLoading" size="sm" [white]="true"></app-loading>
+                <svg *ngIf="!isLoading" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                {{ isLoading ? 'Chargement...' : 'Vérifier mon identité' }}
+            </button>
+        </div>
+
+        <!-- Info Box -->
+        <div class="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-xl">
+            <div class="flex items-start gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 shrink-0 mt-0.5" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="text-sm text-blue-800">
+                    <p class="font-medium mb-1">Ce dont vous avez besoin :</p>
+                    <ul class="list-disc pl-4 space-y-1 opacity-80">
+                        <li>Une pièce d'identité valide (carte d'identité ou passeport)</li>
+                        <li>Un bon éclairage pour la capture du visage</li>
+                        <li>2-3 minutes de votre temps</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Info -->
+    <div *ngIf="status === 'PROCESSING'" class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+        <div class="flex items-center gap-3">
+            <app-loading size="sm"></app-loading>
+            <p class="text-yellow-800 text-sm">
+                La vérification est en cours. Cette page se mettra à jour automatiquement.
+            </p>
+        </div>
+    </div>
+</div>

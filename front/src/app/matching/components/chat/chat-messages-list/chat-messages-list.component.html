@@ -1,0 +1,326 @@
+﻿<div class="flex-1 overflow-hidden chat-rain-container flex flex-col relative">
+    <div class="chat-rain-bg"></div>
+
+    <!-- Warning Banner for reported user -->
+    <div *ngIf="hasBeenReported" (click)="reportBannerClick.emit()"
+        class="bg-orange-50 border-b border-orange-100 p-3 flex items-center gap-3 cursor-pointer hover:bg-orange-100 transition-colors z-20">
+        <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd" />
+            </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold text-orange-800">Signalement déposé</p>
+            <p class="text-[10px] text-orange-600 truncate">Nos administrateurs examinent votre comportement.
+                Cliquez pour plus d'infos.</p>
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-orange-400" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+    </div>
+
+    <div #scrollMe (scroll)="onScroll($event)" class="flex-1 overflow-y-auto p-4 space-y-6 messages-list relative">
+
+        <!-- Loading Older Spinner -->
+        <div *ngIf="isLoadingOlder" class="flex justify-center p-4">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+        </div>
+
+        <!-- Grouped Messages -->
+        <div *ngFor="let group of groupedMessages; trackBy: trackByGroup">
+            <!-- Date Divider -->
+            <div class="date-divider flex justify-center py-6">
+                <span class="date-label">{{ group.date }}</span>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+                <div *ngFor="let msg of group.messages; trackBy: trackByMsgId"
+                    class="flex items-start gap-3 relative w-full transition-opacity"
+                    [class.z-[100]]="activeMenuMessageId === msg.id" [class.z-10]="activeMenuMessageId !== msg.id"
+                    [class.flex-row-reverse]="isMe(msg) && !selectionMode"
+                    [class.cursor-pointer]="selectionMode && isMe(msg)" [class.opacity-50]="selectionMode && !isMe(msg)"
+                    (click)="selectionMode && isMe(msg) ? toggleSelection(msg.id) : null">
+
+                    <!-- Selection Checkbox -->
+                    <div *ngIf="selectionMode && isMe(msg)"
+                        class="mt-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0"
+                        [class.bg-primary]="selectedMessageIds.has(msg.id)"
+                        [class.border-primary]="selectedMessageIds.has(msg.id)"
+                        [class.border-gray-200]="!selectedMessageIds.has(msg.id)">
+                        <svg *ngIf="selectedMessageIds.has(msg.id)" xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+
+                    <!-- Avatar for others -->
+                    <div *ngIf="!isMe(msg)" class="shrink-0 mt-1">
+                        <div
+                            class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px] border border-white shadow-sm overflow-hidden">
+                            <img *ngIf="msg.sender.profilePicture" [src]="msg.sender.profilePicture"
+                                class="h-full w-full object-cover">
+                            <span *ngIf="!msg.sender.profilePicture">{{ msg.sender.firstName[0] }}{{
+                                msg.sender.lastName[0] }}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col flex-1 max-w-[85%] sm:max-w-[75%] md:max-w-[70%]"
+                        [class.items-end]="isMe(msg)">
+                        <span *ngIf="!isMe(msg)" class="text-[10px] text-secondary ml-1 mb-0.5 font-medium">{{
+                            msg.sender.firstName }}</span>
+                        <div class="message-bubble rounded-2xl p-3 shadow-sm relative group transition-all max-w-full"
+                            [ngClass]="{
+                                'bg-primary text-white rounded-tr-none': isMe(msg) && !isContactMessage(msg),
+                                'bg-white text-secondary rounded-tl-none border border-gray-100': !isMe(msg) && !isContactMessage(msg),
+                                'bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 text-gray-800': isContactMessage(msg)
+                            }">
+
+                            <!-- Quoted Reply -->
+                            <div *ngIf="msg.replyTo"
+                                class="mb-2 p-2 rounded-lg bg-black/10 border-l-4 border-white/40 flex flex-col gap-1 text-[11px] cursor-pointer hover:bg-black/20 transition-colors"
+                                [ngClass]="{'bg-gray-50 border-primary text-secondary': !isMe(msg)}">
+                                <span class="font-bold opacity-80">{{ msg.replyTo.sender.firstName }}</span>
+                                <p class="line-clamp-2 italic opacity-90">{{ msg.replyTo.content }}</p>
+                            </div>
+
+                            <!-- Options Trigger Icon -->
+                            <div *ngIf="!selectionMode && !isMeBanned"
+                                class="absolute right-1 top-1 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 cursor-pointer hover:bg-black/5 rounded-lg z-40"
+                                [class.left-1]="!isMe(msg)" [class.right-auto]="!isMe(msg)"
+                                [class.text-white]="isMe(msg)" [class.text-secondary]="!isMe(msg)"
+                                (click)="toggleMessageMenu($event, msg.id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+
+                            <!-- Options Menu -->
+                            <div *ngIf="activeMenuMessageId === msg.id && !isContactMessage(msg)"
+                                class="absolute top-8 right-2 bg-white shadow-2xl rounded-xl border border-gray-100 py-1 z-[110] w-32 flex flex-col"
+                                [class.left-2]="!isMe(msg)" [class.right-auto]="!isMe(msg)">
+                                <button (click)="onReply(msg); $event.stopPropagation()"
+                                    class="px-3 py-2 text-xs text-left text-secondary hover:bg-gray-50 flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                                    </svg>
+                                    Répondre
+                                </button>
+                                <button *ngIf="isMe(msg)" (click)="onEdit(msg); $event.stopPropagation()"
+                                    class="px-3 py-2 text-xs text-left text-secondary hover:bg-gray-50 flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    Modifier
+                                </button>
+                                <button *ngIf="isMe(msg)" (click)="onDelete(msg); $event.stopPropagation()"
+                                    class="px-3 py-2 text-xs text-left text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Supprimer
+                                </button>
+                            </div>
+
+                            <!-- Contact Message Options Menu -->
+                            <div *ngIf="activeMenuMessageId === msg.id && isContactMessage(msg)"
+                                class="absolute top-8 right-2 bg-white shadow-2xl rounded-xl border border-gray-100 py-1 z-[110] w-32 flex flex-col"
+                                [class.left-2]="!isMe(msg)" [class.right-auto]="!isMe(msg)">
+                                <button *ngIf="isMe(msg)" (click)="openContactEditModal(msg); $event.stopPropagation()"
+                                    class="px-3 py-2 text-xs text-left text-secondary hover:bg-gray-50 flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    Modifier
+                                </button>
+                                <button *ngIf="isMe(msg)" (click)="onDelete(msg); $event.stopPropagation()"
+                                    class="px-3 py-2 text-xs text-left text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Supprimer
+                                </button>
+                            </div>
+
+                            <!-- Contact Card (CONTACT type message) -->
+                            <div *ngIf="isContactMessage(msg)" class="contact-card w-full min-w-[240px]"
+                                (click)="toggleContactDetails(msg.id)">
+                                <!-- Target mention for triangle chats -->
+                                <div *ngIf="msg.contactTargetUser" class="mb-2 flex items-center gap-2">
+                                    <span
+                                        class="text-[10px] font-bold px-2 py-1 rounded-full bg-primary/10 text-primary">
+                                        Pour &#64;{{ msg.contactTargetUser.firstName }} {{
+                                        msg.contactTargetUser.lastName }}
+                                    </span>
+                                </div>
+
+                                <!-- Contact Header -->
+                                <div class="flex items-center gap-3" [class.mb-4]="revealedContactIds.has(msg.id)">
+                                    <div
+                                        class="w-11 h-11 rounded-xl bg-primary flex items-center justify-center text-white shrink-0 shadow-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-bold text-gray-900 truncate text-base">{{ msg.contactName }}</p>
+                                        <p class="text-[10px] font-black text-primary uppercase tracking-widest">
+                                            Contact Gestionnaire</p>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-1">
+                                        <div *ngIf="msg.isEdited" class="text-[9px] text-gray-400 italic">Modifié</div>
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="h-4 w-4 text-gray-400 transition-transform duration-300"
+                                            [class.rotate-180]="revealedContactIds.has(msg.id)" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <!-- Contact Details (Hidden by default) -->
+                                <div *ngIf="revealedContactIds.has(msg.id)"
+                                    class="space-y-2 text-sm animate-fade-in pt-2 border-t border-primary/10 mt-2">
+                                    <a *ngIf="msg.contactEmail" [href]="'mailto:' + msg.contactEmail"
+                                        (click)="$event.stopPropagation()"
+                                        class="flex items-center gap-3 p-2 rounded-xl bg-white border border-gray-100 hover:border-primary transition-all group/link min-w-0">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover/link:bg-primary/10 group-hover/link:text-primary transition-colors shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                        <span class="text-gray-700 font-medium truncate">{{ msg.contactEmail }}</span>
+                                    </a>
+                                    <a *ngIf="msg.contactPhone" [href]="'tel:' + msg.contactPhone"
+                                        (click)="$event.stopPropagation()"
+                                        class="flex items-center gap-3 p-2 rounded-xl bg-white border border-gray-100 hover:border-primary transition-all group/link min-w-0">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover/link:bg-primary/10 group-hover/link:text-primary transition-colors shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                            </svg>
+                                        </div>
+                                        <span class="text-gray-700 font-medium">{{ msg.contactPhone }}</span>
+                                    </a>
+                                </div>
+                                <p *ngIf="!revealedContactIds.has(msg.id)"
+                                    class="text-[9px] text-center text-gray-400 mt-2 font-medium uppercase tracking-tighter">
+                                    Cliquer pour voir +</p>
+                            </div>
+
+                            <!-- Multiple Images Grid -->
+                            <div *ngIf="msg.images && msg.images.length > 0" class="mb-1 -mx-1">
+                                <div class="grid gap-1 w-full max-w-[200px] sm:max-w-[280px] md:max-w-[320px]"
+                                    [ngClass]="{
+                                'grid-cols-1': msg.images.length === 1,
+                                'grid-cols-2': msg.images.length === 2,
+                                'grid-cols-2 grid-rows-2': msg.images.length >= 3
+                            }">
+                                    <div *ngFor="let img of msg.images.slice(0, 4); let i = index"
+                                        class="relative aspect-square overflow-hidden cursor-pointer bg-gray-100 rounded-xl"
+                                        [ngClass]="{'row-span-2 h-full': msg.images.length === 3 && i === 0}"
+                                        (click)="openImageFullscreen(img.url, msg)">
+                                        <img [src]="img.url | imageUrl"
+                                            class="w-full h-full object-cover transition-transform group-hover:scale-105">
+                                        <div *ngIf="i === 3 && msg.images.length > 4"
+                                            class="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold text-lg rounded-xl">
+                                            <span>+</span>{{ msg.images.length - 4 }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Single File/Image (backward compatibility or specialized types) -->
+                            <div *ngIf="msg.fileUrl && (!msg.images || msg.images.length === 0)" class="mb-2">
+                                <div *ngIf="msg.type === 'IMAGE' || (msg.fileType && msg.fileType.startsWith('image/'))"
+                                    class="rounded-xl overflow-hidden cursor-pointer shadow-sm border border-gray-100 w-full max-w-[200px] sm:max-w-[250px] md:max-w-[280px]"
+                                    (click)="openImageFullscreen(msg.fileUrl, msg)">
+                                    <img [src]="msg.fileUrl | imageUrl"
+                                        class="w-full h-auto object-cover max-h-48 sm:max-h-60">
+                                </div>
+
+                                <div *ngIf="msg.type === 'FILE' && (!msg.fileType || !msg.fileType.startsWith('image/'))"
+                                    class="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white min-w-[200px]"
+                                    [ngClass]="{'bg-gray-100 text-secondary border-gray-200': !isMe(msg)}">
+                                    <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-bold truncate">{{ msg.content }}</p>
+                                    </div>
+                                    <a [href]="msg.fileUrl" target="_blank" [download]="msg.content"
+                                        class="p-2 hover:bg-white/20 rounded-full transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Text Content -->
+                            <p *ngIf="msg.type === 'TEXT' || ((msg.type === 'IMAGE' || msg.fileUrl) && msg.content && !msg.content.includes('photo'))"
+                                class="text-sm whitespace-pre-wrap leading-relaxed mt-1"
+                                [innerHTML]="formatMessage(msg.content)"></p>
+                            <p class="text-[9px] mt-1 opacity-60" [class.text-right]="isMe(msg)">
+                                {{ msg.createdAt | date:'HH:mm' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State (No messages) -->
+            <div *ngIf="messages.length === 0 && !isLoadingOlder"
+                class="flex flex-col items-center justify-center h-full text-secondary opacity-50 py-12">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <p>Commencez la discussion !</p>
+            </div>
+        </div>
+
+        <!-- Scroll to bottom button -->
+        <button *ngIf="showScrollToBottom" (click)="scrollToBottom(true)"
+            class="absolute bottom-6 right-6 p-4 bg-white text-primary rounded-full shadow-2xl hover:bg-gray-50 transition-all border border-gray-100 z-50 flex items-center justify-center group/scroll">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 group-hover/scroll:translate-y-0.5 transition-transform" viewBox="0 0 20 20"
+                fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clip-rule="evenodd" />
+            </svg>
+        </button>
+    </div>
+</div>

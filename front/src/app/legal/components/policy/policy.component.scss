@@ -1,0 +1,10 @@
+/* privacy-policy.component.scss */
+/* Minimal : uniquement pour une meilleure navigation avec ancres */
+:host {
+  display: block;
+}
+
+/* Optionnel : si vous avez une navbar sticky, augmentez le scroll offset */
+.scroll-mt-24 {
+  scroll-margin-top: 6rem;
+}

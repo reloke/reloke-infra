@@ -1,0 +1,76 @@
+@import 'variables';
+
+@layer components {
+
+    .bg-main {
+        background-color: $color-bg-main;
+    }
+
+    .bg-card {
+        background-color: $color-bg-card;
+    }
+
+    .text-main {
+        color: $color-text-main;
+    }
+
+    .border-main {
+        border-color: $color-text-main;
+    }
+
+    .btn {
+        @apply inline-flex items-center justify-center py-4 px-6 rounded-xl font-semibold transition-all duration-200 cursor-pointer gap-2 text-base border-none;
+    }
+
+    .btn:disabled {
+        @apply opacity-70 cursor-not-allowed;
+    }
+
+    .btn:active:not(:disabled) {
+        @apply transform scale-95;
+    }
+
+    .btn-primary {
+        @apply text-white shadow-md hover:shadow-lg;
+        background-color: $color-primary;
+
+        &:hover {
+            background-color: $color-primary-hover;
+        }
+    }
+
+    .btn-secondary {
+        @apply bg-transparent border border-gray-200;
+        color: $color-text-main;
+
+        &:hover {
+            background-color: rgba($color-primary, 0.05);
+            border-color: $color-primary;
+            color: $color-primary;
+        }
+    }
+
+    .card {
+        @apply bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden transition-all duration-500;
+    }
+
+    .form-control {
+        @apply w-full py-4 px-4 bg-white border border-gray-200 rounded-xl transition-all duration-200 text-base placeholder-gray-400 focus:outline-none focus:ring-2;
+        color: $color-text-main;
+
+        &:focus {
+            border-color: $color-primary;
+            --tw-ring-color: rgba($color-primary, 0.2);
+        }
+    }
+
+    .input-group {
+        @apply flex flex-col gap-2 mb-6;
+    }
+
+    .input-group label {
+        @apply text-xs font-semibold uppercase tracking-wider text-gray-500 pl-1;
+    }
+
+
+}

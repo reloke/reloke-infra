@@ -1,0 +1,394 @@
+// Outgoing Profile Component Styles
+
+// Animation for fade in
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+// ============================================
+// CUSTOM GOOGLE PLACES AUTOCOMPLETE DROPDOWN
+// Style integre au design du composant
+// ============================================
+
+.address-autocomplete-container {
+  position: relative;
+  z-index: 11;
+}
+
+.address-predictions-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #FDFBF7; // bg-card
+  border-radius: 16px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(107, 102, 95, 0.15); // secondary with opacity
+  overflow: hidden;
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  animation: addressDropdownFadeIn 0.2s ease-out;
+
+  // Scrollbar personnalisee
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #C25E46; // primary terracotta
+    border-radius: 3px;
+    opacity: 0.6;
+  }
+}
+
+@keyframes addressDropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.address-prediction-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-bottom: 1px solid rgba(107, 102, 95, 0.08); // secondary with opacity
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover,
+  &--selected {
+    background: linear-gradient(135deg,
+        rgba(194, 94, 70, 0.08) 0%, // primary terracotta
+        rgba(194, 94, 70, 0.04) 100%);
+  }
+
+  &--selected {
+    background: linear-gradient(135deg,
+        rgba(194, 94, 70, 0.12) 0%, // primary terracotta
+        rgba(194, 94, 70, 0.06) 100%);
+  }
+}
+
+.address-prediction-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg,
+      rgba(194, 94, 70, 0.15) 0%, // primary terracotta
+      rgba(194, 94, 70, 0.08) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #C25E46; // primary terracotta
+
+  i {
+    font-size: 14px;
+  }
+}
+
+.address-prediction-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.address-prediction-main {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1f2937; // text-main
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.address-prediction-secondary {
+  font-size: 12px;
+  color: #6B665F; // secondary
+  line-height: 1.3;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.address-google-attribution {
+  padding: 8px 16px;
+  background: #F2F0E9; // bg-main
+  border-top: 1px solid rgba(107, 102, 95, 0.15); // secondary with opacity
+  display: flex;
+  justify-content: flex-end;
+
+  img {
+    opacity: 0.7;
+  }
+}
+
+// Cacher le dropdown Google natif
+:host ::ng-deep .pac-container {
+  display: none !important;
+}
+
+// Responsive
+@media (max-width: 640px) {
+  .address-predictions-dropdown {
+    max-height: 250px;
+  }
+
+  .address-prediction-item {
+    padding: 10px 12px;
+  }
+
+  .address-prediction-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .address-prediction-main {
+    font-size: 13px;
+  }
+
+  .address-prediction-secondary {
+    font-size: 11px;
+  }
+}
+
+// Rotate animation for dropdown chevrons
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+// Fix for video element
+video {
+  min-height: 300px;
+  max-height: 400px;
+  object-fit: cover;
+}
+
+// Aspect ratio polyfill for older browsers
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+
+// Custom scrollbar for dropdowns
+.overflow-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+}
+
+// ============================================
+// CUSTOM PRIMENG CALENDAR STYLES
+// Style integre au design terracotta de l'app
+// ============================================
+
+.date-picker-wrapper {
+  :host ::ng-deep {
+    .p-calendar {
+      width: 100%;
+    }
+
+    .p-inputtext {
+      width: 100%;
+      padding-left: 2.75rem !important;
+    }
+
+    // Hide default calendar icon since we have our own
+    .p-calendar-trigger,
+    .p-datepicker-trigger {
+      display: none !important;
+    }
+  }
+}
+
+// Global PrimeNG Calendar panel styling
+:host ::ng-deep {
+  .p-datepicker {
+    background: #FDFBF7 !important; // bg-card
+    border: 1px solid rgba(107, 102, 95, 0.15) !important;
+    border-radius: 16px !important;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+    padding: 1rem !important;
+    font-family: inherit !important;
+
+    // Header
+    .p-datepicker-header {
+      background: transparent !important;
+      border-bottom: 1px solid rgba(107, 102, 95, 0.1) !important;
+      padding: 0 0 0.75rem 0 !important;
+      margin-bottom: 0.5rem !important;
+
+      .p-datepicker-title {
+
+        .p-datepicker-month,
+        .p-datepicker-year {
+          color: #1f2937 !important; // text-main
+          font-weight: 600 !important;
+          font-size: 1rem !important;
+          padding: 0.5rem !important;
+          border-radius: 8px !important;
+          transition: all 0.2s !important;
+
+          &:hover {
+            background: rgba(194, 94, 70, 0.1) !important;
+            color: #C25E46 !important;
+          }
+        }
+      }
+
+      .p-datepicker-prev,
+      .p-datepicker-next {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        border-radius: 10px !important;
+        color: #6B665F !important;
+        transition: all 0.2s !important;
+
+        &:hover {
+          background: rgba(194, 94, 70, 0.1) !important;
+          color: #C25E46 !important;
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 2px rgba(194, 94, 70, 0.2) !important;
+        }
+      }
+    }
+
+    // Calendar table
+    .p-datepicker-calendar {
+      th {
+        color: #6B665F !important; // secondary
+        font-weight: 600 !important;
+        font-size: 0.75rem !important;
+        text-transform: uppercase !important;
+        padding: 0.5rem !important;
+      }
+
+      td {
+        padding: 0.25rem !important;
+
+        span {
+          width: 2.5rem !important;
+          height: 2.5rem !important;
+          border-radius: 10px !important;
+          color: #1f2937 !important;
+          transition: all 0.15s !important;
+
+          &:hover:not(.p-disabled):not(.p-highlight) {
+            background: rgba(194, 94, 70, 0.1) !important;
+            color: #C25E46 !important;
+          }
+
+          &.p-highlight {
+            background: linear-gradient(135deg, #C25E46 0%, #A84E3A 100%) !important;
+            color: white !important;
+            font-weight: 600 !important;
+          }
+
+          &.p-disabled {
+            color: #d1d5db !important;
+            opacity: 0.5 !important;
+          }
+        }
+      }
+
+      // Today indicator
+      td.p-datepicker-today {
+        span:not(.p-highlight) {
+          background: rgba(194, 94, 70, 0.08) !important;
+          border: 2px solid #C25E46 !important;
+          color: #C25E46 !important;
+          font-weight: 600 !important;
+        }
+      }
+    }
+
+    // Month/Year picker
+    .p-monthpicker,
+    .p-yearpicker {
+
+      .p-monthpicker-month,
+      .p-yearpicker-year {
+        border-radius: 10px !important;
+        color: #1f2937 !important;
+        padding: 0.75rem !important;
+        transition: all 0.15s !important;
+
+        &:hover:not(.p-disabled) {
+          background: rgba(194, 94, 70, 0.1) !important;
+          color: #C25E46 !important;
+        }
+
+        &.p-highlight {
+          background: linear-gradient(135deg, #C25E46 0%, #A84E3A 100%) !important;
+          color: white !important;
+        }
+      }
+    }
+  }
+
+  // Animation
+  .p-datepicker-touch-ui,
+  .p-connected-overlay-enter-done {
+    animation: calendarFadeIn 0.2s ease-out !important;
+  }
+}
+
+@keyframes calendarFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

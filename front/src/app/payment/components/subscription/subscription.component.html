@@ -1,0 +1,130 @@
+<div class="min-h-screen bg-main p-4 md:p-8 flex items-center justify-center">
+    <div class="max-w-6xl w-full">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-heading font-bold text-white mb-4">Choisissez votre formule</h1>
+            <p class="text-secondary-light text-lg">Débloquez tout le potentiel de Reloke avec nos packs exclusifs.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+            <!-- Pack Découverte -->
+            <div class="card bg-white p-8 hover:transform hover:-translate-y-2 transition-all duration-300">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-secondary uppercase tracking-wider">Découverte</h3>
+                    <div class="mt-4 flex justify-center items-baseline">
+                        <span class="text-5xl font-extrabold text-main">15</span>
+                        <span class="text-2xl font-bold text-main">€</span>
+                    </div>
+                    <p class="text-secondary text-sm mt-2">Paiement unique</p>
+                </div>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center text-secondary">
+                        <svg class="h-5 w-5 text-primary mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        5 Matchs inclus
+                    </li>
+                    <li class="flex items-center text-secondary">
+                        <svg class="h-5 w-5 text-primary mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Valable 30 jours
+                    </li>
+                    <li class="flex items-center text-secondary">
+                        <svg class="h-5 w-5 text-primary mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Support standard
+                    </li>
+                </ul>
+                <button (click)="onSubscribe(15, 'PACK_5')" class="btn btn-outline w-full justify-center">Choisir
+                    Découverte</button>
+            </div>
+
+            <!-- Pack Confort (Highlighted) -->
+            <div class="card bg-white p-8 border-4 border-primary transform scale-105 shadow-2xl relative z-10">
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <span
+                        class="bg-primary text-white text-sm font-bold px-4 py-1 rounded-full uppercase tracking-wide">Le
+                        plus populaire</span>
+                </div>
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-primary uppercase tracking-wider">Confort</h3>
+                    <div class="mt-4 flex justify-center items-baseline">
+                        <span class="text-6xl font-extrabold text-main">25</span>
+                        <span class="text-3xl font-bold text-main">€</span>
+                    </div>
+                    <p class="text-secondary text-sm mt-2">Paiement unique</p>
+                </div>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center text-main font-medium">
+                        <svg class="h-6 w-6 text-primary mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        15 Matchs inclus
+                    </li>
+                    <li class="flex items-center text-main font-medium">
+                        <svg class="h-6 w-6 text-primary mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Valable 45 jours
+                    </li>
+                    <li class="flex items-center text-main font-medium">
+                        <svg class="h-6 w-6 text-primary mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Support prioritaire
+                    </li>
+                    <li class="flex items-center text-main font-medium">
+                        <svg class="h-6 w-6 text-primary mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Badge "Vérifié"
+                    </li>
+                </ul>
+                <button (click)="onSubscribe(25, 'PACK_15')"
+                    class="btn btn-primary w-full justify-center text-lg py-4 shadow-lg hover:shadow-xl transition-shadow">Choisir
+                    Confort</button>
+            </div>
+
+            <!-- Pack Premium -->
+            <div class="card bg-white p-8 hover:transform hover:-translate-y-2 transition-all duration-300">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-secondary uppercase tracking-wider">Premium</h3>
+                    <div class="mt-4 flex justify-center items-baseline">
+                        <span class="text-5xl font-extrabold text-main">40</span>
+                        <span class="text-2xl font-bold text-main">€</span>
+                    </div>
+                    <p class="text-secondary text-sm mt-2">Paiement unique</p>
+                </div>
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center text-secondary">
+                        <svg class="h-5 w-5 text-primary mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        30 Matchs inclus
+                    </li>
+                    <li class="flex items-center text-secondary">
+                        <svg class="h-5 w-5 text-primary mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Valable 60 jours
+                    </li>
+                    <li class="flex items-center text-secondary">
+                        <svg class="h-5 w-5 text-primary mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Conciergerie dédiée
+                    </li>
+                </ul>
+                <button (click)="onSubscribe(40, 'PACK_30')" class="btn btn-outline w-full justify-center">Choisir
+                    Premium</button>
+            </div>
+        </div>
+
+        <div class="mt-12 text-center">
+            <p class="text-secondary-light text-sm">Paiement sécurisé via PayPal. Annulation possible sous 14 jours si
+                non utilisé.</p>
+        </div>
+    </div>
+</div>

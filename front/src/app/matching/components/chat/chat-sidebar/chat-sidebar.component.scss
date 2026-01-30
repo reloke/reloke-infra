@@ -1,0 +1,148 @@
+:host {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+/* Desktop (md: 768px+): always visible, supports collapsed mode */
+@media (min-width: 768px) {
+    :host {
+        width: 320px;
+        flex-shrink: 0;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    :host(.collapsed) {
+        width: 60px !important;
+    }
+}
+
+/* Mobile (< 768px): full width list OR completely hidden */
+/* Collapsed state is IGNORED on mobile - always show full width */
+/* IMPORTANT: This rule must come AFTER the desktop rule to only affect mobile */
+@media (max-width: 767px) {
+    :host(.hidden) {
+        display: none !important;
+    }
+}
+
+/* Mobile: force full width regardless of collapsed state */
+@media (max-width: 767px) {
+    :host {
+        width: 100% !important;
+    }
+
+    :host(.collapsed) {
+        width: 100% !important;
+    }
+
+    /* Show all content on mobile even in "collapsed" state */
+    :host(.collapsed) .truncate,
+    :host(.collapsed) h2,
+    :host(.collapsed) h3,
+    :host(.collapsed) p,
+    :host(.collapsed) span,
+    :host(.collapsed) .sidebar-header-text,
+    :host(.collapsed) .flex-1.min-w-0 {
+        display: block !important;
+    }
+
+    :host(.collapsed) .p-4 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    :host(.collapsed) .conversation-item {
+        justify-content: flex-start !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
+
+/* Sidebar transitions */
+.sidebar-container {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 20;
+    overflow: visible !important;
+}
+
+/* Desktop only: collapsed sidebar-container styles */
+@media (min-width: 768px) {
+    .collapsed {
+        width: 60px !important;
+
+        .truncate,
+        h2,
+        h3,
+        p,
+        .sidebar-header-text {
+            display: none !important;
+        }
+
+        .p-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+
+        .conversation-item {
+            justify-content: center;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+    }
+}
+
+/* Tooltip style */
+.chat-tooltip {
+    position: absolute;
+    left: 100%;
+    margin-left: 1rem;
+    padding: 0.5rem 0.75rem;
+    background-color: #111827;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    z-index: 100;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    pointer-events: none;
+
+    &::before {
+        content: '';
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 4px solid transparent;
+        border-right-color: #111827;
+    }
+}
+
+.group:hover .chat-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.conversation-item {
+    &:hover {
+        .chat-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+    }
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}

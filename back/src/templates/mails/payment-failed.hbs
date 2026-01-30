@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Echec du paiement</title>
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap');
+
+        /* Reset styles */
+        body,
+        table,
+        td,
+        a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table,
+        td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            outline: none;
+            text-decoration: none;
+        }
+
+        /* General */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            background-color: #FDFBF7;
+            font-family: 'Inter', Helvetica, Arial, sans-serif;
+            color: #2C2825;
+        }
+
+        .cta-button:hover {
+            background-color: #a64d38 !important;
+        }
+
+        /* Mobile styles */
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .content-padding {
+                padding: 30px 20px !important;
+            }
+
+            .mobile-stack {
+                display: block !important;
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+
+<body style="margin: 0; padding: 0; background-color: #FDFBF7;">
+
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+        style="background-color: #FDFBF7;">
+        <tr>
+            <td align="center" style="padding: 40px 10px;">
+
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" class="container"
+                    style="background-color: #ffffff; max-width: 600px; margin: 0 auto; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 24px rgba(194, 94, 70, 0.08); border-top: 6px solid #EF4444;">
+
+                    {{!-- Header with Logo --}}
+                    {{> email-header}}
+
+                    {{!-- Main Content --}}
+                    <tr>
+                        <td class="content-padding" style="padding: 20px 50px 50px 50px;">
+
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                {{!-- Error Icon --}}
+                                <tr>
+                                    <td align="center" style="padding-bottom: 20px;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td width="60" height="60" align="center" valign="middle" style="
+                                                width:60px;
+                                                height:60px;
+                                                background-color:#FEE2E2;
+                                                border-radius:50%;
+                                                text-align:center;
+                                                vertical-align:middle;
+                                            ">
+                                                    <span style="
+                                                display:inline-block;
+                                                font-size:28px;
+                                                line-height:60px;
+                                                height:60px;
+                                                mso-line-height-rule:exactly;
+                                                ">✕</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+
+                                {{!-- Title --}}
+                                <tr>
+                                    <td align="center" style="padding-bottom: 10px;">
+                                        <h1
+                                            style="margin: 0; font-family: 'Merriweather', serif; font-size: 26px; color: #2C2825; font-weight: 700; line-height: 1.3;">
+                                            Echec du paiement
+                                        </h1>
+                                    </td>
+                                </tr>
+
+                                {{!-- Intro Text --}}
+                                <tr>
+                                    <td align="center" style="padding-bottom: 30px;">
+                                        <p
+                                            style="margin: 0; font-size: 16px; line-height: 1.6; color: #6B665F; max-width: 90%;">
+                                            Bonjour {{userName}}, malheureusement votre paiement n'a pas pu etre traite.
+                                            Aucun montant n'a ete debite de votre compte.
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                {{!-- Details Box --}}
+                                <tr>
+                                    <td style="padding-bottom: 30px;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0"
+                                            width="100%"
+                                            style="background-color: #FEF2F2; border-radius: 12px; border: 1px solid #FECACA;">
+                                            <tr>
+                                                <td style="padding: 25px 30px;">
+                                                    <table role="presentation" border="0" cellpadding="0"
+                                                        cellspacing="0" width="100%">
+                                                        <tr>
+                                                            <td
+                                                                style="padding: 6px 0; font-size: 14px; color: #991B1B;">
+                                                                Pack demande</td>
+                                                            <td
+                                                                style="padding: 6px 0; font-size: 14px; color: #2C2825; font-weight: 500; text-align: right;">
+                                                                {{packLabel}}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td
+                                                                style="padding: 6px 0; font-size: 14px; color: #991B1B;">
+                                                                Montant</td>
+                                                            <td
+                                                                style="padding: 6px 0; font-size: 14px; color: #2C2825; font-weight: 500; text-align: right;">
+                                                                {{amountTotal}} €
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td
+                                                                style="padding: 6px 0; font-size: 14px; color: #991B1B;">
+                                                                Date de la tentative</td>
+                                                            <td
+                                                                style="padding: 6px 0; font-size: 14px; color: #2C2825; font-weight: 500; text-align: right;">
+                                                                {{attemptDate}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                {{!-- Possible Reasons --}}
+                                <tr>
+                                    <td style="padding-bottom: 30px;">
+                                        <p style="margin: 0 0 15px 0; font-size: 14px; font-weight: 600; color: #2C2825;">
+                                            Causes possibles :
+                                        </p>
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0"
+                                            width="100%">
+                                            <tr>
+                                                <td style="padding: 8px 0; font-size: 14px; color: #6B665F;">
+                                                    • Fonds insuffisants sur votre compte
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; font-size: 14px; color: #6B665F;">
+                                                    • Carte expiree ou informations incorrectes
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; font-size: 14px; color: #6B665F;">
+                                                    • Transaction bloquee par votre banque
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; font-size: 14px; color: #6B665F;">
+                                                    • Probleme technique temporaire
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                {{!-- Info Note --}}
+                                <tr>
+                                    <td style="padding-bottom: 30px;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0"
+                                            width="100%">
+                                            <tr>
+                                                <td
+                                                    style="padding: 15px; border-left: 3px solid #3B82F6; background-color: #EFF6FF; border-radius: 0 4px 4px 0;">
+                                                    <p
+                                                        style="margin: 0; font-size: 13px; color: #1E40AF; line-height: 1.5;">
+                                                        <strong>Besoin d'aide ?</strong> Si le probleme persiste apres
+                                                        plusieurs tentatives, contactez notre support ou votre banque.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                {{!-- CTA Button --}}
+                                <tr>
+                                    <td align="center" style="padding-bottom: 25px;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td align="center"
+                                                    style="background-color: #C25E46; border-radius: 8px;">
+                                                    <a href="{{retryUrl}}" target="_blank" class="cta-button" style="
+                                                        display: inline-block;
+                                                        padding: 16px 32px;
+                                                        font-family: 'Inter', Helvetica, Arial, sans-serif;
+                                                        font-size: 16px;
+                                                        font-weight: 600;
+                                                        color: #ffffff;
+                                                        text-decoration: none;
+                                                        border-radius: 8px;
+                                                    ">
+                                                        Reessayer le paiement
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                {{!-- Session ID --}}
+                                <tr>
+                                    <td align="center">
+                                        <p
+                                            style="margin: 0; font-size: 11px; color: #BDB8AE; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            Reference : {{sessionId}}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                    </tr>
+
+                    {{!-- Footer --}}
+                    {{> email-footer}}
+
+                </table>
+
+                {{!-- Spacer --}}
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                        <td height="40" style="font-size: 40px; line-height: 40px;">&nbsp;</td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
