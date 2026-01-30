@@ -1,41 +1,54 @@
 # --- ÉTAPE 1 : Build du Frontend Angular ---
 FROM node:20 AS build-front
 WORKDIR /app/frontend
+
+# Installation avec gestion des conflits de dépendances
 COPY front/package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
+
+# Copie du code et build
 COPY front/ .
 RUN npm run build -- --configuration production
 
 # --- ÉTAPE 2 : Build du Backend NestJS ---
 FROM node:20 AS build-back
 WORKDIR /app/backend
-# Utilisation du dossier "back" selon ton arborescence
+
+# 1. Copier package.json et installer les dépendances
 COPY back/package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
+
+# 2. Copier le schéma Prisma (CRUCIAL pour générer les types TS)
+COPY back/prisma ./prisma/
+RUN npx prisma generate
+
+# 3. Copier le reste du code et compiler NestJS
 COPY back/ .
 RUN npm run build
 
 # --- ÉTAPE 3 : Image Finale (Production) ---
 FROM node:20-slim
-# Installation de Nginx pour servir le front
+# Installation de Nginx
 RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# On récupère le code compilé du back (dist) à la racine de /app
+# Récupération du Backend
 COPY --from=build-back /app/backend/dist ./dist
 COPY --from=build-back /app/backend/package*.json ./
+COPY --from=build-back /app/backend/prisma ./prisma/
 
-# Installation des dépendances de prod à la racine /app
-RUN npm install --only=production
+# Installation des dépendances de prod uniquement
+RUN npm install --only=production --legacy-peer-deps
 
-# On récupère le build du front vers le dossier standard Nginx
-# Attention : vérifie si Angular produit "dist/browser" ou juste "dist"
-COPY --from=build-front /app/frontend/dist/browser /usr/share/nginx/html
+# Récupération du Frontend
+# Note : vérifie bien si ton Angular 17+ génère dans dist/browser ou dist/[nom-projet]/browser
+COPY --from=build-front /app/frontend/dist/Reloke /usr/share/nginx/html
 
-# Injection de la config Nginx et ouverture du port Cloud Run
+# Configuration Nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 8080
 
-# Démarrage simultané de NestJS (en tâche de fond) et Nginx
-CMD ["sh", "-c", "node dist/main.js & nginx -g 'daemon off;'"]
+# Démarrage : Migration de la DB (optionnel au runtime) + NestJS + Nginx
+# Note : npx prisma migrate deploy nécessite que DATABASE_URL soit définie dans Cloud Run
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js & nginx -g 'daemon off;'"]
