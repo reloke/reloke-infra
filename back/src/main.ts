@@ -20,7 +20,14 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: [/localhost:\d+$/, /127\.0\.0\.1:\d+$/, frontendUrl],
+    origin: [
+      /localhost:\d+$/,
+      /127\.0\.0\.1:\d+$/,
+      frontendUrl,
+      'https://reloke.com', // Ajoute ton domaine final
+      'https://www.reloke.com',
+      /\.run\.app$/ // Autorise les URL de test Cloud Run
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
@@ -37,7 +44,9 @@ async function bootstrap() {
   await redisIoAdapter.connectToRedis();
   app.useWebSocketAdapter(redisIoAdapter);
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
+
   console.log(
     `Application is running on: http://localhost:${process.env.PORT ?? 3000}`,
   );
