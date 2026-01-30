@@ -32,6 +32,7 @@ import path, { join } from 'path';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { DossierFacileModule } from './dossier-facile/dossier-facile.module';
 import { GdprModule } from './gdpr/gdpr.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -83,7 +84,7 @@ import { GdprModule } from './gdpr/gdpr.module';
       serveRoot: '/uploads',
     }),
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [
     AppService,
     {
