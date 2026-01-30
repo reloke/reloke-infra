@@ -40,5 +40,5 @@ COPY --from=build-front /app/frontend/dist/Reloke /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 8080
 
-# Script de démarrage pour forcer les logs NestJS au premier plan
-CMD ["sh", "-c", "npx prisma migrate deploy && (node dist/main.js & nginx -g 'daemon off;')"]
+# On utilise ';' au lieu de '&&' pour que Nginx se lance MÊME SI prisma échoue
+CMD ["sh", "-c", "npx prisma migrate deploy ; (node dist/main.js & nginx -g 'daemon off;')"]
