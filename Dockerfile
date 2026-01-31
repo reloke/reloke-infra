@@ -42,4 +42,5 @@ EXPOSE 8080
 
 # On utilise ';' au lieu de '&&' pour que Nginx se lance MÊME SI prisma échoue
 #CMD ["sh", "-c", "npx prisma migrate deploy ; (node dist/main.js & nginx -g 'daemon off;')"]
-CMD ["sh", "-c", "node dist/main.js & nginx -g 'daemon off;' & npx prisma migrate deploy"]
+#CMD ["sh", "-c", "node dist/main.js & nginx -g 'daemon off;' & npx prisma migrate deploy"]
+CMD ["sh", "-c", "npx prisma migrate deploy ; (node dist/src/main.js & nginx -g 'daemon off;')"]
