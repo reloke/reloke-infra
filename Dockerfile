@@ -4,6 +4,7 @@ WORKDIR /app/frontend
 COPY front/package*.json ./
 RUN npm install --legacy-peer-deps
 COPY front/ .
+RUN rm -rf dist
 RUN npm run build -- --configuration production
 
 # --- ÉTAPE 2 : Build du Backend NestJS ---

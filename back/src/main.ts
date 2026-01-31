@@ -55,6 +55,24 @@ async function bootstrap() {
   app.useWebSocketAdapter(redisIoAdapter);
   console.timeEnd('🔌 Redis adapter');
 
+  app.use((req, res, next) => {
+    // Anti-cache pour éviter le cache CDN Firebase/Fastly
+    res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+
+    // Sécurité HTTP
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
+    next();
+  });
+
+  app.use((req, res, next) => {
+    next();
+  });
+
 
   console.time('👂 app.listen');
   //const port = process.env.PORT || 3000;
