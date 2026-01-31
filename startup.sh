@@ -6,6 +6,7 @@ echo "🚀 Starting application..."
 # Migrations seulement si variable RUN_MIGRATIONS=true
 if [ "$RUN_MIGRATIONS" = "true" ]; then
   echo "📦 Running Prisma migrations..."
+  echo "Database URL configured: $(echo $DATABASE_URL | cut -c1-50)..."
   npx prisma@5.22.0 migrate deploy
 
   echo "🗺️ Running spatial scripts..."

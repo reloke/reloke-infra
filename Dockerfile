@@ -36,6 +36,7 @@ RUN npm install --omit=dev --legacy-peer-deps
 
 ENV DATABASE_URL="postgresql://fake:fake@localhost:5432/fake"
 RUN npx prisma@5.22.0 generate
+ENV DATABASE_URL=""
 
 COPY --from=build-front /app/frontend/dist/Reloke /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
