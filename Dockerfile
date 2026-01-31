@@ -13,8 +13,9 @@ COPY back/package*.json ./
 RUN npm install --legacy-peer-deps
 COPY back/prisma ./prisma/
 
-# On utilise npx avec la version précise pour éviter tout conflit
-RUN DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma@5.10.2 generate
+# On fixe l'URL bidon via ENV pour éviter l'erreur de "path undefined"
+ENV DATABASE_URL="postgresql://fake:fake@localhost:5432/fake"
+RUN npx prisma@5.22.0 generate
 
 COPY back/ .
 RUN npx nest build
@@ -29,16 +30,15 @@ COPY --from=build-back /app/backend/dist ./dist
 COPY --from=build-back /app/backend/package*.json ./
 COPY --from=build-back /app/backend/prisma ./prisma/
 
-# On installe les dépendances. Si prisma est en devDependency, 
-# npx ira le chercher dans la version spécifiée après.
 RUN npm install --omit=dev --legacy-peer-deps
 
-# On génère le client avec la version exacte 5.10.2
-RUN DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma@5.10.2 generate
+# On regénère ici aussi avec la version 5.22.0
+ENV DATABASE_URL="postgresql://fake:fake@localhost:5432/fake"
+RUN npx prisma@5.22.0 generate
 
 COPY --from=build-front /app/frontend/dist/Reloke /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 8080
 
-# On utilise la version précise pour le deploy également
-CMD ["sh", "-c", "npx prisma@5.10.2 migrate deploy && (node dist/src/main.js & nginx -g 'daemon off;')"]
+# On utilise la même version pour le déploiement
+CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy && (node dist/src/main.js & nginx -g 'daemon off;')"]
