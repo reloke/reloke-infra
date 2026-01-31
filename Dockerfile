@@ -13,7 +13,7 @@ COPY back/package*.json ./
 RUN npm install --legacy-peer-deps
 COPY back/prisma ./prisma/
 # Génération du client Prisma avant le build
-RUN npx prisma generate
+RUN DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma generate
 COPY back/ .
 # Suppression du "|| exit 0" : si le build échoue, on veut que le build GCP s'arrête !
 RUN npx nest build
@@ -34,7 +34,7 @@ COPY --from=build-back /app/backend/prisma ./prisma/
 RUN npm install --only=production --legacy-peer-deps
 
 # CRUCIAL : On régénère le client Prisma dans l'image finale
-RUN npx prisma generate
+RUN DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma generate
 
 # Récupération du Frontend
 COPY --from=build-front /app/frontend/dist/Reloke /usr/share/nginx/html
