@@ -20,7 +20,7 @@ steps:
         '--min-instances', '1',
         '--cpu', '2',
         '--memory', '2Gi',
-        '--timeout', '600',
+        '--timeout', '2400', 
         '--cpu-boost',
         '--set-env-vars', 'RUN_MIGRATIONS=false',
         #'--set-secrets', '/app/.env=reloke-env-back:latest',

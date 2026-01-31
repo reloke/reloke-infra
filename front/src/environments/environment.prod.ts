@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  publicBaseUrl: 'https://reloke-api-680046371050.europe-west9.run.app',
-  apiUrl: 'https://reloke-api-680046371050.europe-west9.run.app/api',
+  publicBaseUrl: 'https://www.reloke.com',
+  apiUrl: 'https://www.reloke.com/api',
   RECAPTCHA_ACCESS_KEY: '6Lf4VCYsAAAAAN2ng4e59L3jZvDxZg7UqjYJWkqc',
   STRIPE_PUBLISHABLE_KEY:
     'pk_test_51Sd3eaL9TlXHiuXnYcfBuKciaptxwNtCuUiXyvxzC3xxpUO7r4gs4VhGtUhmzufibiDnFCLygSeUtqS4L9Icp4w700GqedEZor',
