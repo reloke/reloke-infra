@@ -21,7 +21,8 @@ steps:
         '--cpu', '2',
         '--memory', '2Gi',
         '--timeout', '600',
-        '--cpu-boost'
+        '--cpu-boost',
+        '--set-env-vars', 'RUN_MIGRATIONS=true'
       ]
 
 options:

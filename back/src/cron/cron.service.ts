@@ -21,7 +21,7 @@ export class CronService {
     private readonly diditService: DiditService,
   ) { }
 
-  @Cron('* * * * *')
+  @Cron('0 0 * * *', { timeZone: 'Europe/Paris' })
   async handleHardDeletion() {
     this.logger.log('Running User Anonymization (Hard Deletion) Cron Job...');
 
