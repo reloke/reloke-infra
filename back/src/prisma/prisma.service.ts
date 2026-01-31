@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import {
   AuditAction,
   AuditEntityType,
@@ -11,7 +11,8 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit {
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(PrismaService.name);
   private readonly auditBypass = new AsyncLocalStorage<boolean>();
 
   constructor(private readonly requestContext: RequestContextService, private readonly configService: ConfigService) {
@@ -20,7 +21,30 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   async onModuleInit() {
-    await this.$connect();
+    await this.connectWithRetry();
+  }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
+  }
+
+  private async connectWithRetry(retries = 5, delay = 3000) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        await this.$connect();
+        this.logger.log('✅ Database connected successfully');
+        return;
+      } catch (error) {
+        this.logger.warn(`⚠️ Database connection attempt ${i + 1}/${retries} failed: ${error.message}`);
+        if (i < retries - 1) {
+          this.logger.log(`⏳ Retrying in ${delay / 1000}s...`);
+          await new Promise(res => setTimeout(res, delay));
+        } else {
+          this.logger.error('❌ Could not connect to database after retries');
+          throw error;
+        }
+      }
+    }
   }
 
   private registerAuditMiddleware() {

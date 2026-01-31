@@ -18,7 +18,7 @@ steps:
         '--platform', 'managed',
         '--allow-unauthenticated',
         '--min-instances', '1',
-        '--cpu', '1',
+        '--cpu', '2',
         '--memory', '2Gi',
         '--timeout', '600',
         '--cpu-boost'
