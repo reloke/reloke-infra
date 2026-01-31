@@ -71,7 +71,9 @@
     "socket.io": "^4.8.1",
     "stripe": "^20.0.0",
     "uuid": "^13.0.0",
-    "web-push": "^3.6.7"
+    "web-push": "^3.6.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -106,8 +108,8 @@
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
+    "tsconfig-paths": "^4.2.0",
     "typescript-eslint": "^8.20.0"
   },
   "jest": {

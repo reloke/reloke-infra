@@ -334,152 +334,152 @@ async function ensurePaymentForIntent(params: {
 async function main() {
   await ensureAdmin();
 
-  const hashedPhantom = await bcrypt.hash(PHANTOM_PASSWORD, 10);
+  // const hashedPhantom = await bcrypt.hash(PHANTOM_PASSWORD, 10);
 
-  // --- Build 20 users plan ---
-  // 7 pairs => 14 users (1..14)
-  // 2 triangles => 6 users (15..20)
-  const users = Array.from({ length: 20 }, (_, k) => phantomUser(k + 1));
+  // // --- Build 20 users plan ---
+  // // 7 pairs => 14 users (1..14)
+  // // 2 triangles => 6 users (15..20)
+  // const users = Array.from({ length: 20 }, (_, k) => phantomUser(k + 1));
 
-  // Pre-assign groups/cities
-  const pairCities = [CITIES[0], CITIES[1], CITIES[2], CITIES[3], CITIES[4], CITIES[5], CITIES[6]]; // 7 distinct
-  const triCities = [CITIES[7], CITIES[0]]; // two triangles in Lille + Lyon (example)
+  // // Pre-assign groups/cities
+  // const pairCities = [CITIES[0], CITIES[1], CITIES[2], CITIES[3], CITIES[4], CITIES[5], CITIES[6]]; // 7 distinct
+  // const triCities = [CITIES[7], CITIES[0]]; // two triangles in Lille + Lyon (example)
 
-  // Create users + home/search/intent/payment
-  for (let i = 0; i < users.length; i++) {
-    const idx = i + 1;
-    const u = users[i];
+  // // Create users + home/search/intent/payment
+  // for (let i = 0; i < users.length; i++) {
+  //   const idx = i + 1;
+  //   const u = users[i];
 
-    const user = await upsertUser(u.email, u.firstName, u.lastName, hashedPhantom);
+  //   const user = await upsertUser(u.email, u.firstName, u.lastName, hashedPhantom);
 
-    // Decide if user is in PAIR or TRIANGLE
-    const isPair = idx <= 14;
-    const seedTag = `SEED:${u.email}`;
+  //   // Decide if user is in PAIR or TRIANGLE
+  //   const isPair = idx <= 14;
+  //   const seedTag = `SEED:${u.email}`;
 
-    let home: Awaited<ReturnType<typeof ensureHomeForUser>>;
-    let search: Awaited<ReturnType<typeof ensureSearchForUser>>;
+  //   let home: Awaited<ReturnType<typeof ensureHomeForUser>>;
+  //   let search: Awaited<ReturnType<typeof ensureSearchForUser>>;
 
-    if (isPair) {
-      // Pair index 0..6, each has two users
-      const pairIndex = Math.floor((idx - 1) / 2);
-      const city = pairCities[pairIndex];
+  //   if (isPair) {
+  //     // Pair index 0..6, each has two users
+  //     const pairIndex = Math.floor((idx - 1) / 2);
+  //     const city = pairCities[pairIndex];
 
-      const ht = homeTypeByIndex(idx);
-      const base = baseHomeNumbers(ht);
+  //     const ht = homeTypeByIndex(idx);
+  //     const base = baseHomeNumbers(ht);
 
-      home = await ensureHomeForUser({
-        userId: user.id,
-        email: u.email,
-        city,
-        idxSeed: idx,
-        homeType: ht,
-        rent: base.rent,
-        surface: base.surface,
-        nbRooms: base.rooms,
-      });
+  //     home = await ensureHomeForUser({
+  //       userId: user.id,
+  //       email: u.email,
+  //       city,
+  //       idxSeed: idx,
+  //       homeType: ht,
+  //       rent: base.rent,
+  //       surface: base.surface,
+  //       nbRooms: base.rooms,
+  //     });
 
-      // Reciprocal-friendly criteria:
-      // - wide enough to accept both sides within that city
-      const maxRent = base.rent + 400;
-      const maxSurface = base.surface + 30;
-      const maxRooms = Math.max(base.rooms, 3);
+  //     // Reciprocal-friendly criteria:
+  //     // - wide enough to accept both sides within that city
+  //     const maxRent = base.rent + 400;
+  //     const maxSurface = base.surface + 30;
+  //     const maxRooms = Math.max(base.rooms, 3);
 
-      search = await ensureSearchForUser({
-        userId: user.id,
-        seedTag,
-        city,
-        idxSeed: idx,
-        minRent: null,
-        maxRent,
-        minRooms: null,
-        maxRooms,
-        minSurface: null,
-        maxSurface,
-        homeTypes: [
-          HomeType.STUDIO,
-          HomeType.T1,
-          HomeType.T1_BIS,
-          HomeType.T2,
-          HomeType.T2_BIS,
-          HomeType.CHAMBRE,
-        ],
-      });
-    } else {
-      // Triangle users: idx 15..17 => triangle 0, idx 18..20 => triangle 1
-      const triIndex = idx <= 17 ? 0 : 1;
-      const city = triCities[triIndex];
+  //     search = await ensureSearchForUser({
+  //       userId: user.id,
+  //       seedTag,
+  //       city,
+  //       idxSeed: idx,
+  //       minRent: null,
+  //       maxRent,
+  //       minRooms: null,
+  //       maxRooms,
+  //       minSurface: null,
+  //       maxSurface,
+  //       homeTypes: [
+  //         HomeType.STUDIO,
+  //         HomeType.T1,
+  //         HomeType.T1_BIS,
+  //         HomeType.T2,
+  //         HomeType.T2_BIS,
+  //         HomeType.CHAMBRE,
+  //       ],
+  //     });
+  //   } else {
+  //     // Triangle users: idx 15..17 => triangle 0, idx 18..20 => triangle 1
+  //     const triIndex = idx <= 17 ? 0 : 1;
+  //     const city = triCities[triIndex];
 
-      // role in triangle group: A, B, C
-      const pos = (idx - (triIndex === 0 ? 15 : 18)) % 3; // 0,1,2
+  //     // role in triangle group: A, B, C
+  //     const pos = (idx - (triIndex === 0 ? 15 : 18)) % 3; // 0,1,2
 
-      // Force a directed cycle by homeType + maxRent:
-      // A wants B(T2), B wants C(T1), C wants A(STUDIO)
-      const triHomes = [
-        { homeType: HomeType.STUDIO, rent: 520, surface: 18, rooms: 1 }, // A
-        { homeType: HomeType.T2, rent: 740, surface: 35, rooms: 2 },     // B
-        { homeType: HomeType.T1, rent: 630, surface: 25, rooms: 2 },     // C
-      ];
-      const meHome = triHomes[pos];
+  //     // Force a directed cycle by homeType + maxRent:
+  //     // A wants B(T2), B wants C(T1), C wants A(STUDIO)
+  //     const triHomes = [
+  //       { homeType: HomeType.STUDIO, rent: 520, surface: 18, rooms: 1 }, // A
+  //       { homeType: HomeType.T2, rent: 740, surface: 35, rooms: 2 },     // B
+  //       { homeType: HomeType.T1, rent: 630, surface: 25, rooms: 2 },     // C
+  //     ];
+  //     const meHome = triHomes[pos];
 
-      home = await ensureHomeForUser({
-        userId: user.id,
-        email: u.email,
-        city,
-        idxSeed: idx,
-        homeType: meHome.homeType,
-        rent: meHome.rent,
-        surface: meHome.surface,
-        nbRooms: meHome.rooms,
-      });
+  //     home = await ensureHomeForUser({
+  //       userId: user.id,
+  //       email: u.email,
+  //       city,
+  //       idxSeed: idx,
+  //       homeType: meHome.homeType,
+  //       rent: meHome.rent,
+  //       surface: meHome.surface,
+  //       nbRooms: meHome.rooms,
+  //     });
 
-      // Search each node wants the "next" node:
-      // A(pos0) wants T2; B(pos1) wants T1; C(pos2) wants STUDIO
-      const wanted = pos === 0
-        ? { types: [HomeType.T2], maxRent: 800, maxSurface: 40, maxRooms: 3 }
-        : pos === 1
-          ? { types: [HomeType.T1], maxRent: 680, maxSurface: 35, maxRooms: 3 }
-          : { types: [HomeType.STUDIO], maxRent: 580, maxSurface: 25, maxRooms: 2 };
+  //     // Search each node wants the "next" node:
+  //     // A(pos0) wants T2; B(pos1) wants T1; C(pos2) wants STUDIO
+  //     const wanted = pos === 0
+  //       ? { types: [HomeType.T2], maxRent: 800, maxSurface: 40, maxRooms: 3 }
+  //       : pos === 1
+  //         ? { types: [HomeType.T1], maxRent: 680, maxSurface: 35, maxRooms: 3 }
+  //         : { types: [HomeType.STUDIO], maxRent: 580, maxSurface: 25, maxRooms: 2 };
 
-      search = await ensureSearchForUser({
-        userId: user.id,
-        seedTag,
-        city,
-        idxSeed: idx,
-        minRent: null,
-        maxRent: wanted.maxRent,
-        minRooms: null,
-        maxRooms: wanted.maxRooms,
-        minSurface: null,
-        maxSurface: wanted.maxSurface,
-        homeTypes: wanted.types,
-      });
-    }
+  //     search = await ensureSearchForUser({
+  //       userId: user.id,
+  //       seedTag,
+  //       city,
+  //       idxSeed: idx,
+  //       minRent: null,
+  //       maxRent: wanted.maxRent,
+  //       minRooms: null,
+  //       maxRooms: wanted.maxRooms,
+  //       minSurface: null,
+  //       maxSurface: wanted.maxSurface,
+  //       homeTypes: wanted.types,
+  //     });
+  //   }
 
-    // Create Intent with credits
-    const intent = await ensureIntentForUser({
-      userId: user.id,
-      homeId: home.id,
-      searchId: search.id,
-      matchesCredit: SEED_MATCHES_PER_USER,
-    });
+  //   // Create Intent with credits
+  //   const intent = await ensureIntentForUser({
+  //     userId: user.id,
+  //     homeId: home.id,
+  //     searchId: search.id,
+  //     matchesCredit: SEED_MATCHES_PER_USER,
+  //   });
 
-    // Create Payment SUCCEEDED for this Intent (CRITICAL for matching to work)
-    await ensurePaymentForIntent({
-      userId: user.id,
-      intentId: intent.id,
-      userIndex: idx,
-      matchesInitial: SEED_MATCHES_PER_USER,
-    });
+  //   // Create Payment SUCCEEDED for this Intent (CRITICAL for matching to work)
+  //   await ensurePaymentForIntent({
+  //     userId: user.id,
+  //     intentId: intent.id,
+  //     userIndex: idx,
+  //     matchesInitial: SEED_MATCHES_PER_USER,
+  //   });
 
-    console.log(`✅ Seed user ready: ${u.email} (Intent=${intent.id}, Credits=${SEED_MATCHES_PER_USER})`);
-  }
+  //   console.log(`✅ Seed user ready: ${u.email} (Intent=${intent.id}, Credits=${SEED_MATCHES_PER_USER})`);
+  // }
 
-  console.log('');
-  console.log('✅ Seed completed: 20 phantom users + Home/Search/Intent/Payment created.');
-  console.log('   - Users 1-14: 7 STANDARD reciprocal pairs');
-  console.log('   - Users 15-20: 2 TRIANGLE cycles (A->B->C->A)');
-  console.log('   - Each user has 10 credits with SUCCEEDED payment');
-  console.log('   - No matches created (matching algorithm will create them)');
+  // console.log('');
+  // console.log('✅ Seed completed: 20 phantom users + Home/Search/Intent/Payment created.');
+  // console.log('   - Users 1-14: 7 STANDARD reciprocal pairs');
+  // console.log('   - Users 15-20: 2 TRIANGLE cycles (A->B->C->A)');
+  // console.log('   - Each user has 10 credits with SUCCEEDED payment');
+  // console.log('   - No matches created (matching algorithm will create them)');
 }
 
 main()

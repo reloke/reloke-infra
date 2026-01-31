@@ -29,6 +29,7 @@ WORKDIR /app
 COPY --from=build-back /app/backend/dist ./dist
 COPY --from=build-back /app/backend/package*.json ./
 COPY --from=build-back /app/backend/prisma ./prisma/
+COPY --from=build-back /app/backend/sql ./sql
 
 RUN npm install --omit=dev --legacy-peer-deps
 
@@ -43,4 +44,12 @@ EXPOSE 8080
 # On utilise la même version pour le déploiement
 #CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy && (node dist/src/main.js & nginx -g 'daemon off;')"]
 #CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy ; (node dist/src/main.js & nginx -g 'daemon off;')"]
-CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy && (nginx -g 'daemon off;' & PORT=3000 node dist/src/main.js)"]
+#CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy && (nginx -g 'daemon off;' & PORT=3000 node dist/src/main.js)"]
+#CMD ["sh", "-c", "npm run deploy && (nginx -g 'daemon off;' & PORT=3000 node dist/src/main.js)"]
+#CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy && npx prisma@5.22.0 db seed && (nginx -g 'daemon off;' & PORT=3000 node dist/src/main.js)"]
+# CMD UNIQUE : 
+# 1. Migrate deploy (Tables)
+# 2. db:spatial (Scripts SQL PostGIS)
+# 3. db seed (Admin)
+# 4. Lancement Nginx + NestJS sur port 3000
+CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy && npx prisma@5.22.0 db execute --file ./sql/spatial/afterMigration.sql && npx prisma@5.22.0 db seed && (nginx -g 'daemon off;' & PORT=3000 node dist/src/main.js)"]
