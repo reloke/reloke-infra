@@ -13,7 +13,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: any) => {
-          return request?.cookies?.access_token;
+          const token = request?.cookies?.access_token;
+          console.log('Cookie access_token présent ?', !!token);
+          return token;
         },
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
@@ -23,10 +25,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    console.log('Payload reçu dans validate:', payload);
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
       select: { id: true, mail: true, role: true, tokenVersion: true },
     });
+    console.log('Utilisateur trouvé en BDD ?', !!user);
 
     if (!user) throw new UnauthorizedException('Utilisateur non trouvé');
 

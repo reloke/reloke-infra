@@ -14,6 +14,10 @@ async function bootstrap() {
     // Enable raw body parsing for Stripe webhooks
     rawBody: true,
   });
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction) {
+    (app as any).set('trust proxy', 1);// Indispensable pour la gestion des cookies derrière un proxy
+  }
   console.timeEnd('📦 NestFactory.create');
 
   app.use(cookieParser());
