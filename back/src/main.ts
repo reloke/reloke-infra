@@ -7,10 +7,14 @@ import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
+  console.time('🚀 Total bootstrap');
+  console.time('📦 NestFactory.create');
+
   const app = await NestFactory.create(AppModule, {
     // Enable raw body parsing for Stripe webhooks
     rawBody: true,
   });
+  console.timeEnd('📦 NestFactory.create');
 
   app.use(cookieParser());
 
@@ -40,14 +44,22 @@ async function bootstrap() {
     }),
   );
 
+  console.time('🔌 Redis adapter');
   const redisIoAdapter = new RedisIoAdapter(app);
   //await redisIoAdapter.connectToRedis();
   redisIoAdapter.connectToRedis().catch(err => console.error("Redis Error:", err));
   app.useWebSocketAdapter(redisIoAdapter);
+  console.timeEnd('🔌 Redis adapter');
 
+
+  console.time('👂 app.listen');
   //const port = process.env.PORT || 3000;
   const port = 3000;
   await app.listen(port, '0.0.0.0');
+  console.timeEnd('👂 app.listen');
+
+
+  console.timeEnd('🚀 Total bootstrap');
 
   console.log(
     `Application is running on: http://localhost:${port}`,
