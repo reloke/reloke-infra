@@ -14,8 +14,8 @@ RUN npm install --legacy-peer-deps
 COPY back/prisma ./prisma/
 
 # On fixe l'URL bidon via ENV pour éviter l'erreur de "path undefined"
-ENV DATABASE_URL="postgresql://fake:fake@localhost:5432/fake"
-RUN npx prisma@5.22.0 generate
+RUN DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma@5.22.0 generate
+#ENV DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" RUN npx prisma@5.22.0 generate
 
 COPY back/ .
 RUN npx nest build
@@ -34,13 +34,12 @@ COPY --from=build-back /app/backend/sql ./sql
 
 RUN npm install --omit=dev --legacy-peer-deps
 
-ENV DATABASE_URL="postgresql://fake:fake@localhost:5432/fake"
-RUN npx prisma@5.22.0 generate
-ENV DATABASE_URL=""
+# Generate avec variable temporaire (ne persiste pas dans l'image)
+RUN DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma@5.22.0 generate
+#ENV DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" RUN npx prisma@5.22.0 generate ENV DATABASE_URL=""
 
 COPY --from=build-front /app/frontend/dist/Reloke /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
-
 # Copier le script de démarrage
 COPY startup.sh /app/startup.sh
 RUN chmod +x /app/startup.sh

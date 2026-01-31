@@ -22,7 +22,8 @@ steps:
         '--memory', '2Gi',
         '--timeout', '600',
         '--cpu-boost',
-        '--set-env-vars', 'RUN_MIGRATIONS=true'
+        '--set-env-vars', 'RUN_MIGRATIONS=true',
+        '--set-secrets', '/app/.env=reloke-env-back:latest'
       ]
 
 options:

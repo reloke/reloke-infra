@@ -1,6 +1,14 @@
 #!/bin/sh
 set -e
 
+# Charger le fichier .env monté depuis Secret Manager
+if [ -f /app/.env ]; then
+  echo "📄 Loading environment from /app/.env"
+  set -a
+  . /app/.env
+  set +a
+fi
+
 echo "🚀 Starting application..."
 
 # Migrations seulement si variable RUN_MIGRATIONS=true
