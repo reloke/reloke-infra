@@ -33,6 +33,9 @@ COPY --from=build-back /app/backend/prisma ./prisma/
 # Installation des dépendances de prod uniquement
 RUN npm install --only=production --legacy-peer-deps
 
+# CRUCIAL : On régénère le client Prisma dans l'image finale
+RUN npx prisma generate
+
 # Récupération du Frontend
 COPY --from=build-front /app/frontend/dist/Reloke /usr/share/nginx/html
 
@@ -43,4 +46,5 @@ EXPOSE 8080
 # On utilise ';' au lieu de '&&' pour que Nginx se lance MÊME SI prisma échoue
 #CMD ["sh", "-c", "npx prisma migrate deploy ; (node dist/main.js & nginx -g 'daemon off;')"]
 #CMD ["sh", "-c", "node dist/main.js & nginx -g 'daemon off;' & npx prisma migrate deploy"]
-CMD ["sh", "-c", "npx prisma migrate deploy ; (node dist/src/main.js & nginx -g 'daemon off;')"]
+#CMD ["sh", "-c", "npx prisma migrate deploy ; (node dist/src/main.js & nginx -g 'daemon off;')"]
+CMD ["sh", "-c", "npx prisma migrate deploy && (node dist/src/main.js & nginx -g 'daemon off;')"]
