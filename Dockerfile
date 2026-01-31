@@ -41,7 +41,7 @@ COPY --from=build-front /app/frontend/dist/Reloke /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copier le script de démarrage
-COPY back/startup.sh /app/startup.sh
+COPY startup.sh /app/startup.sh
 RUN chmod +x /app/startup.sh
 
 EXPOSE 8080
