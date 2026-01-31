@@ -45,11 +45,12 @@ async function bootstrap() {
   redisIoAdapter.connectToRedis().catch(err => console.error("Redis Error:", err));
   app.useWebSocketAdapter(redisIoAdapter);
 
-  const port = process.env.PORT || 3000;
+  //const port = process.env.PORT || 3000;
+  const port = 3000;
   await app.listen(port, '0.0.0.0');
 
   console.log(
-    `Application is running on: http://localhost:${process.env.PORT ?? 3000}`,
+    `Application is running on: http://localhost:${port}`,
   );
 }
 bootstrap();

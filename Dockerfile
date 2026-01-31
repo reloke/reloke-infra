@@ -41,4 +41,5 @@ COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 8080
 
 # On utilise la même version pour le déploiement
-CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy && (node dist/src/main.js & nginx -g 'daemon off;')"]
+#CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy && (node dist/src/main.js & nginx -g 'daemon off;')"]
+CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy ; (node dist/src/main.js & nginx -g 'daemon off;')"]
