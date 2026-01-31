@@ -120,7 +120,7 @@ export class TriangleMatchingService {
     private readonly prisma: PrismaService,
     private readonly notificationOutboxService: NotificationOutboxService,
     private readonly config: MatchingConfigService,
-  ) {}
+  ) { }
 
   /**
    * Find and create triangle matches for a seeker
@@ -641,7 +641,7 @@ export class TriangleMatchingService {
     });
 
     try {
-      await this.prisma.$transaction(async (tx) => {
+      await this.prisma.safeTransaction(async (tx) => {
         // Re-fetch all 3 intents with fresh data
         const [intentA, intentB, intentC] = await Promise.all([
           this.fetchIntentWithFullDataTx(tx, intentAId),

@@ -19,7 +19,7 @@ export class HomeImagesService {
   constructor(
     private prisma: PrismaService,
     private s3Service: S3Service,
-  ) {}
+  ) { }
 
   /**
    * Synchronise les images d'un logement en une seule opÃ©ration (delete + upload)
@@ -103,7 +103,7 @@ export class HomeImagesService {
     }
 
     // Transaction DB : delete + reorder kept + insert new
-    await this.prisma.$transaction(async (tx) => {
+    await this.prisma.safeTransaction(async (tx) => {
       if (deleteIds.length) {
         await tx.homeImg.deleteMany({
           where: { id: { in: deleteIds }, homeId },
@@ -216,7 +216,7 @@ export class HomeImagesService {
     if (totalImageCount > MAX_IMAGES) {
       throw new BadRequestException(
         `Vous ne pouvez pas avoir plus de ${MAX_IMAGES} photos. ` +
-          `Vous en avez déjà ${currentImageCount}.`,
+        `Vous en avez déjà ${currentImageCount}.`,
       );
     }
 

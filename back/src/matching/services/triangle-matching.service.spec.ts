@@ -28,7 +28,7 @@ describe('TriangleMatchingService', () => {
       update: jest.fn(),
     },
     $queryRaw: jest.fn(),
-    $transaction: jest.fn(),
+    safeTransaction: jest.fn(),
   };
 
   const mockNotificationOutboxService = {

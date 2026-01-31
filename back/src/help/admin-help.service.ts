@@ -36,7 +36,7 @@ export class AdminHelpService {
     private s3Service: S3Service,
     private mailService: MailService,
     private helpService: HelpService,
-  ) {}
+  ) { }
 
   /**
    * List help requests with pagination and optional status filter
@@ -194,7 +194,7 @@ export class AdminHelpService {
     adminId: number,
   ): Promise<HelpRequestDto> {
     // Use transaction with serializable isolation for concurrency safety
-    return await this.prisma.$transaction(async (tx) => {
+    return await this.prisma.safeTransaction(async (tx) => {
       const helpRequest = await tx.helpRequest.findUnique({
         where: { uid },
         select: {
@@ -564,13 +564,13 @@ export class AdminHelpService {
       hasHome: !!home,
       home: home
         ? {
-            addressFormatted: home.addressFormatted,
-            homeType: home.homeType,
-            nbRooms: home.nbRooms,
-            surface: home.surface,
-            rent: home.rent,
-            imagesCount: home.images.length,
-          }
+          addressFormatted: home.addressFormatted,
+          homeType: home.homeType,
+          nbRooms: home.nbRooms,
+          surface: home.surface,
+          rent: home.rent,
+          imagesCount: home.images.length,
+        }
         : undefined,
     };
 
@@ -579,36 +579,36 @@ export class AdminHelpService {
       hasSearch: !!search,
       search: search
         ? {
-            minRent: search.minRent,
-            maxRent: search.maxRent,
-            minRoomSurface: search.minRoomSurface,
-            maxRoomSurface: search.maxRoomSurface,
-            homeType: search.homeType as string[] | null,
-            searchStartDate: search.searchStartDate,
-            searchEndDate: search.searchEndDate,
-            zonesCount: search.searchAdresses.length,
-          }
+          minRent: search.minRent,
+          maxRent: search.maxRent,
+          minRoomSurface: search.minRoomSurface,
+          maxRoomSurface: search.maxRoomSurface,
+          homeType: search.homeType as string[] | null,
+          searchStartDate: search.searchStartDate,
+          searchEndDate: search.searchEndDate,
+          zonesCount: search.searchAdresses.length,
+        }
         : undefined,
     };
 
     // Build credits context
     const creditsContext: UserCreditsContextDto = intent
       ? {
-          totalMatchesPurchased: intent.totalMatchesPurchased,
-          totalMatchesUsed: intent.totalMatchesUsed,
-          totalMatchesRemaining: intent.totalMatchesRemaining,
-          isInFlow: intent.isInFlow,
-          isActivelySearching: intent.isActivelySearching,
-          refundCooldownUntil: intent.refundCooldownUntil,
-        }
+        totalMatchesPurchased: intent.totalMatchesPurchased,
+        totalMatchesUsed: intent.totalMatchesUsed,
+        totalMatchesRemaining: intent.totalMatchesRemaining,
+        isInFlow: intent.isInFlow,
+        isActivelySearching: intent.isActivelySearching,
+        refundCooldownUntil: intent.refundCooldownUntil,
+      }
       : {
-          totalMatchesPurchased: 0,
-          totalMatchesUsed: 0,
-          totalMatchesRemaining: 0,
-          isInFlow: false,
-          isActivelySearching: false,
-          refundCooldownUntil: null,
-        };
+        totalMatchesPurchased: 0,
+        totalMatchesUsed: 0,
+        totalMatchesRemaining: 0,
+        isInFlow: false,
+        isActivelySearching: false,
+        refundCooldownUntil: null,
+      };
 
     // Build matches context
     const matchesContext: UserMatchContextDto[] = recentMatches.map((m) => ({

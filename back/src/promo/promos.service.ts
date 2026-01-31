@@ -12,7 +12,7 @@ export class PromosService {
   constructor(
     private prisma: PrismaService,
     private mailService: MailService,
-  ) {}
+  ) { }
 
   /**
    * READ-ONLY check for UI feedback.
@@ -58,7 +58,7 @@ export class PromosService {
   async applyPromoCodeToUser(userId: number, code: string) {
     const normalizedCode = code.toUpperCase();
 
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.safeTransaction(async (tx) => {
       // 1. Check if user already used a code (Optional business rule: one code per user)
       const user = await tx.user.findUnique({ where: { id: userId } });
 

@@ -33,7 +33,7 @@ export class SearchService {
   constructor(
     private prisma: PrismaService,
     private readonly maintenanceService: SearchMaintenanceService,
-  ) {}
+  ) { }
 
   /**
    * Creates a new search profile for a user
@@ -56,7 +56,7 @@ export class SearchService {
     }
 
     // Create search with zones in a transaction
-    const search = await this.prisma.$transaction(async (tx) => {
+    const search = await this.prisma.safeTransaction(async (tx) => {
       const newSearch = await tx.search.create({
         data: {
           userId,
@@ -155,7 +155,7 @@ export class SearchService {
     }
 
     // Update search and zones in a transaction
-    const search = await this.prisma.$transaction(async (tx) => {
+    const search = await this.prisma.safeTransaction(async (tx) => {
       // Update search
       await tx.search.update({
         where: { id },
@@ -211,7 +211,7 @@ export class SearchService {
     this.logger.log(`Search ${id} updated for user ${userId}`);
     return this.mapToResponseDto(search);
   }
-  
+
 
   /**
    * Validates search data according to business rules
@@ -502,7 +502,7 @@ export class SearchService {
     }
 
     // Update search dates and re-enable isActivelySearching in transaction
-    await this.prisma.$transaction(async (tx) => {
+    await this.prisma.safeTransaction(async (tx) => {
       await tx.search.update({
         where: { id: search.id },
         data: {

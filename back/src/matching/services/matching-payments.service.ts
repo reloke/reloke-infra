@@ -473,7 +473,7 @@ export class MatchingPaymentsService {
     }
 
     // 3. Process refunds in a transaction
-    const result = await this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.safeTransaction(async (tx) => {
       let successfulRefunds = 0;
       let refundedMatches = 0;
       let refundedAmount = 0;
@@ -695,7 +695,7 @@ export class MatchingPaymentsService {
     }
 
     // Update in transaction
-    await this.prisma.$transaction(async (tx) => {
+    await this.prisma.safeTransaction(async (tx) => {
       const intent = await tx.intent.findUnique({
         where: { id: payment.intentId },
         select: {
@@ -765,8 +765,8 @@ export class MatchingPaymentsService {
           isInFlow:
             !!homeId && !!searchId
               ? {
-                  set: true,
-                }
+                set: true,
+              }
               : false,
         },
       });
@@ -888,7 +888,7 @@ export class MatchingPaymentsService {
       return;
     }
 
-    await this.prisma.$transaction(async (tx) => {
+    await this.prisma.safeTransaction(async (tx) => {
       await tx.payment.update({
         where: { id: payment.id },
         data: { status: PaymentStatus.FAILED },
@@ -1043,7 +1043,7 @@ export class MatchingPaymentsService {
     }
 
     // Revert payment status if it was marked as refunded
-    await this.prisma.$transaction(async (tx) => {
+    await this.prisma.safeTransaction(async (tx) => {
       if (payment.status === PaymentStatus.REFUNDED) {
         await tx.payment.update({
           where: { id: payment.id },
@@ -1109,7 +1109,7 @@ export class MatchingPaymentsService {
     }
 
     // 3. Mise à jour transactionnelle
-    await this.prisma.$transaction(async (tx) => {
+    await this.prisma.safeTransaction(async (tx) => {
       // Incrémenter matchesUsed sur le paiement
       await tx.payment.update({
         where: { id: paymentToConsume.id },

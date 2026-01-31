@@ -709,7 +709,7 @@ export class AdminService {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('Utilisateur non trouvé');
 
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.safeTransaction(async (tx) => {
       // 1. Reset user KYC fields
       const updatedUser = await tx.user.update({
         where: { id: userId },

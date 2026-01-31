@@ -150,7 +150,7 @@ export class MatchingWorkerService implements OnModuleInit, OnModuleDestroy {
 
     // Use raw SQL for SKIP LOCKED - Prisma doesn't support it natively
     // This is a single atomic transaction: select + update
-    const result = await this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.safeTransaction(async (tx) => {
       // Step 1: Select available tasks with SKIP LOCKED
       // FOR UPDATE prevents other workers from taking these rows
       // SKIP LOCKED means rows already locked by another worker are ignored

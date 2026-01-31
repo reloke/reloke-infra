@@ -669,7 +669,7 @@ export class MatchAlgorithmService {
     if (brokenIntents.length === 0) return;
 
     for (const intent of brokenIntents) {
-      await this.prisma.$transaction(async (tx) => {
+      await this.prisma.safeTransaction(async (tx) => {
         let homeId = intent.homeId;
         let searchId = intent.searchId;
 
@@ -1249,7 +1249,7 @@ export class MatchAlgorithmService {
         evaluation.steps || [],
       );
 
-      const result = await this.prisma.$transaction(async (tx) => {
+      const result = await this.prisma.safeTransaction(async (tx) => {
         // Re-verify both still have credits
         const [freshSeeker, freshTarget] = await Promise.all([
           tx.intent.findUnique({

@@ -24,7 +24,7 @@ describe('PromosService', () => {
     influencer: {
       findUnique: jest.fn(),
     },
-    $transaction: jest.fn((callback) => callback(mockPrisma)),
+    safeTransaction: jest.fn((callback) => callback(mockPrisma)),
   };
 
   const mockMail = {

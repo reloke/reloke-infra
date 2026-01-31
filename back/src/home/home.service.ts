@@ -22,7 +22,7 @@ export class HomeService {
     private prisma: PrismaService,
     private googlePlacesService: GooglePlacesService,
     private s3Service: S3Service,
-  ) {}
+  ) { }
 
   /**
    * Récupère le Home de l'utilisateur connecté (s'il existe)
@@ -74,7 +74,7 @@ export class HomeService {
       where: { userId },
     });
 
-    const home = await this.prisma.$transaction(async (tx) => {
+    const home = await this.prisma.safeTransaction(async (tx) => {
       let updatedHome;
       if (existingHome) {
         updatedHome = await tx.home.update({
@@ -157,8 +157,8 @@ export class HomeService {
       description: home.description,
       images: home.images
         ? await Promise.all(
-            home.images.map((img: any) => this.mapImageToResponseDto(img)),
-          )
+          home.images.map((img: any) => this.mapImageToResponseDto(img)),
+        )
         : [],
     };
   }

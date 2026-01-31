@@ -8,12 +8,13 @@ import {
 } from '@prisma/client';
 import { RequestContextService } from '../common/request-context.service';
 import { AsyncLocalStorage } from 'async_hooks';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   private readonly auditBypass = new AsyncLocalStorage<boolean>();
 
-  constructor(private readonly requestContext: RequestContextService) {
+  constructor(private readonly requestContext: RequestContextService, private readonly configService: ConfigService) {
     super();
     this.registerAuditMiddleware();
   }
@@ -222,4 +223,23 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 
     return diff;
   }
+
+
+  async safeTransaction<T>(
+    fn: (prisma: Prisma.TransactionClient) => Promise<T>,
+    options: { timeout?: number; maxWait?: number } = {}
+  ): Promise<T> {
+    // 1. Récupération des valeurs depuis le ConfigService
+    const defaultTimeout = parseInt(this.configService.get('PRISMA_TRANSACTION_TIMEOUT') || '30000', 10);
+    const defaultMaxWait = parseInt(this.configService.get('PRISMA_TRANSACTION_MAX_WAIT') || '10000', 10);
+
+    // 2. Appel de la méthode RÉELLE de Prisma : $transaction
+    // On utilise (this as any) uniquement pour contourner l'erreur de typage TS sur le "$"
+    return (this as any).$transaction(fn, {
+      timeout: options.timeout || defaultTimeout,
+      maxWait: options.maxWait || defaultMaxWait,
+    });
+  }
+
+
 }

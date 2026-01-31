@@ -364,7 +364,7 @@ export class DataLifecycleService {
       const anonymizedEmail = `deleted+${userId}@reloke.invalid`;
       const anonymizedName = 'Deleted User';
 
-      await this.prisma.$transaction(async (tx) => {
+      await this.prisma.safeTransaction(async (tx) => {
         // Delete operational data
         await tx.home.deleteMany({ where: { userId } }); // cascades to HomeImg
         await tx.search.deleteMany({ where: { userId } }); // cascades

@@ -441,7 +441,7 @@ export class ChatService {
     imageUrls?: string[],
     replyToId?: number,
   ) {
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.safeTransaction(async (tx) => {
       const message = await tx.message.create({
         data: {
           chatId,
@@ -531,7 +531,7 @@ export class ChatService {
   }
 
   async exitFlow(chatId: number, userId: number) {
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.safeTransaction(async (tx) => {
       const chat = await tx.chat.findUnique({
         where: { id: chatId },
         include: { participants: true },
@@ -740,7 +740,7 @@ export class ChatService {
       targetUserId?: number;
     },
   ) {
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.safeTransaction(async (tx) => {
       const message = await tx.message.create({
         data: {
           chatId,
@@ -992,7 +992,7 @@ export class ChatService {
     }
 
     // 4. Transaction: Delete MessageImgs + Redact Message
-    await this.prisma.$transaction(async (tx) => {
+    await this.prisma.safeTransaction(async (tx) => {
       // Delete all images associated with the message
       if (message.images && message.images.length > 0) {
         await tx.messageImg.deleteMany({

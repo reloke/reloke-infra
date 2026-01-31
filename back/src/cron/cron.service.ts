@@ -70,7 +70,7 @@ export class CronService {
         }
 
         // 3. Transactional DB Anonymization
-        await this.prisma.$transaction(async (tx) => {
+        await this.prisma.safeTransaction(async (tx) => {
           await tx.user.update({
             where: { id: user.id },
             data: {
@@ -153,7 +153,7 @@ export class CronService {
     const s3KeysToDelete: string[] = [];
 
     try {
-      await this.prisma.$transaction(
+      await this.prisma.safeTransaction(
         async (tx) => {
           const lockResult = await tx.$queryRaw<{ locked: boolean }[]>`
             SELECT pg_try_advisory_lock(${this.archiveLockKey}) AS locked

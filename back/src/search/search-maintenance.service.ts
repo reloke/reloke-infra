@@ -18,7 +18,7 @@ export class SearchMaintenanceService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3Service: S3Service,
-  ) {}
+  ) { }
 
   /**
    * Public orchestrator for a list of users (starts its own transaction).
@@ -40,7 +40,7 @@ export class SearchMaintenanceService {
 
     const now = options?.now ?? new Date();
 
-    const { metrics, s3Keys } = await this.prisma.$transaction(async (tx) => {
+    const { metrics, s3Keys } = await this.prisma.safeTransaction(async (tx) => {
       return this.cleanupUsersWithClient(tx, userIds, now, options);
     });
 

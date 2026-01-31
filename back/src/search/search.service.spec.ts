@@ -25,7 +25,7 @@ describe('SearchService', () => {
       update: jest.fn(),
       create: jest.fn(),
     },
-    $transaction: jest.fn((callback: any) => callback(mockPrisma)),
+    safeTransaction: jest.fn((callback: any) => callback(mockPrisma)),
   };
 
   beforeEach(async () => {
