@@ -19,7 +19,9 @@ steps:
         '--allow-unauthenticated',
         '--min-instances', '1',
         '--cpu', '1',
-        '--memory', '1Gi'
+        '--memory', '2Gi',
+        '--timeout', '600',
+        '--cpu-boost'
       ]
 
 options:
