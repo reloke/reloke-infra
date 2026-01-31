@@ -52,4 +52,5 @@ EXPOSE 8080
 # 2. db:spatial (Scripts SQL PostGIS)
 # 3. db seed (Admin)
 # 4. Lancement Nginx + NestJS sur port 3000
-CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy && npx prisma@5.22.0 db execute --file ./sql/spatial/afterMigration.sql && npx prisma@5.22.0 db seed && (nginx -g 'daemon off;' & PORT=3000 node dist/src/main.js)"]
+#CMD ["sh", "-c", "npx prisma@5.22.0 migrate deploy && npx prisma@5.22.0 db execute --file ./sql/spatial/afterMigration.sql && npx prisma@5.22.0 db seed && (nginx -g 'daemon off;' & PORT=3000 node dist/src/main.js)"]
+CMD ["sh", "-c", "nginx -g 'daemon off;' & (npx prisma@5.22.0 migrate deploy && npx prisma@5.22.0 db execute --file ./sql/spatial/afterMigration.sql && npx prisma@5.22.0 db seed && PORT=3000 node dist/src/main.js)"]
