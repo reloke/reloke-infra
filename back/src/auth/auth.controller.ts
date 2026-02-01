@@ -54,7 +54,9 @@ export class AuthController {
     res.cookie('__session_access_token', accessToken, {
       httpOnly: true,
       secure: this.isProduction,
-      sameSite: this.isProduction ? 'strict' : 'lax',
+      //sameSite: this.isProduction ? 'strict' : 'lax',
+      sameSite: 'lax',
+      domain: '.reloke.com',
       maxAge: AUTH_CONSTANTS.JWT.ACCESS_TOKEN_EXPIRE,
       path: '/',
     });
@@ -62,7 +64,9 @@ export class AuthController {
     res.cookie('__session_refresh_token', refreshToken, {
       httpOnly: true,
       secure: this.isProduction,
-      sameSite: this.isProduction ? 'strict' : 'lax',
+      //sameSite: this.isProduction ? 'strict' : 'lax',
+      sameSite: 'lax',
+      domain: '.reloke.com',
       maxAge: AUTH_CONSTANTS.JWT.REFRESH_TOKEN_EXPIRE, // Sliding Window Hard Limit (reset on use)
       path: '/', // Restricted path? Maybe /auth/refresh? For now / is easier.
     });
