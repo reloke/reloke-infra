@@ -51,7 +51,7 @@ export class AuthController {
   }
 
   private setCookies(res: Response, accessToken: string, refreshToken: string) {
-    res.cookie('access_token', accessToken, {
+    res.cookie('__session_access_token', accessToken, {
       httpOnly: true,
       secure: this.isProduction,
       sameSite: this.isProduction ? 'strict' : 'lax',
@@ -59,7 +59,7 @@ export class AuthController {
       path: '/',
     });
 
-    res.cookie('refresh_token', refreshToken, {
+    res.cookie('__session_refresh_token', refreshToken, {
       httpOnly: true,
       secure: this.isProduction,
       sameSite: this.isProduction ? 'strict' : 'lax',
@@ -162,7 +162,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies['refresh_token'];
+    const refreshToken = req.cookies['__session_refresh_token'];
 
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token');
@@ -202,8 +202,8 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('access_token', { path: '/' });
-    res.clearCookie('refresh_token', { path: '/' });
+    res.clearCookie('__session_access_token', { path: '/' });
+    res.clearCookie('__session_refresh_token', { path: '/' });
     return { message: 'Logged out successfully' };
   }
 

@@ -52,7 +52,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private redisService: RedisService,
     private mailService: MailService,
     private prisma: PrismaService,
-  ) {}
+  ) { }
 
   afterInit(server: Server) {
     // Override CORS with dynamic FRONTEND_URL from config
@@ -158,7 +158,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       acc[key] = value;
       return acc;
     }, {} as any);
-    return cookies['access_token'] || null;
+    return cookies['__session_access_token'] || null;
   }
 
   async handleDisconnect(client: Socket) {
@@ -176,7 +176,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (chatRooms.length > 0) {
         await this.redisService
           .srem(`active_rooms:${userId}`, ...chatRooms)
-          .catch(() => {});
+          .catch(() => { });
         this.logger.debug(
           `Cleaned up ${chatRooms.length} rooms for user ${userId}: ${chatRooms.join(', ')}`,
         );
